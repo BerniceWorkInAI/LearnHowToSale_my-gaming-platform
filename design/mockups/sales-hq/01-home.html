@@ -1,61 +1,61 @@
 <title>Botler Sales HQ — Home · Today's mission</title>
 <style>
-  /* ═══ LES 3 PAPIERS — A: Night Blueprint (défaut) · B: Mint Studio · C: Lavender Paper ═══ */
+  /* ═══ LES 3 PAPIERS — A: Gallery White (défaut) · B: Morning Sky · C: Peach Fizz ═══ */
   :root {
-    --paper: #16222e;              /* fond */
-    --grid: rgba(240,234,216,.055);/* quadrillage */
-    --ink: #ece5d3;                /* texte principal */
-    --ink-strong: #f6f1e4;
-    --panel: #1c2a38;              /* fond des nœuds/surfaces */
-    --rule: #2e3f50;               /* filets doux */
-    --rule-strong: #ece5d3;        /* trait éditorial fort */
-    --grey: #8e99a8;               /* texte secondaire */
-    --faint: #5d6b7c;              /* texte très discret */
-    --gold: #e0b64f;               /* mots serif italique */
+    --paper: #ffffff;              /* fond */
+    --grid: rgba(29,27,23,.05);    /* quadrillage */
+    --ink: #1d1b17;                /* texte principal */
+    --ink-strong: #14120e;
+    --panel: #fafaf7;              /* fond des nœuds/surfaces */
+    --rule: #e7e5df;               /* filets doux */
+    --rule-strong: #1d1b17;        /* trait éditorial fort */
+    --grey: #8f8b81;               /* texte secondaire */
+    --faint: #c2beb3;              /* texte très discret */
+    --gold: #b8860b;               /* mots serif italique */
     --signal: #ffd12e;             /* LE jaune — ne change jamais */
     --signal-ink: #1d1b17;         /* texte sur jaune */
-    --green: #3aa385;
-    --orange: #e8763d;
-    --bar-bg: #24333f;
-    --shadow: #000;                /* ombre franche */
-    --border: #ece5d3;             /* bordures de nœuds */
-    --grain-invert: 1;
-  }
-  :root[data-theme="mint"] {
-    --paper: #e7efe9;
-    --grid: rgba(23,48,38,.06);
-    --ink: #182420;
-    --ink-strong: #101a16;
-    --panel: #fbfdf9;
-    --rule: #cfdcd2;
-    --rule-strong: #182420;
-    --grey: #71847a;
-    --faint: #a3b3a9;
-    --gold: #a5760a;
-    --green: #1f7d64;
+    --green: #23856f;
     --orange: #d1571f;
-    --bar-bg: #d8e4da;
-    --shadow: #182420;
-    --border: #182420;
+    --bar-bg: #efede8;
+    --shadow: #1d1b17;             /* ombre franche */
+    --border: #1d1b17;             /* bordures de nœuds */
+    --grain-invert: 0;
+  }
+  :root[data-theme="sky"] {
+    --paper: #e2edf6;
+    --grid: rgba(22,52,80,.07);
+    --ink: #16232e;
+    --ink-strong: #0e1922;
+    --panel: #fbfdff;
+    --rule: #c8d9e6;
+    --rule-strong: #16232e;
+    --grey: #6d8194;
+    --faint: #a4bccd;
+    --gold: #a5760a;
+    --green: #1f7d70;
+    --orange: #d1571f;
+    --bar-bg: #d2e1ec;
+    --shadow: #16232e;
+    --border: #16232e;
     --signal-ink: #1d1b17;
     --grain-invert: 0;
   }
-  :root[data-theme="lavender"] {
-    --paper: #eae8f3;
-    --grid: rgba(43,36,66,.06);
-    --ink: #221d33;
-    --ink-strong: #17132a;
-    --panel: #fdfcff;
-    --rule: #d5d0e4;
-    --rule-strong: #221d33;
-    --grey: #837c9c;
-    --faint: #aea8c4;
-    --gold: #a97d1c;
-    --green: #23856f;
-    --orange: #d1571f;
-    --bar-bg: #ddd8ea;
-    --shadow: #221d33;
-    --border: #221d33;
+  :root[data-theme="peach"] {
+    --paper: #fce8dc;
+    --grid: rgba(83,38,16,.06);
+    --ink: #33200f;
+    --ink-strong: #241507;
+    --panel: #fffbf8;
+    --rule: #edd3c2;
+    --rule-strong: #33200f;
+    --grey: #a3826c;
+    --faint: #d4b8a5;
+    --gold: #b05c14;
+    --green: #1f7d64;
+    --orange: #c8451a;
+    --bar-bg: #f3dccc;
+    --shadow: #33200f;
+    --border: #33200f;
     --signal-ink: #1d1b17;
     --grain-invert: 0;
   }
@@ -112,9 +112,9 @@
     content: "✓"; position: absolute; inset: 0; display: grid; place-items: center;
     font-size: 12px; font-weight: 800; color: #fff; text-shadow: 0 0 3px rgba(0,0,0,.7);
   }
-  .picker .pa { background: #16222e; }
-  .picker .pb { background: #e7efe9; }
-  .picker .pc { background: #eae8f3; }
+  .picker .pa { background: #ffffff; }
+  .picker .pb { background: #cfe2f1; }
+  .picker .pc { background: #f8d9c5; }
   .picker button:focus-visible { outline: 2.5px solid var(--ink); outline-offset: 2px; }
 
   /* ── en-tête éditorial ── */
@@ -228,9 +228,9 @@
 <!-- Sélecteur de papier — outil de démo, à retirer une fois le choix fait -->
 <div class="picker">
   <span class="lbl mono">Paper</span>
-  <button class="pa on" title="A · Night Blueprint" onclick="setPaper('night', this)"></button>
-  <button class="pb" title="B · Mint Studio" onclick="setPaper('mint', this)"></button>
-  <button class="pc" title="C · Lavender Paper" onclick="setPaper('lavender', this)"></button>
+  <button class="pa on" title="A · Gallery White" onclick="setPaper('white', this)"></button>
+  <button class="pb" title="B · Morning Sky" onclick="setPaper('sky', this)"></button>
+  <button class="pc" title="C · Peach Fizz" onclick="setPaper('peach', this)"></button>
 </div>
 
 <div class="stage">
@@ -342,8 +342,8 @@
 <script>
   // ── sélecteur de papier (démo) ──
   function setPaper(name, btn) {
-    document.documentElement.dataset.theme = name === 'night' ? '' : name;
-    if (name === 'night') delete document.documentElement.dataset.theme;
+    if (name === 'white') delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = name;
     document.querySelectorAll('.picker button').forEach(b => b.classList.remove('on'));
     btn.classList.add('on');
   }
@@ -388,7 +388,7 @@
   }
 
   function confetti() {
-    const colors = ['#ffd12e', '#e9c15c', '#3aa385', '#e8763d', '#f2ead6'];
+    const colors = ['#ffd12e', '#e9c15c', '#23856f', '#d1571f', '#7fb3d8'];
     for (let i = 0; i < 40; i++) {
       const p = document.createElement('div');
       p.className = 'confetti';
