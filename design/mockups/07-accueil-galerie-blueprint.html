@@ -1,0 +1,135 @@
+<title>Botler AI Academy — Accueil v7 · Galerie × Blueprint</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f6f4ef; color: #1d1b17;
+    background-image:
+      linear-gradient(rgba(29,27,23,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(29,27,23,.04) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  button { font: inherit; cursor: pointer; }
+  .stage { max-width: 500px; margin: 0 auto; padding: 50px 26px 70px; min-height: 100vh; }
+
+  /* grain tactile */
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  .mono {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase;
+  }
+
+  /* ── en-tête éditorial ── */
+  .meta {
+    display: flex; justify-content: space-between; color: #a09a8c;
+    border-bottom: 1px solid #1d1b17; padding-bottom: 14px;
+    animation: rise .5s both;
+  }
+  h1 {
+    font-size: clamp(50px, 14vw, 72px); font-weight: 800; letter-spacing: -.04em;
+    line-height: .98; margin: 38px 0 8px; text-wrap: balance;
+    animation: rise .5s .08s both;
+  }
+  h1 em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: #b8860b; }
+  .lede { color: #a09a8c; font-size: 15px; margin: 0 0 40px; animation: rise .5s .14s both; }
+
+  /* ── le panneau du quiz : blueprint adouci ── */
+  .panel {
+    background: #fffefb; border: 1.5px solid #1d1b17; border-radius: 4px;
+    position: relative; margin-bottom: 34px;
+    animation: rise .5s .2s both;
+  }
+  .panel .corner { position: absolute; width: 8px; height: 8px; background: #ffd12e; border: 1.5px solid #1d1b17; top: -5px; left: -5px; }
+  .phead {
+    display: flex; justify-content: space-between; align-items: center;
+    color: #a09a8c; border-bottom: 1px dashed #ddd8ca; padding: 11px 18px;
+  }
+  .live { color: #23856f; }
+  .live::before {
+    content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: #23856f; margin-right: 7px; animation: pulse 2s infinite;
+  }
+  .pbody { text-align: center; padding: 30px 22px 26px; }
+  .pbody h2 { margin: 0 0 4px; font-size: 26px; font-weight: 750; letter-spacing: -.025em; }
+  .pbody h2 em { font-family: Georgia, serif; font-style: italic; font-weight: 400; }
+  .pbody p { margin: 0 0 20px; font-size: 14.5px; color: #a09a8c; }
+  .go {
+    width: 100%; padding: 19px; font-size: 19px; font-weight: 800;
+    background: #ffd12e; color: #1d1b17; border: 1.5px solid #1d1b17; border-radius: 8px;
+    box-shadow: 4px 4px 0 #1d1b17;
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .go:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 #1d1b17; }
+  .go:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 #1d1b17; }
+
+  /* ── streak & niveau : lignes galerie avec index blueprint ── */
+  .line {
+    display: flex; gap: 14px; align-items: center;
+    border-top: 1px solid #ddd8ca; padding: 22px 2px;
+  }
+  .line:last-of-type { border-bottom: 1px solid #ddd8ca; }
+  .line:nth-of-type(2) { animation: rise .5s .28s both; }
+  .line:nth-of-type(3) { animation: rise .5s .36s both; }
+  .line .icon { font-size: 26px; flex: none; }
+  .line .t { font-size: 16.5px; font-weight: 650; }
+  .line .d { font-size: 13px; color: #a09a8c; margin-top: 4px; line-height: 1.55; }
+  .line .idx { margin-left: auto; color: #a09a8c; white-space: nowrap; padding-left: 14px; align-self: flex-start; padding-top: 4px; }
+  .snum { color: #d1571f; font-variant-numeric: tabular-nums; }
+  .lvl { color: #23856f; }
+  .bar { height: 6px; background: #ece7d9; border: 1px solid #1d1b17; border-radius: 3px; margin-top: 11px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 20%; background: #23856f; }
+
+  .foot {
+    margin-top: 40px; text-align: center; color: #c4bfae;
+    animation: rise .5s .44s both;
+  }
+</style>
+
+<div class="stage">
+  <div class="meta mono"><span>Botler AI Academy</span><span>Tue 23 Jul</span></div>
+
+  <h1>Hi <em>Sofia</em></h1>
+  <p class="lede">Your daily minute of AI, ready when you are.</p>
+
+  <div class="panel">
+    <span class="corner"></span>
+    <div class="phead mono"><span>01 · Today's quiz</span><span class="live">Ready</span></div>
+    <div class="pbody">
+      <h2><em>One minute</em>. That's all.</h2>
+      <p>3 quick questions · one tap each</p>
+      <button class="go">Start ▶</button>
+    </div>
+  </div>
+
+  <div class="line">
+    <span class="icon">🔥</span>
+    <div>
+      <div class="t"><span class="snum">6</span> days in a row</div>
+      <div class="d">Play today to make it 7. Miss a day? You get one free pass every week 🛡️</div>
+    </div>
+    <span class="idx mono">02 · Streak</span>
+  </div>
+
+  <div class="line">
+    <span class="icon">🌱</span>
+    <div style="flex:1">
+      <div class="t">You're a <span class="lvl">Beginner</span> — level 1 of 5</div>
+      <div class="bar"><i></i></div>
+      <div class="d">Keep playing to reach Explorer ✨</div>
+    </div>
+    <span class="idx mono">03 · Level</span>
+  </div>
+
+  <p class="foot mono">Learn a little · every day</p>
+</div>

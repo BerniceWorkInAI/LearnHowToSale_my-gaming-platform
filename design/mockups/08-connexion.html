@@ -1,0 +1,118 @@
+<title>Botler AI Academy — Connexion (lien magique)</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f6f4ef; color: #1d1b17;
+    background-image:
+      linear-gradient(rgba(29,27,23,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(29,27,23,.04) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  button, input { font: inherit; }
+  .stage { max-width: 500px; margin: 0 auto; padding: 50px 26px 70px; min-height: 100vh; display: flex; flex-direction: column; }
+
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; }
+
+  .meta { display: flex; justify-content: space-between; color: #a09a8c; border-bottom: 1px solid #1d1b17; padding-bottom: 14px; animation: rise .5s both; }
+
+  h1 { font-size: clamp(44px, 12vw, 64px); font-weight: 800; letter-spacing: -.04em; line-height: 1.02; margin: 44px 0 10px; text-wrap: balance; animation: rise .5s .08s both; }
+  h1 em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: #b8860b; }
+  .lede { color: #a09a8c; font-size: 15.5px; margin: 0 0 42px; line-height: 1.55; animation: rise .5s .14s both; }
+
+  .panel { background: #fffefb; border: 1.5px solid #1d1b17; border-radius: 4px; position: relative; animation: rise .5s .2s both; }
+  .panel .corner { position: absolute; width: 8px; height: 8px; background: #ffd12e; border: 1.5px solid #1d1b17; top: -5px; left: -5px; }
+  .phead { display: flex; justify-content: space-between; align-items: center; color: #a09a8c; border-bottom: 1px dashed #ddd8ca; padding: 11px 18px; }
+  .pbody { padding: 26px 22px 24px; }
+
+  label { display: block; font-size: 14px; font-weight: 650; margin-bottom: 10px; }
+  input[type=email] {
+    width: 100%; padding: 16px; font-size: 16px;
+    border: 1.5px solid #1d1b17; border-radius: 8px; background: #f6f4ef;
+    color: #1d1b17; outline: none; margin-bottom: 16px;
+  }
+  input[type=email]:focus { background: #fff; box-shadow: 3px 3px 0 rgba(29,27,23,.15); }
+  input::placeholder { color: #b5af9f; }
+
+  .go {
+    width: 100%; padding: 18px; font-size: 18px; font-weight: 800;
+    background: #ffd12e; color: #1d1b17; border: 1.5px solid #1d1b17; border-radius: 8px;
+    box-shadow: 4px 4px 0 #1d1b17; cursor: pointer;
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .go:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 #1d1b17; }
+  .go:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 #1d1b17; }
+  .hint { font-size: 12.5px; color: #a09a8c; margin: 14px 0 0; line-height: 1.55; text-align: center; }
+
+  /* état 2 : confirmation */
+  #sent { display: none; }
+  .sent-icon { font-size: 44px; text-align: center; margin-bottom: 6px; }
+  .sent-title { text-align: center; font-size: 24px; font-weight: 750; letter-spacing: -.02em; margin: 0 0 8px; }
+  .sent-title em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: #b8860b; }
+  .sent-d { text-align: center; color: #a09a8c; font-size: 14.5px; line-height: 1.6; margin: 0; }
+  .sent-d b { color: #1d1b17; }
+  .again { display: block; margin: 18px auto 0; background: none; border: 0; color: #a09a8c; font-size: 13px; text-decoration: underline; cursor: pointer; }
+
+  .live { color: #23856f; }
+  .live::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #23856f; margin-right: 7px; animation: pulse 2s infinite; }
+
+  .foot { margin-top: auto; padding-top: 40px; text-align: center; color: #c4bfae; animation: rise .5s .3s both; }
+</style>
+
+<div class="stage">
+  <div class="meta mono"><span>Botler AI Academy</span><span>Welcome</span></div>
+
+  <h1>Find your <em>AI level</em>.</h1>
+  <p class="lede">Grow it in one minute a day — no passwords, no homework, no pressure.</p>
+
+  <!-- État 1 : saisie de l'email -->
+  <div class="panel" id="ask">
+    <span class="corner"></span>
+    <div class="phead mono"><span>01 · Sign in</span><span class="live">Magic link</span></div>
+    <div class="pbody">
+      <label for="email">Your work email</label>
+      <input type="email" id="email" placeholder="you@bestoftours.co.uk" autocomplete="email">
+      <button class="go" onclick="send()">Email me my magic link ✉️</button>
+      <p class="hint">We'll send you a link — one click and you're in. Nothing to remember.</p>
+    </div>
+  </div>
+
+  <!-- État 2 : confirmation -->
+  <div class="panel" id="sent">
+    <span class="corner"></span>
+    <div class="phead mono"><span>01 · Sign in</span><span class="live">Link sent</span></div>
+    <div class="pbody">
+      <div class="sent-icon">✉️</div>
+      <h2 class="sent-title">Check your <em>inbox</em></h2>
+      <p class="sent-d">We sent a sign-in link to <b id="echo">you@bestoftours.co.uk</b>.<br>Click it and you're in — it works for 15 minutes.</p>
+      <button class="again" onclick="back()">Wrong email? Send again</button>
+    </div>
+  </div>
+
+  <p class="foot mono">Learn a little · every day</p>
+</div>
+
+<script>
+  function send() {
+    const v = document.getElementById('email').value.trim();
+    if (v) document.getElementById('echo').textContent = v;
+    document.getElementById('ask').style.display = 'none';
+    document.getElementById('sent').style.display = 'block';
+  }
+  function back() {
+    document.getElementById('sent').style.display = 'none';
+    document.getElementById('ask').style.display = 'block';
+  }
+</script>

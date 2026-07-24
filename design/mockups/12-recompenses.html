@@ -1,0 +1,130 @@
+<title>Botler AI Academy — Mes récompenses</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f6f4ef; color: #1d1b17;
+    background-image:
+      linear-gradient(rgba(29,27,23,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(29,27,23,.04) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  .stage { max-width: 500px; margin: 0 auto; padding: 50px 26px 70px; }
+
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; }
+  .meta { display: flex; justify-content: space-between; color: #a09a8c; border-bottom: 1px solid #1d1b17; padding-bottom: 14px; animation: rise .5s both; }
+
+  h1 { font-size: clamp(40px, 11vw, 54px); font-weight: 800; letter-spacing: -.04em; line-height: 1; margin: 34px 0 8px; animation: rise .5s .08s both; }
+  h1 em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: #b8860b; }
+  .lede { color: #a09a8c; font-size: 15px; margin: 0 0 36px; animation: rise .5s .14s both; }
+
+  .shead { display: flex; justify-content: space-between; align-items: baseline; color: #a09a8c; border-top: 1px solid #1d1b17; padding: 14px 2px 16px; }
+  .shead .cnt { color: #23856f; }
+  section { animation: rise .5s .2s both; }
+  section + section { margin-top: 34px; }
+
+  /* danses */
+  .dances { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .dance {
+    background: #fffefb; border: 1.5px solid #1d1b17; border-radius: 8px;
+    padding: 16px 10px 12px; text-align: center; position: relative;
+  }
+  .dance .em { font-size: 30px; }
+  .dance .n { font-size: 12px; font-weight: 700; margin-top: 8px; }
+  .dance .lv { font-size: 10px; color: #a09a8c; margin-top: 3px; }
+  .dance.got { box-shadow: 3px 3px 0 #23856f; }
+  .dance.got .badge { position: absolute; top: -8px; right: -6px; font-size: 14px; }
+  .dance.lock { background: #f1ede2; border-style: dashed; border-color: #b5af9f; color: #8c8574; }
+  .dance.lock .em { filter: grayscale(1); opacity: .45; }
+
+  /* illustrations */
+  .arts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .art {
+    aspect-ratio: 1; border: 1.5px solid #1d1b17; border-radius: 8px;
+    display: grid; place-items: center; font-size: 26px; background: #fffefb;
+  }
+  .art.got { box-shadow: 3px 3px 0 #b8860b; background: linear-gradient(150deg, #fffefb, #fdf3d8); }
+  .art.lock { border-style: dashed; border-color: #b5af9f; background: #f1ede2; font-size: 15px; color: #8c8574; }
+
+  /* trousseau */
+  .keys { display: flex; flex-direction: column; }
+  .key { display: flex; gap: 12px; align-items: baseline; padding: 13px 2px; border-top: 1px solid #ddd8ca; font-size: 14.5px; }
+  .key:first-child { border-top: 0; }
+  .key b { font-family: Georgia, serif; font-style: italic; font-weight: 500; color: #b8860b; }
+  .key .from { margin-left: auto; color: #b5af9f; white-space: nowrap; padding-left: 10px; font-size: 10px; }
+
+  /* mes données */
+  .quiet { border: 1px solid #ddd8ca; border-radius: 8px; padding: 18px; background: rgba(255,254,251,.6); }
+  .quiet p { font-size: 13px; color: #8c8574; line-height: 1.6; margin: 0 0 12px; }
+  .quiet .links { display: flex; gap: 18px; flex-wrap: wrap; }
+  .quiet a { color: #8c8574; font-size: 13px; }
+
+  .foot { margin-top: 46px; text-align: center; color: #c4bfae; }
+</style>
+
+<div class="stage">
+  <div class="meta mono"><span>Botler AI Academy</span><span>Sofia · Practitioner</span></div>
+
+  <h1>Your <em>treasures</em></h1>
+  <p class="lede">Everything you've earned — and what's waiting for you next.</p>
+
+  <section>
+    <div class="shead mono"><span>01 · Dances — Bot Space 💃</span><span class="cnt">3 of 5 unlocked</span></div>
+    <div class="dances">
+      <div class="dance got"><span class="badge">✅</span><div class="em">🕺</div><div class="n">First Steps</div><div class="lv">Beginner</div></div>
+      <div class="dance got"><span class="badge">✅</span><div class="em">💃</div><div class="n">Smooth Move</div><div class="lv">Explorer</div></div>
+      <div class="dance got"><span class="badge">✅</span><div class="em">🌀</div><div class="n">The Spin</div><div class="lv">Practitioner</div></div>
+      <div class="dance lock"><div class="em">🔥</div><div class="n">🔒 Firestorm</div><div class="lv">Reach Power User</div></div>
+      <div class="dance lock"><div class="em">👑</div><div class="n">🔒 The Legend</div><div class="lv">Reach Champion</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead mono"><span>02 · Art collection 🖼️</span><span class="cnt">3 of 8 collected</span></div>
+    <div class="arts">
+      <div class="art got">🌅</div>
+      <div class="art got">🚀</div>
+      <div class="art got">🦉</div>
+      <div class="art lock">🔒</div>
+      <div class="art lock">🔒</div>
+      <div class="art lock">🔒</div>
+      <div class="art lock">🔒</div>
+      <div class="art lock">🔒</div>
+    </div>
+    <p class="lede" style="margin:12px 0 0; font-size:12.5px; animation:none;">A new artwork joins your collection every 7-day streak 🔥</p>
+  </section>
+
+  <section>
+    <div class="shead mono"><span>03 · Your keyring 🗝️</span><span class="cnt">12 keys</span></div>
+    <div class="keys">
+      <div class="key">🔑 Client data → <b>approved tools only.</b><span class="from mono">Safety</span></div>
+      <div class="key">🔑 Can't verify it? <b>Don't use it.</b><span class="from mono">Safety</span></div>
+      <div class="key">🔑 Brief AI <b>like you'd brief a colleague.</b><span class="from mono">Prompting</span></div>
+      <div class="key">🔑 …and 9 more keys collected<span class="from mono">All topics</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead mono"><span>04 · Your data</span></div>
+    <div class="quiet">
+      <p>Your progress is stored to help you learn — never to evaluate you. Only you and Berni can see it.</p>
+      <div class="links">
+        <a href="#">Reset my progress (Berni confirms first)</a>
+        <a href="#">Delete all my data</a>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot mono">Learn a little · every day</p>
+</div>

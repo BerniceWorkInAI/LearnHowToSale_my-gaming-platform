@@ -1,0 +1,276 @@
+<title>Botler AI Academy — Daily Drop (quiz jouable v2)</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f6f4ef; color: #1d1b17;
+    background-image:
+      linear-gradient(rgba(29,27,23,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(29,27,23,.04) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  button { font: inherit; cursor: pointer; }
+  .stage { max-width: 500px; margin: 0 auto; padding: 50px 26px 70px; min-height: 100vh; }
+
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes pop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; }
+
+  .meta { display: flex; justify-content: space-between; color: #a09a8c; border-bottom: 1px solid #1d1b17; padding-bottom: 14px; }
+
+  .prog { display: flex; gap: 8px; margin: 22px 0 10px; }
+  .prog span { flex: 1; height: 6px; background: #e6e1d2; border: 1px solid #1d1b17; border-radius: 3px; }
+  .prog span.done { background: #23856f; }
+  .prog span.now { background: #ffd12e; }
+
+  /* ── timer ── */
+  .timerwrap { display: flex; align-items: center; gap: 10px; margin: 0 0 26px; }
+  .timer { flex: 1; height: 8px; background: #e6e1d2; border: 1px solid #1d1b17; border-radius: 4px; overflow: hidden; }
+  .timer i { display: block; height: 100%; width: 100%; background: #23856f; border-radius: 3px; transition: width .2s linear, background .4s ease; }
+  .timer i.mid { background: #ffd12e; }
+  .timer i.low { background: #d1571f; }
+  .tnum { font-variant-numeric: tabular-nums; color: #a09a8c; min-width: 34px; text-align: right; }
+
+  /* ── la scène ── */
+  .scenerow { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 18px; }
+  .scene {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: #b8860b; border: 1px solid #b8860b; border-radius: 999px;
+    padding: 6px 13px; animation: rise .4s both;
+  }
+  .scene .em { font-size: 14px; }
+  .diff { color: #a09a8c; white-space: nowrap; animation: rise .4s .05s both; }
+
+  .q { font-size: clamp(23px, 6.2vw, 29px); font-weight: 750; letter-spacing: -.025em; line-height: 1.25; margin: 0 0 24px; text-wrap: balance; animation: rise .4s .08s both; }
+  .q em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: #b8860b; }
+
+  .answers { display: flex; flex-direction: column; gap: 12px; }
+  .ans {
+    text-align: left; padding: 16px 18px; font-size: 15.5px; line-height: 1.4;
+    background: #fffefb; border: 1.5px solid #1d1b17; border-radius: 8px;
+    transition: transform .08s ease, box-shadow .08s ease;
+    animation: rise .4s both;
+  }
+  .ans:nth-child(1) { animation-delay: .18s; } .ans:nth-child(2) { animation-delay: .26s; }
+  .ans:nth-child(3) { animation-delay: .34s; } .ans:nth-child(4) { animation-delay: .42s; }
+  .ans:hover:not(:disabled) { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 rgba(29,27,23,.8); }
+  .ans:disabled { cursor: default; }
+  .ans.good { background: #e7f3ee; border-color: #23856f; box-shadow: 3px 3px 0 #23856f; }
+  .ans.bad { background: #f6ece7; border-color: #c96a3b; opacity: .9; }
+  .ans.dim { opacity: .45; }
+
+  .fb { margin-top: 20px; background: #fffefb; border: 1.5px solid #1d1b17; border-radius: 4px; position: relative; animation: rise .35s both; }
+  .fb .corner { position: absolute; width: 8px; height: 8px; border: 1.5px solid #1d1b17; top: -5px; left: -5px; }
+  .fb.ok .corner { background: #23856f; }
+  .fb.ko .corner { background: #ffd12e; }
+  .fb .fhead { color: #a09a8c; border-bottom: 1px dashed #ddd8ca; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
+  .fb.ok .fhead b { color: #23856f; } .fb.ko .fhead b { color: #c96a3b; }
+  .fb .fbody { padding: 18px; font-size: 17px; font-weight: 600; line-height: 1.5; color: #1d1b17; }
+  .fb .fbody b { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 500; color: #b8860b; }
+  .fb .pts { color: #23856f; font-weight: 700; }
+  .combo {
+    display: inline-block; margin-left: 10px; background: #ffd12e; border: 1.5px solid #1d1b17;
+    border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 800; color: #1d1b17;
+    animation: pop .35s both;
+  }
+
+  .next {
+    width: 100%; margin-top: 18px; padding: 18px; font-size: 18px; font-weight: 800;
+    background: #ffd12e; color: #1d1b17; border: 1.5px solid #1d1b17; border-radius: 8px;
+    box-shadow: 4px 4px 0 #1d1b17; transition: transform .08s ease, box-shadow .08s ease;
+    animation: rise .35s .08s both;
+  }
+  .next:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 #1d1b17; }
+
+  .done-icon { font-size: 50px; text-align: center; margin: 40px 0 8px; animation: pop .5s both; }
+  .done-title { text-align: center; font-size: clamp(34px, 9vw, 44px); font-weight: 800; letter-spacing: -.035em; margin: 0 0 30px; animation: rise .4s .06s both; }
+  .done-title em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: #b8860b; }
+  .line { display: flex; gap: 14px; align-items: center; border-top: 1px solid #ddd8ca; padding: 20px 2px; }
+  .line:last-of-type { border-bottom: 1px solid #ddd8ca; }
+  .line .icon { font-size: 24px; }
+  .line .t { font-size: 16px; font-weight: 650; }
+  .line .d { font-size: 13px; color: #a09a8c; margin-top: 3px; }
+  .line .idx { margin-left: auto; color: #a09a8c; }
+  .bye { text-align: center; color: #a09a8c; font-size: 14.5px; margin-top: 30px; animation: rise .4s .2s both; }
+  .hidden { display: none; }
+</style>
+
+<div class="stage">
+  <div class="meta mono"><span>Daily quiz</span><span id="counter">Question 1 of 3</span></div>
+  <div class="prog" id="prog"><span class="now"></span><span></span><span></span></div>
+  <div class="timerwrap" id="timerwrap">
+    <div class="timer"><i id="tbar"></i></div>
+    <span class="tnum mono" id="tnum">25s</span>
+  </div>
+
+  <div id="play">
+    <div class="scenerow">
+      <div class="scene mono" id="scene"><span class="em" id="sceneEm"></span><span id="sceneTx"></span></div>
+      <span class="diff mono" id="diff"></span>
+    </div>
+    <h1 class="q" id="qtext"></h1>
+    <div class="answers" id="answers"></div>
+    <div id="fbzone"></div>
+  </div>
+
+  <div id="recap" class="hidden">
+    <div class="done-icon">🎉</div>
+    <h1 class="done-title">That's a <em>wrap</em>!</h1>
+    <div class="line"><span class="icon">⭐</span><div><div class="t" id="score"></div><div class="d" id="scoredetail"></div></div><span class="idx mono">Points</span></div>
+    <div class="line"><span class="icon">🔥</span><div><div class="t">7 days in a row — new record!</div><div class="d">Your free pass is still unused this week 🛡️</div></div><span class="idx mono">Streak</span></div>
+    <p class="bye">See you tomorrow, Sofia 👋</p>
+  </div>
+</div>
+
+<script>
+  // 🎛️ réglages (plus tard : variables en haut de module, modifiables par Berni)
+  const SECONDS_PER_QUESTION = 25;
+  const POINTS_PER_CORRECT   = 10;
+  const SPEED_BONUS          = 5;   // si réponse dans les 10 premières secondes
+  const SPEED_WINDOW         = 10;
+
+  const QUESTIONS = [
+    {
+      em: '📩', scene: 'Your inbox', dif: '★ Easy',
+      q: 'A client sends a <em>confidential</em> contract. You want AI to summarise it. Your move?',
+      a: [
+        { t: 'Paste it into any AI tool', ok: false },
+        { t: 'Check the approved tools first', ok: true },
+        { t: 'Retype it by hand first', ok: false },
+        { t: 'Get a colleague to paste it', ok: false },
+      ],
+      why: 'Client data → <b>approved tools only.</b>'
+    },
+    {
+      em: '🕵️', scene: 'Fact-check', dif: '★★ Medium',
+      q: 'The AI cites a <em>perfect</em> source… that you can\'t find anywhere. What\'s going on?',
+      a: [
+        { t: 'Too recent for search engines', ok: false },
+        { t: 'Probably invented — verify it', ok: true },
+        { t: 'The website must be down', ok: false },
+        { t: 'AI sources are always real', ok: false },
+      ],
+      why: 'Can\'t verify it? <b>Don\'t use it.</b>'
+    },
+    {
+      em: '🎯', scene: 'Better answers', dif: '★ Easy',
+      q: 'You need a <em>better</em> answer from AI, fast. What actually works?',
+      a: [
+        { t: 'Ask again, louder 😤', ok: false },
+        { t: 'Give context: who, what, format', ok: true },
+        { t: 'Use more technical words', ok: false },
+        { t: 'Make it as short as possible', ok: false },
+      ],
+      why: 'Brief AI <b>like you\'d brief a colleague.</b>'
+    },
+  ];
+
+  let i = 0, pts = 0, bonuses = 0, comboRun = 0;
+  let tLeft, tHandle;
+
+  function startTimer() {
+    tLeft = SECONDS_PER_QUESTION;
+    updateTimer();
+    clearInterval(tHandle);
+    tHandle = setInterval(() => {
+      tLeft -= 0.1;
+      if (tLeft <= 0) { tLeft = 0; updateTimer(); clearInterval(tHandle); timeUp(); return; }
+      updateTimer();
+    }, 100);
+  }
+  function updateTimer() {
+    const bar = document.getElementById('tbar');
+    bar.style.width = (tLeft / SECONDS_PER_QUESTION * 100) + '%';
+    bar.className = tLeft <= 6 ? 'low' : (tLeft <= 12 ? 'mid' : '');
+    document.getElementById('tnum').textContent = Math.ceil(tLeft) + 's';
+  }
+
+  function render() {
+    document.getElementById('counter').textContent = `Question ${i+1} of 3`;
+    document.querySelectorAll('#prog span').forEach((s, k) => {
+      s.className = k < i ? 'done' : (k === i ? 'now' : '');
+    });
+    const q = QUESTIONS[i];
+    document.getElementById('sceneEm').textContent = q.em;
+    document.getElementById('sceneTx').textContent = q.scene;
+    document.getElementById('diff').textContent = q.dif;
+    // relance l'animation de la scène
+    const sc = document.getElementById('scene');
+    sc.style.animation = 'none'; sc.offsetHeight; sc.style.animation = '';
+    document.getElementById('qtext').innerHTML = q.q;
+    document.getElementById('fbzone').innerHTML = '';
+    const zone = document.getElementById('answers');
+    zone.innerHTML = '';
+    q.a.forEach((ans, k) => {
+      const b = document.createElement('button');
+      b.className = 'ans'; b.textContent = ans.t;
+      b.onclick = () => pick(k);
+      zone.appendChild(b);
+    });
+    startTimer();
+  }
+
+  function timeUp() { reveal(null, false, false); }
+
+  function pick(k) {
+    clearInterval(tHandle);
+    const good = QUESTIONS[i].a[k].ok;
+    const fast = (SECONDS_PER_QUESTION - tLeft) <= SPEED_WINDOW;
+    reveal(k, good, good && fast);
+  }
+
+  function reveal(k, good, fast) {
+    const q = QUESTIONS[i];
+    if (good) { pts += POINTS_PER_CORRECT; comboRun++; } else { comboRun = 0; }
+    if (fast) { pts += SPEED_BONUS; bonuses++; }
+    document.querySelectorAll('.ans').forEach((b, j) => {
+      b.disabled = true;
+      if (q.a[j].ok) b.classList.add('good');
+      else if (j === k) b.classList.add('bad');
+      else b.classList.add('dim');
+    });
+    const head = k === null ? '⏱ Time\'s up!' : (good ? 'Nice! ✓' : 'Not quite');
+    let right = '';
+    if (good) {
+      right = `<span class="pts">+${POINTS_PER_CORRECT}${fast ? ' +' + SPEED_BONUS + ' ⚡' : ''} points</span>`;
+      if (comboRun >= 2) right += `<span class="combo">${comboRun} in a row 🎯</span>`;
+    }
+    const fb = document.createElement('div');
+    fb.className = 'fb ' + (good ? 'ok' : 'ko');
+    fb.innerHTML = `<span class="corner"></span>
+      <div class="fhead mono"><b>${head}</b><span>${right}</span></div>
+      <div class="fbody">🔑 ${q.why}</div>`;
+    const next = document.createElement('button');
+    next.className = 'next';
+    next.textContent = i < 2 ? 'Next question →' : 'Finish ✨';
+    next.onclick = () => { i++; i < 3 ? render() : recap(); };
+    const zone = document.getElementById('fbzone');
+    zone.appendChild(fb); zone.appendChild(next);
+    next.focus();
+  }
+
+  function recap() {
+    clearInterval(tHandle);
+    document.querySelectorAll('#prog span').forEach(s => s.className = 'done');
+    document.getElementById('counter').textContent = 'Done · under 90s';
+    document.getElementById('timerwrap').style.visibility = 'hidden';
+    document.getElementById('play').classList.add('hidden');
+    document.getElementById('score').textContent = `+${pts} points earned`;
+    document.getElementById('scoredetail').textContent = bonuses
+      ? `Including ${bonuses} speed bonus${bonuses > 1 ? 'es' : ''} ⚡ — every point moves you toward Explorer`
+      : 'Every point moves you toward Explorer';
+    document.getElementById('recap').classList.remove('hidden');
+  }
+
+  render();
+</script>

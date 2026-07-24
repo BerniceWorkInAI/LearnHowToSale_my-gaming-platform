@@ -1,0 +1,122 @@
+<title>Botler AI Academy — Admin · Tableau de bord équipe</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f6f4ef; color: #1d1b17;
+    background-image:
+      linear-gradient(rgba(29,27,23,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(29,27,23,.04) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  .stage { max-width: 640px; margin: 0 auto; padding: 50px 26px 70px; }
+
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+  .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; }
+  .meta { display: flex; justify-content: space-between; color: #a09a8c; border-bottom: 1px solid #1d1b17; padding-bottom: 14px; animation: rise .5s both; }
+  .meta .adm { color: #b8860b; }
+
+  h1 { font-size: clamp(38px, 10vw, 50px); font-weight: 800; letter-spacing: -.04em; margin: 32px 0 6px; animation: rise .5s .08s both; }
+  h1 em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: #b8860b; }
+  .lede { color: #a09a8c; font-size: 14.5px; margin: 0 0 32px; animation: rise .5s .14s both; }
+
+  /* gros chiffres */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; animation: rise .5s .2s both; }
+  .stat { background: #fffefb; border: 1.5px solid #1d1b17; border-radius: 8px; padding: 16px 14px; }
+  .stat .n { font-size: 30px; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .stat .l { font-size: 11.5px; color: #a09a8c; margin-top: 4px; line-height: 1.4; }
+  .stat .n .u { font-size: 15px; color: #a09a8c; font-weight: 600; }
+  .stat.hot .n { color: #23856f; }
+
+  section { margin-top: 34px; animation: rise .5s .26s both; }
+  .shead { display: flex; justify-content: space-between; align-items: baseline; color: #a09a8c; border-top: 1px solid #1d1b17; padding: 14px 2px 16px; }
+
+  /* heatmap */
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 480px; }
+  th { text-align: left; font-family: ui-monospace, Consolas, monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #a09a8c; font-weight: 600; padding: 8px 10px; }
+  td { padding: 7px 10px; font-size: 13.5px; border-top: 1px solid #ddd8ca; }
+  td.name { font-weight: 650; white-space: nowrap; }
+  td.name small { display: block; font-weight: 400; font-size: 11px; color: #a09a8c; }
+  .cell { text-align: center; border-radius: 6px; font-size: 12px; font-weight: 700; padding: 6px 0 !important; }
+  .g { background: #dcefe6; color: #1c6a55; }
+  .m { background: #fbf0cf; color: #8a6b0d; }
+  .r { background: #f8e2d7; color: #a34c22; }
+  .streakcol { text-align: center; font-variant-numeric: tabular-nums; color: #d1571f; font-weight: 700; }
+
+  /* répartition niveaux */
+  .dist { display: flex; gap: 6px; align-items: flex-end; height: 90px; }
+  .bar { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; text-align: center; gap: 6px; }
+  .bar i { display: block; background: #23856f; border: 1.5px solid #1d1b17; border-radius: 6px 6px 0 0; }
+  .bar .lbl { font-size: 10px; color: #a09a8c; }
+  .bar .cnt { font-size: 12px; font-weight: 800; }
+
+  /* nudges */
+  .nudge { display: flex; align-items: center; gap: 12px; border-top: 1px solid #ddd8ca; padding: 14px 2px; font-size: 14px; }
+  .nudge:first-of-type { border-top: 0; }
+  .nudge .d { color: #a09a8c; font-size: 12.5px; margin-top: 2px; }
+  .nudge .btn {
+    margin-left: auto; font-size: 12.5px; font-weight: 700; white-space: nowrap;
+    background: #fffefb; border: 1.5px solid #1d1b17; border-radius: 999px; padding: 8px 14px; cursor: pointer;
+    box-shadow: 2px 2px 0 #1d1b17;
+  }
+  .note { font-size: 12px; color: #a09a8c; margin-top: 14px; line-height: 1.6; }
+  .foot { margin-top: 44px; text-align: center; color: #c4bfae; }
+</style>
+
+<div class="stage">
+  <div class="meta mono"><span>Botler AI Academy</span><span class="adm">Admin · Berni</span></div>
+
+  <h1>Your <em>team</em></h1>
+  <p class="lede">22 players · Botler · Wednesday 23 July</p>
+
+  <div class="stats">
+    <div class="stat hot"><div class="n">17<span class="u">/22</span></div><div class="l">players did today's quiz</div></div>
+    <div class="stat"><div class="n">9.4</div><div class="l">average streak 🔥</div></div>
+    <div class="stat"><div class="n">86<span class="u">%</span></div><div class="l">success rate (target ~85%)</div></div>
+  </div>
+
+  <section>
+    <div class="shead mono"><span>01 · Skills heatmap</span><span>% of correct answers</span></div>
+    <p class="note" style="margin:0 0 12px">Each number = <b>% of correct answers</b> in that topic (recent). <span class="cell g" style="padding:2px 8px !important">80+</span> solid&nbsp; <span class="cell m" style="padding:2px 8px !important">60–79</span> growing&nbsp; <span class="cell r" style="padding:2px 8px !important">&lt;60</span> needs help</p>
+    <div class="scroll">
+      <table>
+        <tr><th>Player</th><th>Prompting</th><th>Everyday</th><th>Safety</th><th>Agents</th><th>🔥</th></tr>
+        <tr><td class="name">Sofia<small>Practitioner</small></td><td class="cell g">92</td><td class="cell g">85</td><td class="cell g">95</td><td class="cell m">64</td><td class="streakcol">12</td></tr>
+        <tr><td class="name">Putri<small>Explorer</small></td><td class="cell g">81</td><td class="cell m">70</td><td class="cell g">88</td><td class="cell r">41</td><td class="streakcol">8</td></tr>
+        <tr><td class="name">Ahmed<small>Power User</small></td><td class="cell g">95</td><td class="cell g">90</td><td class="cell m">72</td><td class="cell g">89</td><td class="streakcol">15</td></tr>
+        <tr><td class="name">Manon<small>Beginner</small></td><td class="cell m">58</td><td class="cell m">63</td><td class="cell g">80</td><td class="cell r">30</td><td class="streakcol">4</td></tr>
+        <tr><td class="name">Amani<small>Practitioner</small></td><td class="cell g">88</td><td class="cell g">84</td><td class="cell g">91</td><td class="cell m">68</td><td class="streakcol">11</td></tr>
+      </table>
+    </div>
+    <p class="note">💡 One glance says it all: the <b>Agents</b> column is the team's weak spot — a good theme for your next session. (+ 17 more players below in the real version.)</p>
+  </section>
+
+  <section>
+    <div class="shead mono"><span>02 · Levels</span><span>5 tiers</span></div>
+    <div class="dist">
+      <div class="bar"><span class="cnt">3</span><i style="height:24px"></i><span class="lbl">Beginner</span></div>
+      <div class="bar"><span class="cnt">8</span><i style="height:62px"></i><span class="lbl">Explorer</span></div>
+      <div class="bar"><span class="cnt">7</span><i style="height:54px"></i><span class="lbl">Practitioner</span></div>
+      <div class="bar"><span class="cnt">3</span><i style="height:24px"></i><span class="lbl">Power User</span></div>
+      <div class="bar"><span class="cnt">1</span><i style="height:10px"></i><span class="lbl">Champion</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead mono"><span>03 · Needs a nudge</span><span>2 players</span></div>
+    <div class="nudge">😴 <div><b>Karim</b><div class="d">Last played 9 days ago · streak lost</div></div><button class="btn">Send a friendly hello 👋</button></div>
+    <div class="nudge">🌙 <div><b>Elena</b><div class="d">Last played 7 days ago · freeze used</div></div><button class="btn">Send a friendly hello 👋</button></div>
+    <p class="note">🔒 This page is for helping, never for evaluating — that promise is written into the player privacy notice.</p>
+  </section>
+
+  <p class="foot mono">Admin · visible only to you</p>
+</div>
