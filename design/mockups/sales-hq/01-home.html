@@ -1,14 +1,75 @@
 <title>Botler Sales HQ — Home · Today's mission</title>
 <style>
+  /* ═══ LES 3 PAPIERS — A: Night Blueprint (défaut) · B: Mint Studio · C: Lavender Paper ═══ */
+  :root {
+    --paper: #16222e;              /* fond */
+    --grid: rgba(240,234,216,.055);/* quadrillage */
+    --ink: #ece5d3;                /* texte principal */
+    --ink-strong: #f6f1e4;
+    --panel: #1c2a38;              /* fond des nœuds/surfaces */
+    --rule: #2e3f50;               /* filets doux */
+    --rule-strong: #ece5d3;        /* trait éditorial fort */
+    --grey: #8e99a8;               /* texte secondaire */
+    --faint: #5d6b7c;              /* texte très discret */
+    --gold: #e0b64f;               /* mots serif italique */
+    --signal: #ffd12e;             /* LE jaune — ne change jamais */
+    --signal-ink: #1d1b17;         /* texte sur jaune */
+    --green: #3aa385;
+    --orange: #e8763d;
+    --bar-bg: #24333f;
+    --shadow: #000;                /* ombre franche */
+    --border: #ece5d3;             /* bordures de nœuds */
+    --grain-invert: 1;
+  }
+  :root[data-theme="mint"] {
+    --paper: #e7efe9;
+    --grid: rgba(23,48,38,.06);
+    --ink: #182420;
+    --ink-strong: #101a16;
+    --panel: #fbfdf9;
+    --rule: #cfdcd2;
+    --rule-strong: #182420;
+    --grey: #71847a;
+    --faint: #a3b3a9;
+    --gold: #a5760a;
+    --green: #1f7d64;
+    --orange: #d1571f;
+    --bar-bg: #d8e4da;
+    --shadow: #182420;
+    --border: #182420;
+    --signal-ink: #1d1b17;
+    --grain-invert: 0;
+  }
+  :root[data-theme="lavender"] {
+    --paper: #eae8f3;
+    --grid: rgba(43,36,66,.06);
+    --ink: #221d33;
+    --ink-strong: #17132a;
+    --panel: #fdfcff;
+    --rule: #d5d0e4;
+    --rule-strong: #221d33;
+    --grey: #837c9c;
+    --faint: #aea8c4;
+    --gold: #a97d1c;
+    --green: #23856f;
+    --orange: #d1571f;
+    --bar-bg: #ddd8ea;
+    --shadow: #221d33;
+    --border: #221d33;
+    --signal-ink: #1d1b17;
+    --grain-invert: 0;
+  }
+
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: #f6f4ef; color: #1d1b17;
+    background: var(--paper); color: var(--ink);
     background-image:
-      linear-gradient(rgba(29,27,23,.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(29,27,23,.04) 1px, transparent 1px);
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
     background-size: 44px 44px;
+    transition: background-color .35s ease, color .35s ease;
   }
   button { font: inherit; cursor: pointer; }
   a { color: inherit; }
@@ -16,13 +77,14 @@
 
   /* grain tactile */
   body::after {
-    content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .4;
+    content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .35;
+    filter: invert(var(--grain-invert));
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
-  @keyframes ring { 0%,100% { box-shadow: 0 0 0 0 rgba(35,133,111,.35); } 50% { box-shadow: 0 0 0 7px rgba(35,133,111,0); } }
+  @keyframes ring { 0%,100% { box-shadow: 0 0 0 0 rgba(58,163,133,.4); } 50% { box-shadow: 0 0 0 7px rgba(58,163,133,0); } }
   @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
   @keyframes fall { to { transform: translateY(105vh) rotate(660deg); opacity: .9; } }
   @media (prefers-reduced-motion: reduce) {
@@ -34,114 +96,142 @@
     font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase;
   }
 
+  /* ── le sélecteur de papier (démo uniquement) ── */
+  .picker {
+    position: fixed; top: 14px; right: 14px; z-index: 50;
+    display: flex; gap: 8px; align-items: center;
+    background: var(--panel); border: 1.5px solid var(--border); border-radius: 999px;
+    padding: 7px 12px;
+  }
+  .picker .lbl { color: var(--grey); }
+  .picker button {
+    width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border);
+    padding: 0; position: relative;
+  }
+  .picker button.on::after {
+    content: "✓"; position: absolute; inset: 0; display: grid; place-items: center;
+    font-size: 12px; font-weight: 800; color: #fff; text-shadow: 0 0 3px rgba(0,0,0,.7);
+  }
+  .picker .pa { background: #16222e; }
+  .picker .pb { background: #e7efe9; }
+  .picker .pc { background: #eae8f3; }
+  .picker button:focus-visible { outline: 2.5px solid var(--ink); outline-offset: 2px; }
+
   /* ── en-tête éditorial ── */
   .meta {
-    display: flex; justify-content: space-between; color: #a09a8c;
-    border-bottom: 1px solid #1d1b17; padding-bottom: 14px;
+    display: flex; justify-content: space-between; color: var(--grey);
+    border-bottom: 1px solid var(--rule-strong); padding-bottom: 14px;
     animation: rise .5s both;
   }
 
   .head { animation: rise .5s .08s both; }
   h1 {
     font-size: clamp(46px, 8vw, 66px); font-weight: 800; letter-spacing: -.04em;
-    line-height: .98; margin: 34px 0 10px; text-wrap: balance;
+    line-height: .98; margin: 34px 0 10px; text-wrap: balance; color: var(--ink-strong);
   }
-  h1 em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: #b8860b; }
-  .lede { color: #a09a8c; font-size: 15.5px; margin: 0 0 44px; max-width: 60ch; line-height: 1.55; }
-  .lede b { color: #1d1b17; font-weight: 650; }
+  h1 em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: var(--gold); }
+  .lede { color: var(--grey); font-size: 15.5px; margin: 0 0 44px; max-width: 60ch; line-height: 1.55; }
+  .lede b { color: var(--ink-strong); font-weight: 650; }
 
-  /* ── deux colonnes : la mission | le tableau de bord ── */
+  /* ── deux colonnes ── */
   .cols { display: grid; grid-template-columns: 1.55fr 1fr; gap: 64px; align-items: start; }
   @media (max-width: 760px) { .cols { grid-template-columns: 1fr; gap: 40px; } }
 
   .shead {
     display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
-    color: #a09a8c; border-top: 1px solid #1d1b17; padding: 13px 2px 6px;
+    color: var(--grey); border-top: 1px solid var(--rule-strong); padding: 13px 2px 6px;
   }
-  .shead .live { color: #23856f; white-space: nowrap; }
+  .shead .live { color: var(--green); white-space: nowrap; }
   .shead .live::before {
     content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
-    background: #23856f; margin-right: 7px; animation: pulse 2s infinite;
+    background: var(--green); margin-right: 7px; animation: pulse 2s infinite;
   }
-  .explain { color: #a09a8c; font-size: 13px; line-height: 1.55; margin: 4px 0 26px; }
+  .explain { color: var(--grey); font-size: 13px; line-height: 1.55; margin: 4px 0 26px; }
 
-  /* ── le parcours de quête, tracé sur le blueprint ── */
+  /* ── le parcours de quête ── */
   .quest { animation: rise .5s .16s both; }
   .path { position: relative; margin: 0 0 8px; padding: 0; list-style: none; }
   .path::before {
     content: ""; position: absolute; left: 17px; top: 20px; bottom: 20px;
-    border-left: 1.5px dashed #b5af9f;
+    border-left: 1.5px dashed var(--faint);
   }
-  .stop { position: relative; display: flex; gap: 20px; padding: 16px 0 16px 0; }
+  .stop { position: relative; display: flex; gap: 20px; padding: 16px 0; }
   .node {
     flex: none; width: 36px; height: 36px; border-radius: 50%; z-index: 1;
-    background: #fffefb; border: 1.5px solid #1d1b17;
+    background: var(--panel); border: 1.5px solid var(--border); color: var(--ink);
     display: grid; place-items: center;
     font-family: ui-monospace, Consolas, monospace; font-size: 13px; font-weight: 700;
     transition: background .3s ease, color .3s ease;
   }
   .stop.current .node { animation: ring 2s infinite; }
-  .stop.done .node { background: #23856f; border-color: #23856f; color: #f6f4ef; }
+  .stop.done .node { background: var(--green); border-color: var(--green); color: var(--paper); }
   .stop .body { padding-top: 4px; }
-  .stop .t { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
-  .stop .t em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: #b8860b; }
-  .stop .d { font-size: 13.5px; color: #a09a8c; margin-top: 4px; line-height: 1.55; max-width: 46ch; }
-  .stop .st { margin-left: auto; padding-left: 12px; padding-top: 10px; color: #c4bfae; white-space: nowrap; }
-  .stop.done .st { color: #23856f; }
+  .stop .t { font-size: 17px; font-weight: 700; letter-spacing: -.01em; color: var(--ink-strong); }
+  .stop .t em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: var(--gold); }
+  .stop .d { font-size: 13.5px; color: var(--grey); margin-top: 4px; line-height: 1.55; max-width: 46ch; }
+  .stop .st { margin-left: auto; padding-left: 12px; padding-top: 10px; color: var(--faint); white-space: nowrap; }
+  .stop.done .st { color: var(--green); }
   .stop.done .t { text-decoration: line-through; text-decoration-thickness: 1.5px; opacity: .6; }
   .stop.done .d { opacity: .6; }
 
-  /* la station finale : le cadeau */
   .stop.goal .node { border-style: dashed; font-size: 16px; }
-  .stop.goal .t { color: #a09a8c; font-weight: 650; }
-  .stop.goal.won .node { background: #ffd12e; border-style: solid; border-color: #1d1b17; animation: pop .5s ease; }
-  .stop.goal.won .t { color: #1d1b17; }
+  .stop.goal .t { color: var(--grey); font-weight: 650; }
+  .stop.goal.won .node { background: var(--signal); border-style: solid; border-color: var(--border); animation: pop .5s ease; }
+  .stop.goal.won .t { color: var(--ink-strong); }
 
   .go {
     width: 100%; margin-top: 18px; padding: 19px; font-size: 19px; font-weight: 800;
-    background: #ffd12e; color: #1d1b17; border: 1.5px solid #1d1b17; border-radius: 8px;
-    box-shadow: 4px 4px 0 #1d1b17;
+    background: var(--signal); color: var(--signal-ink); border: 1.5px solid var(--border); border-radius: 8px;
+    box-shadow: 4px 4px 0 var(--shadow);
     transition: transform .08s ease, box-shadow .08s ease;
   }
-  .go:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 #1d1b17; }
-  .go:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 #1d1b17; }
-  .go:focus-visible { outline: 2.5px solid #1d1b17; outline-offset: 3px; }
-  .gonote { margin: 12px 0 0; text-align: center; color: #c4bfae; }
+  .go:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--shadow); }
+  .go:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--shadow); }
+  .go:focus-visible { outline: 2.5px solid var(--ink); outline-offset: 3px; }
+  .gonote { margin: 12px 0 0; text-align: center; color: var(--faint); }
 
   #doneMsg { display: none; text-align: center; margin-top: 22px; }
-  #doneMsg .big { font-size: 30px; font-weight: 800; letter-spacing: -.03em; margin: 0 0 6px; }
-  #doneMsg .big em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: #b8860b; }
-  #doneMsg p { margin: 0; font-size: 14.5px; color: #a09a8c; }
+  #doneMsg .big { font-size: 30px; font-weight: 800; letter-spacing: -.03em; margin: 0 0 6px; color: var(--ink-strong); }
+  #doneMsg .big em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: var(--gold); }
+  #doneMsg p { margin: 0; font-size: 14.5px; color: var(--grey); }
 
-  /* ── colonne de droite : le tableau de bord ── */
+  /* ── colonne de droite ── */
   .rail section { animation: rise .5s .24s both; }
   .rail section + section { margin-top: 30px; }
   .rail .row { display: flex; gap: 13px; align-items: center; padding: 4px 2px 0; }
   .rail .icon { font-size: 24px; flex: none; }
-  .rail .t { font-size: 16px; font-weight: 650; }
-  .rail .d { font-size: 12.5px; color: #a09a8c; margin-top: 4px; line-height: 1.55; }
-  .snum { color: #d1571f; font-variant-numeric: tabular-nums; display: inline-block; }
+  .rail .t { font-size: 16px; font-weight: 650; color: var(--ink-strong); }
+  .rail .d { font-size: 12.5px; color: var(--grey); margin-top: 4px; line-height: 1.55; }
+  .snum { color: var(--orange); font-variant-numeric: tabular-nums; display: inline-block; }
   .snum.grew { animation: pop .5s ease; }
-  .bar { height: 6px; background: #ece7d9; border: 1px solid #1d1b17; border-radius: 3px; margin-top: 10px; overflow: hidden; }
-  .bar i { display: block; height: 100%; width: 42%; background: #23856f; transition: width .5s ease; }
-  .lesson q { font-family: Georgia, serif; font-style: italic; quotes: "“" "”"; font-size: 15px; line-height: 1.6; color: #1d1b17; }
-  .lesson .who { color: #a09a8c; font-size: 12.5px; margin-top: 6px; }
+  .bar { height: 6px; background: var(--bar-bg); border: 1px solid var(--border); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 42%; background: var(--green); transition: width .5s ease; }
+  .lesson q { font-family: Georgia, serif; font-style: italic; quotes: "“" "”"; font-size: 15px; line-height: 1.6; color: var(--ink); }
+  .lesson .who { color: var(--grey); font-size: 12.5px; margin-top: 6px; }
 
   .rail .links { display: flex; flex-direction: column; }
   .rail .links a {
     display: flex; justify-content: space-between; gap: 10px;
     text-decoration: none; font-size: 14.5px; font-weight: 650;
-    padding: 12px 2px; border-bottom: 1px solid #ddd8ca;
+    padding: 12px 2px; border-bottom: 1px solid var(--rule);
   }
-  .rail .links a:first-child { border-top: 1px solid #ddd8ca; }
-  .rail .links a .mono { color: #c4bfae; align-self: center; }
-  .rail .links a:hover { color: #b8860b; }
+  .rail .links a:first-child { border-top: 1px solid var(--rule); }
+  .rail .links a .mono { color: var(--faint); align-self: center; }
+  .rail .links a:hover { color: var(--gold); }
 
-  .foot { margin-top: 56px; text-align: center; color: #c4bfae; animation: rise .5s .4s both; }
-  .replay { display: block; margin: 16px auto 0; background: none; border: none; color: #c4bfae; text-decoration: underline; }
+  .foot { margin-top: 56px; text-align: center; color: var(--faint); animation: rise .5s .4s both; }
+  .replay { display: block; margin: 16px auto 0; background: none; border: none; color: var(--faint); text-decoration: underline; }
 
   .confetti { position: fixed; top: -4vh; z-index: 45; pointer-events: none; opacity: 0; animation: fall linear both; }
 </style>
+
+<!-- Sélecteur de papier — outil de démo, à retirer une fois le choix fait -->
+<div class="picker">
+  <span class="lbl mono">Paper</span>
+  <button class="pa on" title="A · Night Blueprint" onclick="setPaper('night', this)"></button>
+  <button class="pb" title="B · Mint Studio" onclick="setPaper('mint', this)"></button>
+  <button class="pc" title="C · Lavender Paper" onclick="setPaper('lavender', this)"></button>
+</div>
 
 <div class="stage">
   <div class="meta mono"><span>Botler Sales HQ · Berni's game</span><span>Fri 24 Jul</span></div>
@@ -154,7 +244,7 @@
   </div>
 
   <div class="cols">
-    <!-- ══ LA MISSION : le parcours du jour ══ -->
+    <!-- ══ LA MISSION ══ -->
     <div class="quest">
       <div class="shead mono"><span>01 · Today's mission — your only job today</span><span class="live" id="plive">Ready</span></div>
       <p class="explain">Do them in any order. Each done move = points. One move is enough to protect your streak 🔥</p>
@@ -250,8 +340,15 @@
 </div>
 
 <script>
-  // Démo : chaque clic sur le bouton jaune "termine" l'étape suivante du parcours.
-  // Dans le vrai HQ, ce bouton ouvrira le mode quête (écran 2).
+  // ── sélecteur de papier (démo) ──
+  function setPaper(name, btn) {
+    document.documentElement.dataset.theme = name === 'night' ? '' : name;
+    if (name === 'night') delete document.documentElement.dataset.theme;
+    document.querySelectorAll('.picker button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+  }
+
+  // ── démo de la mission : chaque clic termine l'étape suivante ──
   let n = 0;
   const labels = ['Nice — next one ▶', 'Last one ▶'];
   let week = 5; const weekGoal = 12;
@@ -291,7 +388,7 @@
   }
 
   function confetti() {
-    const colors = ['#ffd12e', '#e9c15c', '#23856f', '#d1571f', '#f2ead6'];
+    const colors = ['#ffd12e', '#e9c15c', '#3aa385', '#e8763d', '#f2ead6'];
     for (let i = 0; i < 40; i++) {
       const p = document.createElement('div');
       p.className = 'confetti';
