@@ -1,0 +1,125 @@
+/* ═══ Botler Sales HQ · styles communs · charte design/CHARTE-SALES-HQ.md ═══ */
+:root {
+  --paper: #ffffff;
+  --grid: rgba(29,27,23,.05);
+  --ink: #1d1b17;
+  --ink-strong: #14120e;
+  --panel: #fafaf7;
+  --rule: #e7e5df;
+  --rule-strong: #1d1b17;
+  --grey: #8f8b81;
+  --faint: #c2beb3;
+  --gold: #b8860b;
+  --signal: #ffd12e;
+  --signal-ink: #1d1b17;
+  --green: #23856f;
+  --orange: #d1571f;
+  --bar-bg: #efede8;
+  --shadow: #1d1b17;
+  --border: #1d1b17;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--paper); color: var(--ink);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+button { font: inherit; cursor: pointer; }
+a { color: inherit; }
+
+/* grain tactile */
+body::after {
+  content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+@keyframes ring { 0%,100% { box-shadow: 0 0 0 0 rgba(58,163,133,.4); } 50% { box-shadow: 0 0 0 7px rgba(58,163,133,0); } }
+@keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+@keyframes slidein { from { opacity: 0; transform: translateX(-18px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes fall { to { transform: translateY(105vh) rotate(660deg); opacity: .9; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+.mono {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase;
+}
+
+.meta {
+  display: flex; justify-content: space-between; color: var(--grey);
+  border-bottom: 1px solid var(--rule-strong); padding-bottom: 14px;
+  animation: rise .5s both;
+}
+.meta a { text-decoration: none; }
+.meta a:hover { color: var(--ink); }
+
+h1 em, h2 em, .gold-em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: var(--gold); }
+
+.shead {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  color: var(--grey); border-top: 1px solid var(--rule-strong); padding: 13px 2px 6px;
+}
+.shead .live { color: var(--green); white-space: nowrap; }
+.shead .live::before {
+  content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green); margin-right: 7px; animation: pulse 2s infinite;
+}
+.explain { color: var(--grey); font-size: 13px; line-height: 1.55; margin: 4px 0 26px; }
+
+/* LE bouton jaune signal */
+.go {
+  width: 100%; padding: 19px; font-size: 19px; font-weight: 800;
+  background: var(--signal); color: var(--signal-ink); border: 1.5px solid var(--border); border-radius: 8px;
+  box-shadow: 4px 4px 0 var(--shadow);
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+.go:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--shadow); }
+.go:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--shadow); }
+.go:focus-visible { outline: 2.5px solid var(--ink); outline-offset: 3px; }
+.go:disabled { opacity: .5; cursor: default; }
+
+/* boutons outils secondaires */
+.tool {
+  background: var(--paper); color: var(--ink); font-weight: 700; font-size: 14px;
+  border: 1.5px solid var(--border); border-radius: 8px; padding: 11px 16px;
+  box-shadow: 2.5px 2.5px 0 var(--shadow); text-decoration: none; display: inline-block;
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+.tool:hover { transform: translate(-1px,-1px); box-shadow: 3.5px 3.5px 0 var(--shadow); }
+.tool:active { transform: translate(2px,2px); box-shadow: .5px .5px 0 var(--shadow); }
+.tool:focus-visible { outline: 2.5px solid var(--ink); outline-offset: 3px; }
+
+input.hq, textarea.hq {
+  font: inherit; font-size: 14.5px; padding: 12px 13px; color: var(--ink);
+  background: var(--panel); border: 1.5px solid var(--border); border-radius: 8px;
+}
+input.hq::placeholder { color: var(--faint); }
+input.hq:focus-visible, textarea.hq:focus-visible { outline: 2.5px solid var(--gold); outline-offset: 2px; }
+
+/* toast de points */
+#toast {
+  position: fixed; left: 50%; top: 22px; transform: translateX(-50%) translateY(-80px);
+  z-index: 60; background: var(--ink); color: var(--paper);
+  padding: 12px 22px; border-radius: 999px; font-weight: 800; font-size: 15px;
+  transition: transform .35s cubic-bezier(.2,.9,.3,1.3); pointer-events: none;
+  max-width: min(90vw, 560px); text-align: center;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+
+.confetti { position: fixed; top: -4vh; z-index: 45; pointer-events: none; opacity: 0; animation: fall linear both; }
+
+.foot { text-align: center; color: var(--faint); }
+.footlinks { display: flex; justify-content: center; gap: 22px; margin-top: 10px; }
+.footlinks button, .footlinks label {
+  background: none; border: none; color: var(--faint); text-decoration: underline;
+  font-size: 12px; cursor: pointer;
+}
+.footlinks button:hover, .footlinks label:hover { color: var(--grey); }
