@@ -145,6 +145,11 @@
   document.getElementById('dateLine').textContent = HQ.dateLine();
   let chosen = HQ.state.character || null;
 
+  // 🔊 les sons de Berni (joués sur ses clics, jamais tout seuls)
+  const sndChoose = new Audio('media/sfx/choosing-character.mp3');
+  const sndStart = new Audio('media/sfx/character-selected.mp3');
+  sndChoose.preload = sndStart.preload = 'auto';
+
   function paint() {
     document.getElementById('cBernice').classList.toggle('sel', chosen === 'bernice');
     document.getElementById('cInjection').classList.toggle('sel', chosen === 'injection');
@@ -154,10 +159,24 @@
       b.textContent = chosen === 'injection' ? 'Start · unleash Injection 😈 ▶' : 'Start as Bernice ▶';
     }
   }
-  function pick(k) { chosen = k; paint(); }
+  function pick(k) {
+    chosen = k;
+    sndChoose.currentTime = 0;
+    sndChoose.play().catch(() => {});
+    paint();
+  }
   function start() {
     HQ.setCharacter(chosen);
-    location.href = 'index.html';
+    sndChoose.pause();
+    sndStart.play().catch(() => {});
+    const b = document.getElementById('start');
+    b.disabled = true;
+    b.textContent = chosen === 'injection' ? 'Unleashing… 😈' : 'Here we go ✨';
+    // on laisse le son se jouer, puis on entre dans le HQ
+    let gone = false;
+    const go = () => { if (!gone) { gone = true; location.href = 'index.html'; } };
+    sndStart.onended = go;
+    setTimeout(go, 2500);   // filet de sécurité si le son ne charge pas
   }
   paint();
 </script>
