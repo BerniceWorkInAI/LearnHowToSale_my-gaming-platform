@@ -102,7 +102,8 @@
 
     let nextHtml;
     if (p.level === 3) {
-      nextHtml = '<div class="calm">🏆 ' + HQ.esc(p.name) + ' is a client. Nothing to do but be proud.<br>Keep them happy, they are your best ambassador.</div>';
+      nextHtml = '<div class="calm">🏆 ' + HQ.esc(p.name) + ' is a client. Nothing to do but be proud.<br>Keep them happy, they are your best ambassador.</div>'
+        + '<div class="quick" style="margin-top:16px"><a class="tool" href="celebrate.html?id=' + p.id + '&kind=client" title="Replay the celebration whenever you need a boost">🎬 Replay the celebration</a></div>';
     } else if (v) {
       const scriptHtml = HQ.esc(v.script).replace(/\[(.+?)\]/g, '<span class="hole">[$1]</span>');
       nextHtml =

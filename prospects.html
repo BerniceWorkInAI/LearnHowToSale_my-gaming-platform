@@ -129,7 +129,8 @@
               + (li < 3 ? '<div class="acts">'
                   + '<button class="up" onclick="up(' + p.id + ')">' + L.up + '</button>'
                   + '<button class="no" onclick="no(' + p.id + ')" title="They said no, that is +15 courage points">🦁 no +15</button>'
-                  + '</div>' : '')
+                  + '</div>'
+                : '<div class="acts"><a class="up" href="celebrate.html?id=' + p.id + '&kind=client" style="text-decoration:none" title="Replay the celebration whenever you need a boost">🎬 replay the party</a></div>')
               + '</div>';
           }).join('') || '<div class="empty">Nobody here yet.<br>Your next move fills this box ✨</div>')
         + '</div>';
