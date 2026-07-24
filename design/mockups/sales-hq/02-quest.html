@@ -89,6 +89,15 @@
   }
   h1 em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: var(--gold); }
 
+  /* le badge canal : où envoyer, zéro doute */
+  .chan {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--panel); border: 1.5px solid var(--border); border-radius: 999px;
+    padding: 8px 16px; margin: 16px 0 2px; color: var(--grey);
+  }
+  .chan b { color: var(--ink-strong); letter-spacing: .1em; }
+  .chan .em { font-size: 15px; letter-spacing: 0; }
+
   .who { color: var(--grey); font-size: 14.5px; line-height: 1.6; margin: 0 0 6px; }
   .why { color: var(--ink); font-size: 14.5px; line-height: 1.6; margin: 0 0 24px; }
   .why b { font-weight: 700; }
@@ -208,6 +217,7 @@
   const MOVES = [
     {
       head: '01 · Move 1 — first hello',
+      channel: '<span class="em">💼</span> Send this on <b>LINKEDIN</b> · direct message',
       title: 'Say hi to <em>Luigi’s Pizzeria</em> ✉️',
       who: '🍕 Family pizzeria in Leeds · found on LinkedIn · never contacted before.',
       why: 'Why them: <b>no online ordering on their site</b> — customers must phone. <span class="tag">Exactly what Botler fixes.</span>',
@@ -219,12 +229,13 @@ Worth a 10-minute look?`,
         { label: 'Copy message 📋', copy: true },
         { label: 'Open their LinkedIn ↗', href: '#' }
       ],
-      btn: 'I sent it ✔ +10',
+      btn: 'I sent it on LinkedIn ✔ +10',
       points: '+10 points ✨',
       courage: null
     },
     {
       head: '02 · Move 2 — gentle follow-up',
+      channel: '<span class="em">✉️</span> Send this by <b>EMAIL</b> · reply to your Tuesday thread',
       title: 'Follow up with <em>Rosie’s Bakery</em> 🔁',
       who: '🥐 Bakery in Bristol · asked about pricing on Tuesday · one email so far.',
       why: 'Why now: <b>she showed interest 3 days ago</b> — a gentle nudge doubles your chances. <span class="tag">Nudging is caring.</span>',
@@ -235,12 +246,13 @@ And if it's a no for now, that's completely fine too — just say so and I'll st
         { label: 'Copy message 📋', copy: true },
         { label: 'Open email draft ✉️', href: 'mailto:rosie@example.com?subject=Quick%20follow-up%20from%20Botler' }
       ],
-      btn: 'I sent it ✔ +10',
+      btn: 'I sent it by email ✔ +10',
       points: '+10 points ✨',
       courage: 'If Rosie answers <b>no</b>, tap "brave no" on her card later → <b>+15 courage points</b>. A no beats silence — it means you dared to ask.'
     },
     {
       head: '03 · Move 3 — grow your book',
+      channel: '<span class="em">📇</span> No message to send · <b>JUST YOUR BOOK</b>',
       title: 'Add one prospect to <em>your book</em> 📇',
       who: '30 seconds, promise. A name, a trade, a city — that’s all.',
       why: 'Why it matters: <b>tomorrow’s mission is built from your book.</b> <span class="tag">Future-you says thanks.</span>',
@@ -260,6 +272,7 @@ And if it's a no for now, that's completely fine too — just say so and I'll st
     const m = MOVES[i];
     box.innerHTML = `
       <div class="shead mono"><span>${m.head}</span><span class="live">In progress</span></div>
+      <div class="chan mono">${m.channel}</div>
       <h1>${m.title}</h1>
       <p class="who">${m.who}</p>
       <p class="why">${m.why}</p>
