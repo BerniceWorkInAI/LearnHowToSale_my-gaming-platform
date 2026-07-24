@@ -45,6 +45,12 @@ Toujours utiliser ces **variables CSS** (`:root`) — jamais de couleurs en dur.
 - Jamais d'action téléphonique. Jamais de pression ("You're free — see you tomorrow 🌿").
 - Pied de page : "Sell with heart · one brave move a day".
 
+## Interdits d'écriture (règles de Berni)
+- **JAMAIS d'em dash (—)** dans les textes visibles : ça sonne "AI generated".
+  Utiliser le point médian "·" (déjà la signature du style), une virgule,
+  deux points, ou couper en deux phrases. Vaut aussi pour les scripts de vente.
+- Le fond beige crème (#f6f4ef) est banni : papier officiel = Gallery White.
+
 ## Brain treats 🎁 (validé sur l'écran 2)
 Chaque action terminée offre une mini-phrase mémorisable ("brain treat"), tirée
 au sort localement (jamais d'API). Deux familles :

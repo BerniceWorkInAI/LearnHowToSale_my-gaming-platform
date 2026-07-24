@@ -1,6 +1,6 @@
-<title>Botler Sales HQ — Home · Today's mission</title>
+<title>Botler Sales HQ · Home · Today's mission</title>
 <style>
-  /* ═══ PAPIER OFFICIEL DU SALES HQ : Gallery White — validé par Berni le 24 juillet 2026 ═══ */
+  /* ═══ PAPIER OFFICIEL DU SALES HQ : Gallery White · validé par Berni le 24 juillet 2026 ═══ */
   :root {
     --paper: #ffffff;              /* fond */
     --grid: rgba(29,27,23,.05);    /* quadrillage */
@@ -12,7 +12,7 @@
     --grey: #8f8b81;               /* texte secondaire */
     --faint: #c2beb3;              /* texte très discret */
     --gold: #b8860b;               /* mots serif italique */
-    --signal: #ffd12e;             /* LE jaune — ne change jamais */
+    --signal: #ffd12e;             /* LE jaune · ne change jamais */
     --signal-ink: #1d1b17;         /* texte sur jaune */
     --green: #23856f;
     --orange: #d1571f;
@@ -173,14 +173,14 @@
   <div class="head">
     <h1>Hi <em>Berni♥</em></h1>
     <p class="lede">Your HQ picked <b>3 small moves</b> for today, straight from your prospect list.
-    About 15 minutes total, message scripts included — <b>and never a phone call.</b>
+    About 15 minutes total, message scripts included · <b>and never a phone call.</b>
     Finish the path, and your day is won.</p>
   </div>
 
   <div class="cols">
     <!-- ══ LA MISSION ══ -->
     <div class="quest">
-      <div class="shead mono"><span>01 · Today's mission — your only job today</span><span class="live" id="plive">Ready</span></div>
+      <div class="shead mono"><span>01 · Today's mission · your only job today</span><span class="live" id="plive">Ready</span></div>
       <p class="explain">Do them in any order. Each done move = points. One move is enough to protect your streak 🔥</p>
 
       <ol class="path">
@@ -188,7 +188,7 @@
           <span class="node" id="node1">1</span>
           <div class="body">
             <div class="t">Say hi to <em>Luigi's Pizzeria</em> ✉️</div>
-            <div class="d">First LinkedIn message · Leeds · your script is ready to copy — just add their name.</div>
+            <div class="d">First LinkedIn message · Leeds · your script is ready to copy · just add their name.</div>
           </div>
           <span class="st mono" id="st1">to do</span>
         </li>
@@ -196,7 +196,7 @@
           <span class="node" id="node2">2</span>
           <div class="body">
             <div class="t">Follow up with <em>Rosie's Bakery</em> 🔁</div>
-            <div class="d">She asked about pricing on Tuesday — one gentle nudge by email, script ready.</div>
+            <div class="d">She asked about pricing on Tuesday · one gentle nudge by email, script ready.</div>
           </div>
           <span class="st mono" id="st2">to do</span>
         </li>
@@ -204,7 +204,7 @@
           <span class="node" id="node3">3</span>
           <div class="body">
             <div class="t">Add one prospect to <em>your book</em> 📇</div>
-            <div class="d">30 seconds, promise — a name, a trade, a city. Future-you says thanks.</div>
+            <div class="d">30 seconds, promise · a name, a trade, a city. Future-you says thanks.</div>
           </div>
           <span class="st mono" id="st3">to do</span>
         </li>
@@ -221,14 +221,14 @@
 
       <div id="doneMsg">
         <div class="big">Mission <em>complete</em> ✨</div>
-        <p>3 of 3 · +30 points · You're free — see you tomorrow 🌿</p>
+        <p>3 of 3 · +30 points · You're free · see you tomorrow 🌿</p>
       </div>
     </div>
 
     <!-- ══ LE TABLEAU DE BORD ══ -->
     <aside class="rail">
       <section>
-        <div class="shead mono"><span>02 · Streak — your fire</span></div>
+        <div class="shead mono"><span>02 · Streak · your fire</span></div>
         <div class="row">
           <span class="icon">🔥</span>
           <div>
@@ -239,13 +239,13 @@
       </section>
 
       <section>
-        <div class="shead mono"><span>03 · This week — your effort</span></div>
+        <div class="shead mono"><span>03 · This week · your effort</span></div>
         <div class="row">
           <span class="icon">🌿</span>
           <div style="flex:1">
             <div class="t">Brave moves this week</div>
             <div class="bar"><i id="wbar"></i></div>
-            <div class="d" id="wdesc">A good rhythm is building — keep it gentle. Effort counts, answers don't.</div>
+            <div class="d" id="wdesc">A good rhythm is building · keep it gentle. Effort counts, answers don't.</div>
           </div>
         </div>
       </section>
@@ -261,9 +261,9 @@
       <section>
         <div class="shead mono"><span>05 · Go to</span></div>
         <div class="links">
-          <a href="#" title="Screen 3 — coming next">My prospects <span class="mono">soon</span></a>
-          <a href="#" title="Screen 5 — coming next">Trophy Room 🏆 <span class="mono">soon</span></a>
-          <a href="#" title="Screen 6 — waiting for Maëva's catalogue">Products <span class="mono">soon</span></a>
+          <a href="#" title="Screen 3 · coming next">My prospects <span class="mono">soon</span></a>
+          <a href="#" title="Screen 5 · coming next">Trophy Room 🏆 <span class="mono">soon</span></a>
+          <a href="#" title="Screen 6 · waiting for Maëva's catalogue">Products <span class="mono">soon</span></a>
         </div>
       </section>
     </aside>
@@ -276,7 +276,7 @@
 <script>
   // ── démo de la mission : chaque clic termine l'étape suivante ──
   let n = 0;
-  const labels = ['Nice — next one ▶', 'Last one ▶'];
+  const labels = ['Nice · next one ▶', 'Last one ▶'];
   let week = 5; const weekGoal = 12;
 
   function step() {
@@ -289,7 +289,7 @@
 
     week++;
     document.getElementById('wbar').style.width = Math.round(week / weekGoal * 100) + '%';
-    document.getElementById('wdesc').textContent = week + ' brave moves this week — nearly there.';
+    document.getElementById('wdesc').textContent = week + ' brave moves this week · nearly there.';
 
     if (n === 1) {
       const s = document.getElementById('snum');
@@ -304,7 +304,7 @@
     } else {
       const goal = document.getElementById('goal');
       goal.classList.add('won');
-      document.getElementById('goalT').textContent = 'Mission complete — you did the whole path 🏁';
+      document.getElementById('goalT').textContent = 'Mission complete · you did the whole path 🏁';
       document.getElementById('go').style.display = 'none';
       document.getElementById('gonote').style.display = 'none';
       document.getElementById('doneMsg').style.display = 'block';

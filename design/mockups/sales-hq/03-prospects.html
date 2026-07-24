@@ -1,6 +1,6 @@
-<title>Botler Sales HQ — My prospects · The board</title>
+<title>Botler Sales HQ · My prospects · The board</title>
 <style>
-  /* ═══ PAPIER OFFICIEL : Gallery White — cf. design/CHARTE-SALES-HQ.md ═══ */
+  /* ═══ PAPIER OFFICIEL : Gallery White · cf. design/CHARTE-SALES-HQ.md ═══ */
   :root {
     --paper: #ffffff;
     --grid: rgba(29,27,23,.05);
@@ -191,8 +191,9 @@
 
   <div id="addForm">
     <input placeholder="Business name" id="fName" aria-label="Business name">
-    <input placeholder="Trade — pizzeria, bakery, club…" id="fTrade" aria-label="Trade">
+    <input placeholder="Trade · pizzeria, bakery, club…" id="fTrade" aria-label="Trade">
     <input placeholder="City" id="fCity" aria-label="City">
+    <input placeholder="Website (optional · empty = no site yet 🎯)" id="fSite" aria-label="Website">
     <button class="ok" onclick="addProspect()">Add ✔ +5</button>
   </div>
 
@@ -207,16 +208,16 @@
 <div id="clientParty">
   <div class="in">
     <div class="big">CLIENT! <em>You did it</em> 🏆</div>
-    <p>This is where your full-screen celebration will play —<br>your victory video, the golden card, the whole show. (Screen 5!)</p>
+    <p>This is where your full-screen celebration will play ·<br>your victory video, the golden card, the whole show. (Screen 5!)</p>
     <button onclick="closeParty()">Back to the board ▶</button>
   </div>
 </div>
 
 <script>
-  // ── Le plateau (démo — dans le vrai HQ : localStorage) ──
+  // ── Le plateau (démo · dans le vrai HQ : localStorage) ──
   const LEVELS = [
-    { key: 'contacted',  label: '01 · CONTACTED',  desc: 'You said hi — waiting for a reply.',              up: '↗ They replied! → Interested +20' },
-    { key: 'interested', label: '02 · INTERESTED', desc: 'They replied — curious, asking questions.',       up: '↗ Demo booked! → Demo +20' },
+    { key: 'contacted',  label: '01 · CONTACTED',  desc: 'You said hi · waiting for a reply.',              up: '↗ They replied! → Interested +20' },
+    { key: 'interested', label: '02 · INTERESTED', desc: 'They replied · curious, asking questions.',       up: '↗ Demo booked! → Demo +20' },
     { key: 'demo',       label: '03 · DEMO',       desc: 'A demo is booked or already done.',               up: '🏆 They said YES! → Client +20' },
     { key: 'client',     label: '04 · CLIENT 🏆',  desc: 'They said yes. You sold with heart.',             up: null },
   ];
@@ -246,9 +247,9 @@
             ${li < 3 ? `
               <div class="acts">
                 <button class="up" onclick="moveUp(${p.id})">${L.up}</button>
-                <button class="no" onclick="braveNo(${p.id})" title="They said no — that's +15 courage points">🦁 no +15</button>
+                <button class="no" onclick="braveNo(${p.id})" title="They said no · that's +15 courage points">🦁 no +15</button>
               </div>` : ''}
-          </div>`).join('') || `<div class="empty">Nobody here yet —<br>your next move fills this box ✨</div>`}
+          </div>`).join('') || `<div class="empty">Nobody here yet ·<br>your next move fills this box ✨</div>`}
       </div>`;
     }).join('');
 
