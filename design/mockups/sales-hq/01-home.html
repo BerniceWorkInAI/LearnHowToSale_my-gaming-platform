@@ -1,6 +1,6 @@
 <title>Botler Sales HQ — Home · Today's mission</title>
 <style>
-  /* ═══ LES 3 PAPIERS — A: Gallery White (défaut) · B: Morning Sky · C: Peach Fizz ═══ */
+  /* ═══ PAPIER OFFICIEL DU SALES HQ : Gallery White — validé par Berni le 24 juillet 2026 ═══ */
   :root {
     --paper: #ffffff;              /* fond */
     --grid: rgba(29,27,23,.05);    /* quadrillage */
@@ -19,44 +19,6 @@
     --bar-bg: #efede8;
     --shadow: #1d1b17;             /* ombre franche */
     --border: #1d1b17;             /* bordures de nœuds */
-    --grain-invert: 0;
-  }
-  :root[data-theme="sky"] {
-    --paper: #e2edf6;
-    --grid: rgba(22,52,80,.07);
-    --ink: #16232e;
-    --ink-strong: #0e1922;
-    --panel: #fbfdff;
-    --rule: #c8d9e6;
-    --rule-strong: #16232e;
-    --grey: #6d8194;
-    --faint: #a4bccd;
-    --gold: #a5760a;
-    --green: #1f7d70;
-    --orange: #d1571f;
-    --bar-bg: #d2e1ec;
-    --shadow: #16232e;
-    --border: #16232e;
-    --signal-ink: #1d1b17;
-    --grain-invert: 0;
-  }
-  :root[data-theme="peach"] {
-    --paper: #fce8dc;
-    --grid: rgba(83,38,16,.06);
-    --ink: #33200f;
-    --ink-strong: #241507;
-    --panel: #fffbf8;
-    --rule: #edd3c2;
-    --rule-strong: #33200f;
-    --grey: #a3826c;
-    --faint: #d4b8a5;
-    --gold: #b05c14;
-    --green: #1f7d64;
-    --orange: #c8451a;
-    --bar-bg: #f3dccc;
-    --shadow: #33200f;
-    --border: #33200f;
-    --signal-ink: #1d1b17;
     --grain-invert: 0;
   }
 
@@ -96,26 +58,6 @@
     font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase;
   }
 
-  /* ── le sélecteur de papier (démo uniquement) ── */
-  .picker {
-    position: fixed; top: 14px; right: 14px; z-index: 50;
-    display: flex; gap: 8px; align-items: center;
-    background: var(--panel); border: 1.5px solid var(--border); border-radius: 999px;
-    padding: 7px 12px;
-  }
-  .picker .lbl { color: var(--grey); }
-  .picker button {
-    width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border);
-    padding: 0; position: relative;
-  }
-  .picker button.on::after {
-    content: "✓"; position: absolute; inset: 0; display: grid; place-items: center;
-    font-size: 12px; font-weight: 800; color: #fff; text-shadow: 0 0 3px rgba(0,0,0,.7);
-  }
-  .picker .pa { background: #ffffff; }
-  .picker .pb { background: #cfe2f1; }
-  .picker .pc { background: #f8d9c5; }
-  .picker button:focus-visible { outline: 2.5px solid var(--ink); outline-offset: 2px; }
 
   /* ── en-tête éditorial ── */
   .meta {
@@ -225,14 +167,6 @@
   .confetti { position: fixed; top: -4vh; z-index: 45; pointer-events: none; opacity: 0; animation: fall linear both; }
 </style>
 
-<!-- Sélecteur de papier — outil de démo, à retirer une fois le choix fait -->
-<div class="picker">
-  <span class="lbl mono">Paper</span>
-  <button class="pa on" title="A · Gallery White" onclick="setPaper('white', this)"></button>
-  <button class="pb" title="B · Morning Sky" onclick="setPaper('sky', this)"></button>
-  <button class="pc" title="C · Peach Fizz" onclick="setPaper('peach', this)"></button>
-</div>
-
 <div class="stage">
   <div class="meta mono"><span>Botler Sales HQ · Berni's game</span><span>Fri 24 Jul</span></div>
 
@@ -340,14 +274,6 @@
 </div>
 
 <script>
-  // ── sélecteur de papier (démo) ──
-  function setPaper(name, btn) {
-    if (name === 'white') delete document.documentElement.dataset.theme;
-    else document.documentElement.dataset.theme = name;
-    document.querySelectorAll('.picker button').forEach(b => b.classList.remove('on'));
-    btn.classList.add('on');
-  }
-
   // ── démo de la mission : chaque clic termine l'étape suivante ──
   let n = 0;
   const labels = ['Nice — next one ▶', 'Last one ▶'];
