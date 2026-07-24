@@ -57,6 +57,13 @@ COURAGE et l'EFFORT, pas seulement les ventes.
 - Brain treats 🎁 : culture G historique/scientifique + expressions anglaises.
   Jamais de contenu que Berni connaît déjà (prompting, bases de l'IA moderne).
 
+## Le dossier private/ (IMPORTANT)
+`private/` est ignoré par git (.gitignore) : c'est là que Berni dépose le
+catalogue produits, les prix et toute doc interne. Tu peux LIRE ces fichiers
+pour écrire fiches et scripts, mais leur contenu brut ne doit JAMAIS être
+copié dans le code ni commité : le repo est PUBLIC. Reformule toujours de
+façon "publique-safe" (arguments génériques, pas de conditions internes).
+
 ## En attente
 - Doc produits de Maëva → écran Produits (fiches anti-panique).
 - Médias de Berni : `media/music/`, `media/art/`, `media/victory/` (à la toute fin).

@@ -217,6 +217,21 @@
     const p = st.prospects.find(x => x.id === id);
     if (p) { p.history.push({ d: today(), txt: '📝 ' + txt }); save(); }
   }
+  /* retirer une fiche (test, erreur) : pas de points, ce n'est pas un "brave no" */
+  function removeProspect(id) {
+    const k = st.prospects.findIndex(x => x.id === id);
+    if (k < 0) return;
+    if (st.prospects[k].level === 3) st.clients = Math.max(0, st.clients - 1);
+    st.prospects.splice(k, 1);
+    save();
+  }
+  /* tout remettre à zéro (après des tests) */
+  function resetAll() {
+    st = fresh();
+    st.quest = genQuest();
+    st.questDate = today();
+    save();
+  }
 
   /* ── trophées ── */
   const TROPHY_DEFS = [
@@ -289,6 +304,23 @@
     a.download = 'botler-sales-hq-backup-' + today() + '.json';
     a.click();
   }
+  /* export CSV : s'ouvre directement dans Excel ou Google Sheets */
+  function exportCSV() {
+    const lvl = ['Contacted', 'Interested', 'Demo', 'Client 🏆'];
+    const head = ['Name', 'Trade', 'City', 'Level', 'Website', 'LinkedIn', 'Email', 'Added', 'Last touch', 'Story'];
+    const rows = st.prospects.map(p => [
+      p.name, p.trade, p.city, lvl[p.level], p.website, p.linkedin, p.email,
+      p.createdAt, p.lastTouch || '', p.history.map(h => h.d + ' · ' + h.txt).join('  |  '),
+    ]);
+    const csv = [head].concat(rows)
+      .map(r => r.map(c => '"' + String(c ?? '').replace(/"/g, '""') + '"').join(','))
+      .join('\r\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });  // le BOM aide Excel avec les accents
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'botler-sales-hq-prospects-' + today() + '.csv';
+    a.click();
+  }
   function importData(file, cb) {
     const r = new FileReader();
     r.onload = () => {
@@ -339,9 +371,9 @@
   window.HQ = {
     get state() { return st; },
     save, ensureDay, genQuest, moveView, completeMove, skipMove,
-    addProspect, moveUp, braveNo, addNote,
+    addProspect, moveUp, braveNo, addNote, removeProspect, resetAll,
     TROPHY_DEFS, nextTreat, lessonOfDay,
-    exportData, importData,
+    exportData, exportCSV, importData,
     esc, toast, confetti, dateLine, today, nice, daysBetween,
     WEEK_GOAL: 12,
   };

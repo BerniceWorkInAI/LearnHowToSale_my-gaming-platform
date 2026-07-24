@@ -1,0 +1,7 @@
+# Dossier local pour les documents sensibles (catalogue produits, prix, docs internes).
+# Claude Code peut les lire en local ; ils ne partent JAMAIS sur GitHub.
+private/
+
+# Divers
+.DS_Store
+Thumbs.db
