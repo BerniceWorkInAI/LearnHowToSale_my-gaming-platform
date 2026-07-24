@@ -67,6 +67,36 @@
   .hint { color: var(--faint); margin-top: 12px; }
 
   .foot { margin-top: auto; padding-top: 40px; animation: rise .5s .3s both; }
+
+  /* ── ambiance nuit 🌑 : cet écran est la seule salle sombre du HQ ──
+     Le mystère avant le choix ; une fois la légende choisie, retour à la
+     lumière Gallery White. Validé par Berni. */
+  body {
+    background: #131109; color: #ece5d3;
+    background-image:
+      radial-gradient(85% 55% at 50% 26%, rgba(246,241,228,.06), transparent),
+      linear-gradient(rgba(246,244,239,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(246,244,239,.045) 1px, transparent 1px);
+    background-size: 100% 100%, 44px 44px, 44px 44px;
+  }
+  body::after { filter: invert(1); opacity: .25; }
+  .meta { color: #8d8776; border-bottom-color: #ece5d3; }
+  h1 { color: #f6f1e4; }
+  h1 em { color: #e0b64f; }
+  .lede { color: #9a9484; }
+  .char { background: #1b1812; border-color: #3c372b; }
+  .char:hover { border-color: #ece5d3; }
+  .pic { background: #211d15; }
+  .pic .ph { color: #8d8776; }
+  .plate .n { color: #f6f1e4; }
+  .char.injection .plate .n { color: #b27bff; }
+  .tag { color: #9a9484; }
+  .char.bernice:hover, .char.bernice.sel { box-shadow: 6px 8px 0 #e0b64f, 0 0 44px rgba(224,182,79,.25); border-color: #e0b64f; }
+  .char.injection:hover, .char.injection.sel { box-shadow: 6px 8px 0 #7d3bd8, 0 0 44px rgba(150,80,255,.3); border-color: #7d3bd8; }
+  .plate .n, .tag { position: relative; }
+  .hint { color: #6f6a5c; }
+  .foot { color: #57523f; }
+  .go:disabled { opacity: .35; }
 </style>
 </head>
 <body>
