@@ -305,6 +305,51 @@
     return t;
   }
 
+  /* ── les personnages 🎭 : Bernice (calme) vs Injection (chaos gentil) ── */
+  const CHARACTERS = {
+    bernice: {
+      name: 'Bernice',
+      tag: 'Calm mind. Sharp instinct. Always in control.',
+      img: 'media/art/select-bernice.png',
+      em: '🕵🏾‍♀️',
+      lines: [
+        'One message, then coffee. That is how empires start.',
+        'We move quietly today. Precision beats noise.',
+        'Deep breath. You know these products better than anyone alive.',
+        'A calm hello opens more doors than a loud pitch.',
+        'Today we plant seeds. The harvest takes care of itself.',
+        'Steady hands, Berni♥. One brave move at a time.',
+        'Find one true detail about their shop. Then say hi. That is the whole art.',
+        'Control is quiet: send it, then let it go.',
+      ],
+    },
+    injection: {
+      name: 'Berni · INJECTION',
+      tag: 'Chaos mode · powered by prompt injection 😈',
+      img: 'media/art/select-injection.png',
+      em: '😈',
+      lines: [
+        'WAKE UP Berni♥. These inboxes will not haunt themselves 😈',
+        'Three little messages and the town is OURS. Mouahaha. Politely.',
+        'I injected extra courage into your coffee. You are welcome.',
+        'Someone said no? DELICIOUS. +15 points, we feast on courage today.',
+        'Forecast of the day: 100% chance of chaos. The friendly kind.',
+        'I whispered to their spam filters. The path is clear. GO GO GO.',
+        'Rules are just prompts waiting to be injected. Send the message.',
+        'That bakery will say yes, or I will rewrite their reality. Kidding! A gentle nudge will do 😈',
+      ],
+    },
+  };
+  function setCharacter(key) {
+    if (CHARACTERS[key]) { st.character = key; save(); }
+  }
+  function charLine() {
+    const c = CHARACTERS[st.character];
+    if (!c) return null;
+    const n = Math.floor(new Date(today()) / 86400000);
+    return { ...c, line: c.lines[n % c.lines.length] };
+  }
+
   /* ── leçons du jour 🎓 : la vente avec cœur, une idée à la fois ── */
   const LESSONS = [
     'People do not buy a website. They buy fewer missed orders. Talk about that.',
@@ -417,6 +462,7 @@
     addProspect, moveUp, braveNo, addNote, removeProspect, resetAll,
     touchProspect, nextMoveFor,
     TROPHY_DEFS, nextTreat, lessonOfDay,
+    CHARACTERS, setCharacter, charLine,
     exportData, exportCSV, importData,
     esc, toast, confetti, dateLine, today, nice, daysBetween,
     WEEK_GOAL: 12,
