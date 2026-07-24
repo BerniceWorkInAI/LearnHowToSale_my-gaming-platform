@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Botler Sales HQ · Quest mode</title>
+<link rel="stylesheet" href="assets/hq.css">
+<style>
+  .stage { max-width: 660px; margin: 0 auto; padding: 46px 30px 70px; min-height: 100vh; }
+  .qbar { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 8px; color: var(--grey); animation: rise .5s .06s both; }
+  .qbar a { text-decoration: none; }
+  .qbar a:hover { color: var(--ink); }
+  .dots { display: flex; gap: 8px; align-items: center; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--panel); }
+  .dot.on { background: var(--green); border-color: var(--green); }
+  .dot.now { background: var(--signal); }
+
+  .move { animation: rise .5s .12s both; }
+  .move .shead { margin-top: 18px; }
+  h1 { font-size: clamp(34px, 7vw, 48px); font-weight: 800; letter-spacing: -.04em; line-height: 1.02; margin: 18px 0 12px; text-wrap: balance; color: var(--ink-strong); }
+  .chan { display: inline-flex; align-items: center; gap: 8px; background: var(--panel); border: 1.5px solid var(--border); border-radius: 999px; padding: 8px 16px; margin: 16px 0 2px; color: var(--grey); }
+  .chan b { color: var(--ink-strong); letter-spacing: .1em; }
+  .who { color: var(--grey); font-size: 14.5px; line-height: 1.6; margin: 0 0 6px; }
+  .why { color: var(--ink); font-size: 14.5px; line-height: 1.6; margin: 0 0 24px; }
+
+  .script { background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px; position: relative; margin-bottom: 14px; }
+  .script .corner { position: absolute; width: 8px; height: 8px; background: var(--signal); border: 1.5px solid var(--border); top: -5px; left: -5px; }
+  .script .head { display: flex; justify-content: space-between; color: var(--grey); border-bottom: 1px dashed var(--rule); padding: 10px 16px; }
+  .script .txt { padding: 18px 18px 16px; font-size: 15px; line-height: 1.7; white-space: pre-line; }
+  .hole { background: var(--bar-bg); border-bottom: 1.5px dashed var(--gold); padding: 0 4px; border-radius: 3px; font-weight: 650; white-space: nowrap; }
+  .tools { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 26px; }
+  .mini { display: grid; gap: 12px; margin-bottom: 26px; }
+
+  .skip { display: block; margin: 16px auto 0; background: none; border: none; color: var(--faint); text-decoration: underline; font-size: 13px; }
+  .skip:hover { color: var(--grey); }
+  .skipnote { text-align: center; color: var(--faint); margin-top: 8px; }
+  .courage { display: flex; gap: 12px; align-items: center; margin: 22px 0 0; border-top: 1px solid var(--rule); padding-top: 16px; color: var(--grey); font-size: 13px; line-height: 1.6; }
+  .courage .em { font-size: 22px; flex: none; }
+  .courage b { color: var(--ink); }
+
+  #treat { display: none; gap: 14px; align-items: flex-start; background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px; position: relative; padding: 16px 18px; margin: 22px 0 4px; animation: rise .5s both; }
+  #treat .corner { position: absolute; width: 8px; height: 8px; background: var(--gold); border: 1.5px solid var(--border); top: -5px; left: -5px; }
+  #treat .em { font-size: 26px; flex: none; }
+  #treat .k { color: var(--grey); margin-bottom: 5px; }
+  #treat .phrase { font-size: 15.5px; font-weight: 700; color: var(--ink-strong); line-height: 1.5; }
+  #treat .hint { font-size: 13px; color: var(--grey); margin-top: 4px; line-height: 1.55; }
+
+  #final { display: none; text-align: center; padding: 70px 0 30px; }
+  #final .big { font-size: clamp(38px, 9vw, 54px); font-weight: 800; letter-spacing: -.04em; margin: 14px 0 10px; animation: rise .5s both; }
+  #final p { color: var(--grey); font-size: 15px; margin: 0 0 34px; animation: rise .5s .08s both; }
+  #final .go { max-width: 340px; animation: rise .5s .16s both; }
+
+  .foot { margin-top: 56px; animation: rise .5s .3s both; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="meta mono"><span>Botler Sales HQ · Quest mode</span><span id="dateLine"></span></div>
+
+  <div class="qbar mono">
+    <a href="index.html" title="Back to Home, no guilt">← Back home</a>
+    <div class="dots" id="dots"></div>
+    <span id="stepLbl"></span>
+  </div>
+
+  <div id="treat">
+    <span class="corner"></span>
+    <span class="em" id="treatEm">🎁</span>
+    <div>
+      <div class="k mono">You earned a brain treat · keep it!</div>
+      <div class="phrase" id="treatP"></div>
+      <div class="hint" id="treatH"></div>
+    </div>
+  </div>
+
+  <div id="moveBox" class="move"></div>
+
+  <div id="final">
+    <div class="big">Mission <em>complete</em> ✨</div>
+    <p id="finalMsg"></p>
+    <button class="go" onclick="location.href='index.html'">Back to home ▶</button>
+  </div>
+
+  <p class="foot mono">Sell with heart · one brave move a day</p>
+</div>
+
+<script src="assets/hq.js"></script>
+<script>
+  HQ.ensureDay();
+  document.getElementById('dateLine').textContent = HQ.dateLine();
+  const box = document.getElementById('moveBox');
+
+  function pending() { return HQ.state.quest.filter(m => !m.done); }
+
+  function render() {
+    const st = HQ.state;
+    const left = pending();
+    const total = st.quest.length;
+    const doneN = total - left.length;
+
+    document.getElementById('dots').innerHTML = st.quest.map((m, i) =>
+      '<span class="dot' + (m.done ? ' on' : (left[0] && left[0].id === m.id ? ' now' : '')) + '"></span>').join('');
+
+    if (!left.length) {
+      document.getElementById('stepLbl').textContent = 'Done';
+      box.style.display = 'none';
+      document.getElementById('finalMsg').innerHTML = total + ' of ' + total + ' · Your streak is safe 🔥<br>You showed up. That\'s the whole secret.';
+      document.getElementById('final').style.display = 'block';
+      HQ.confetti(44);
+      return;
+    }
+    document.getElementById('stepLbl').textContent = 'Move ' + (doneN + 1) + ' of ' + total;
+
+    const m = left[0];
+    const v = HQ.moveView(m);
+    const scriptHtml = v.script
+      ? HQ.esc(v.script).replace(/\[(.+?)\]/g, '<span class="hole">[$1]</span>')
+      : '';
+
+    box.innerHTML =
+      '<div class="shead mono"><span>0' + (doneN + 1) + ' · Move ' + (doneN + 1) + '</span><span class="live">In progress</span></div>'
+      + '<div class="chan mono">' + v.channel + '</div>'
+      + '<h1>' + HQ.esc(v.title) + ' ' + v.icon + '</h1>'
+      + '<p class="who">' + HQ.esc(v.desc) + '</p>'
+      + '<p class="why">' + HQ.esc(v.why) + '</p>'
+      + (v.script ? '<div class="script"><span class="corner"></span>'
+          + '<div class="head mono"><span>Your script · short &amp; warm</span><span>fill the [holes]</span></div>'
+          + '<div class="txt" id="scriptTxt">' + scriptHtml + '</div></div>'
+          + '<div class="tools">'
+          + '<button class="tool" onclick="copyIt(this)">Copy message 📋</button>'
+          + (v.p && v.p.linkedin ? '<a class="tool" href="' + HQ.esc(v.p.linkedin) + '" target="_blank" rel="noopener">Open their LinkedIn ↗</a>' : '')
+          + (v.p && v.p.email ? '<a class="tool" href="mailto:' + HQ.esc(v.p.email) + '">Open email draft ✉️</a>' : '')
+          + '</div>'
+        : '')
+      + (m.type === 'add' ? '<div class="mini">'
+          + '<input class="hq" id="aName" placeholder="Business name">'
+          + '<input class="hq" id="aTrade" placeholder="Trade: pizzeria, bakery, club…">'
+          + '<input class="hq" id="aCity" placeholder="City">'
+          + '<input class="hq" id="aSite" placeholder="Website (optional · empty = no site yet 🎯)">'
+          + '</div>'
+        : '')
+      + '<button class="go" onclick="done(' + m.id + ',' + (m.type === 'add') + ')">' + HQ.esc(v.btn) + '</button>'
+      + '<button class="skip" onclick="skip(' + m.id + ')">Not today →</button>'
+      + '<p class="skipnote mono">Skipping never breaks your streak · it comes back tomorrow</p>'
+      + (m.type === 'nudge' ? '<div class="courage"><span class="em">🦁</span><div>If they answer <b>no</b>, tap "brave no" on their card later. <b>+15 courage points.</b> A no beats silence, it means you dared to ask.</div></div>' : '');
+  }
+
+  function copyIt(btn) {
+    const raw = document.getElementById('scriptTxt').innerText;
+    navigator.clipboard && navigator.clipboard.writeText(raw);
+    btn.textContent = 'Copied ✅';
+    setTimeout(() => btn.textContent = 'Copy message 📋', 1600);
+  }
+
+  function done(qid, isAdd) {
+    if (isAdd) {
+      const name = document.getElementById('aName').value.trim();
+      if (!name) { HQ.toast('A name is all I need 🙂'); return; }
+      HQ.addProspect({
+        name,
+        trade: document.getElementById('aTrade').value.trim(),
+        city: document.getElementById('aCity').value.trim(),
+        website: document.getElementById('aSite').value.trim(),
+      });
+      HQ.toast('+5 points ✨ Welcome, ' + name + '!');
+    } else {
+      const v = HQ.completeMove(qid);
+      if (v) HQ.toast('+' + v.pts + ' points ✨');
+    }
+    HQ.confetti(14);
+    showTreat();
+    render();
+  }
+  function skip(qid) {
+    HQ.skipMove(qid);
+    HQ.toast('Saved for tomorrow 🌿');
+    render();
+  }
+  function showTreat() {
+    const t = HQ.nextTreat();
+    document.getElementById('treatEm').textContent = t.em;
+    document.getElementById('treatP').textContent = t.p;
+    document.getElementById('treatH').textContent = t.h;
+    const el = document.getElementById('treat');
+    el.style.display = 'flex';
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = '';
+  }
+
+  render();
+</script>
+</body>
+</html>

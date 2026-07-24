@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Botler Sales HQ · Home</title>
+<link rel="stylesheet" href="assets/hq.css">
+<style>
+  .stage { max-width: 1020px; margin: 0 auto; padding: 46px 34px 70px; min-height: 100vh; }
+  .head { animation: rise .5s .08s both; }
+  h1 { font-size: clamp(46px, 8vw, 66px); font-weight: 800; letter-spacing: -.04em; line-height: .98; margin: 34px 0 10px; text-wrap: balance; color: var(--ink-strong); }
+  .lede { color: var(--grey); font-size: 15.5px; margin: 0 0 44px; max-width: 60ch; line-height: 1.55; }
+  .lede b { color: var(--ink-strong); font-weight: 650; }
+
+  .cols { display: grid; grid-template-columns: 1.55fr 1fr; gap: 64px; align-items: start; }
+  @media (max-width: 760px) { .cols { grid-template-columns: 1fr; gap: 40px; } }
+
+  .quest { animation: rise .5s .16s both; }
+  .path { position: relative; margin: 0 0 8px; padding: 0; list-style: none; }
+  .path::before { content: ""; position: absolute; left: 17px; top: 20px; bottom: 20px; border-left: 1.5px dashed var(--faint); }
+  .stop { position: relative; display: flex; gap: 20px; padding: 16px 0; }
+  .node {
+    flex: none; width: 36px; height: 36px; border-radius: 50%; z-index: 1;
+    background: var(--panel); border: 1.5px solid var(--border); color: var(--ink);
+    display: grid; place-items: center;
+    font-family: ui-monospace, Consolas, monospace; font-size: 13px; font-weight: 700;
+  }
+  .stop.current .node { animation: ring 2s infinite; }
+  .stop.done .node { background: var(--green); border-color: var(--green); color: var(--paper); }
+  .stop .body { padding-top: 4px; }
+  .stop .t { font-size: 17px; font-weight: 700; letter-spacing: -.01em; color: var(--ink-strong); }
+  .stop .d { font-size: 13.5px; color: var(--grey); margin-top: 4px; line-height: 1.55; max-width: 46ch; }
+  .stop .st { margin-left: auto; padding-left: 12px; padding-top: 10px; color: var(--faint); white-space: nowrap; }
+  .stop.done .st { color: var(--green); }
+  .stop.done .t { text-decoration: line-through; text-decoration-thickness: 1.5px; opacity: .6; }
+  .stop.done .d { opacity: .6; }
+  .stop.goal .node { border-style: dashed; font-size: 16px; }
+  .stop.goal .t { color: var(--grey); font-weight: 650; }
+  .stop.goal.won .node { background: var(--signal); border-style: solid; border-color: var(--border); animation: pop .5s ease; }
+  .stop.goal.won .t { color: var(--ink-strong); }
+  .gonote { margin: 12px 0 0; text-align: center; color: var(--faint); }
+
+  #doneMsg { display: none; text-align: center; margin-top: 22px; }
+  #doneMsg .big { font-size: 30px; font-weight: 800; letter-spacing: -.03em; margin: 0 0 6px; color: var(--ink-strong); }
+  #doneMsg p { margin: 0; font-size: 14.5px; color: var(--grey); }
+
+  .rail section { animation: rise .5s .24s both; }
+  .rail section + section { margin-top: 30px; }
+  .rail .row { display: flex; gap: 13px; align-items: center; padding: 4px 2px 0; }
+  .rail .icon { font-size: 24px; flex: none; }
+  .rail .t { font-size: 16px; font-weight: 650; color: var(--ink-strong); }
+  .rail .d { font-size: 12.5px; color: var(--grey); margin-top: 4px; line-height: 1.55; }
+  .snum { color: var(--orange); font-variant-numeric: tabular-nums; }
+  .bar { height: 6px; background: var(--bar-bg); border: 1px solid var(--border); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--green); transition: width .5s ease; }
+  .lesson q { font-family: Georgia, serif; font-style: italic; quotes: "“" "”"; font-size: 15px; line-height: 1.6; color: var(--ink); }
+  .lesson .who { color: var(--grey); font-size: 12.5px; margin-top: 6px; }
+  .links { display: flex; flex-direction: column; }
+  .links a { display: flex; justify-content: space-between; gap: 10px; text-decoration: none; font-size: 14.5px; font-weight: 650; padding: 12px 2px; border-bottom: 1px solid var(--rule); }
+  .links a:first-child { border-top: 1px solid var(--rule); }
+  .links a:hover { color: var(--gold); }
+  .links a .mono { color: var(--faint); align-self: center; }
+
+  .foot { margin-top: 56px; animation: rise .5s .4s both; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="meta mono"><span>Botler Sales HQ · Berni's game</span><span id="dateLine"></span></div>
+
+  <div class="head">
+    <h1>Hi <em>Berni♥</em></h1>
+    <p class="lede" id="lede"></p>
+  </div>
+
+  <div class="cols">
+    <div class="quest">
+      <div class="shead mono"><span>01 · Today's mission · your only job today</span><span class="live" id="plive">Ready</span></div>
+      <p class="explain" id="qexplain">Do them in any order. Each done move = points. One move is enough to protect your streak 🔥</p>
+      <ol class="path" id="path"></ol>
+      <button class="go" id="go" onclick="location.href='quest.html'">Start ▶</button>
+      <p class="gonote mono" id="gonote">Opens quest mode · one action at a time · script included</p>
+      <div id="doneMsg">
+        <div class="big">Mission <em>complete</em> ✨</div>
+        <p>You're free. See you tomorrow 🌿</p>
+      </div>
+    </div>
+
+    <aside class="rail">
+      <section>
+        <div class="shead mono"><span>02 · Streak · your fire</span></div>
+        <div class="row">
+          <span class="icon">🔥</span>
+          <div>
+            <div class="t"><span class="snum" id="snum">0</span> <span id="sword">days in a row</span></div>
+            <div class="d" id="sdesc"></div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="shead mono"><span>03 · This week · your effort</span></div>
+        <div class="row">
+          <span class="icon">🌿</span>
+          <div style="flex:1">
+            <div class="t">Brave moves this week</div>
+            <div class="bar"><i id="wbar"></i></div>
+            <div class="d" id="wdesc"></div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="shead mono"><span>04 · Lesson of the day</span></div>
+        <div class="lesson">
+          <q id="lesson"></q>
+          <div class="who">Selling with heart · one idea a day</div>
+        </div>
+      </section>
+      <section>
+        <div class="shead mono"><span>05 · Go to</span></div>
+        <div class="links">
+          <a href="prospects.html">My prospects <span class="mono" id="pcount"></span></a>
+          <a href="trophies.html">Trophy Room 🏆 <span class="mono" id="tcount"></span></a>
+          <a href="#" title="Waiting for the product catalogue">Products <span class="mono">soon</span></a>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <div class="foot">
+    <div class="mono">Sell with heart · one brave move a day</div>
+    <div class="footlinks mono">
+      <button onclick="HQ.exportData()">💾 Save my data</button>
+      <label>📂 Restore<input type="file" accept=".json" style="display:none" onchange="restore(this)"></label>
+    </div>
+  </div>
+</div>
+
+<script src="assets/hq.js"></script>
+<script>
+  HQ.ensureDay();
+  const st = HQ.state;
+  document.getElementById('dateLine').textContent = HQ.dateLine();
+  document.getElementById('lesson').textContent = HQ.lessonOfDay();
+
+  const empty = st.prospects.length === 0;
+  document.getElementById('lede').innerHTML = empty
+    ? 'Welcome to your HQ! First mission: <b>plant the seeds</b>. Add your first prospects to your book, real businesses you would love to help. <b>Never a phone call, promise.</b>'
+    : 'Your HQ picked <b>' + st.quest.length + ' small move' + (st.quest.length > 1 ? 's' : '') + '</b> for today, straight from your prospect list. Message scripts included, <b>and never a phone call.</b> Finish the path, and your day is won.';
+
+  const allDone = st.quest.every(m => m.done);
+  document.getElementById('path').innerHTML = st.quest.map((m, i) => {
+    const v = HQ.moveView(m);
+    const current = !m.done && st.quest.findIndex(x => !x.done) === i;
+    return '<li class="stop' + (m.done ? ' done' : '') + (current ? ' current' : '') + '">'
+      + '<span class="node">' + (m.done ? '✓' : i + 1) + '</span>'
+      + '<div class="body"><div class="t">' + HQ.esc(v.title) + ' ' + v.icon + '</div>'
+      + '<div class="d">' + HQ.esc(v.desc) + '</div></div>'
+      + '<span class="st mono">' + (m.done ? (m.skipped ? 'tomorrow 🌿' : 'done ✅') : 'to do') + '</span></li>';
+  }).join('')
+  + '<li class="stop goal' + (allDone ? ' won' : '') + '"><span class="node">🎁</span><div class="body"><div class="t">'
+  + (allDone ? 'Mission complete. You did the whole path 🏁' : 'Finish all ' + st.quest.length + ' and you\'re free')
+  + '</div></div></li>';
+
+  if (allDone) {
+    document.getElementById('go').style.display = 'none';
+    document.getElementById('gonote').style.display = 'none';
+    document.getElementById('doneMsg').style.display = 'block';
+    document.getElementById('plive').textContent = 'Done ✨';
+  } else if (empty) {
+    document.getElementById('go').textContent = 'Plant my first seeds 🌱';
+    document.getElementById('go').onclick = () => location.href = 'prospects.html';
+    document.getElementById('gonote').textContent = 'Opens your prospect board · adding takes 30 seconds';
+  }
+
+  const s = st.streak.count;
+  document.getElementById('snum').textContent = s;
+  document.getElementById('sword').textContent = s === 1 ? 'day in a row' : 'days in a row';
+  document.getElementById('sdesc').textContent = st.streak.lastActive === HQ.today()
+    ? 'Today counts 🔥 Your streak is safe.'
+    : 'One action today makes it ' + (s + 1) + '. Miss a day? You get one free pass every week 🛡️';
+
+  document.getElementById('wbar').style.width = Math.min(100, Math.round(st.week.moves / HQ.WEEK_GOAL * 100)) + '%';
+  document.getElementById('wdesc').textContent = st.week.moves === 0
+    ? 'A fresh week. One gentle move starts the rhythm. Effort counts, answers don\'t.'
+    : st.week.moves + ' brave move' + (st.week.moves > 1 ? 's' : '') + ' this week. Effort counts, answers don\'t.';
+
+  document.getElementById('pcount').textContent = st.prospects.length || 'empty';
+  document.getElementById('tcount').textContent = Object.keys(st.trophies).length + ' of ' + HQ.TROPHY_DEFS.length;
+
+  function restore(inp) {
+    if (!inp.files[0]) return;
+    HQ.importData(inp.files[0], ok => { HQ.toast(ok ? 'Data restored ✅' : 'Hmm, that file does not look right'); if (ok) setTimeout(() => location.reload(), 800); });
+  }
+</script>
+</body>
+</html>
