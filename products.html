@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Botler Sales HQ · Products</title>
+<link rel="stylesheet" href="assets/hq.css">
+<style>
+  .stage { max-width: 1100px; margin: 0 auto; padding: 46px 34px 70px; min-height: 100vh; }
+  .head { animation: rise .5s .08s both; }
+  h1 { font-size: clamp(40px, 6vw, 58px); font-weight: 800; letter-spacing: -.04em; line-height: 1; margin: 30px 0 8px; color: var(--ink-strong); }
+  .lede { color: var(--grey); font-size: 15.5px; margin: 0 0 18px; max-width: 62ch; line-height: 1.55; }
+  .lede b { color: var(--ink-strong); font-weight: 650; }
+
+  .waiting {
+    display: flex; gap: 12px; align-items: center;
+    border: 1.5px dashed var(--border); border-radius: 8px; background: var(--panel);
+    padding: 13px 16px; margin: 0 0 36px; color: var(--grey); font-size: 13.5px; line-height: 1.55;
+    animation: rise .5s .14s both; max-width: 720px;
+  }
+  .waiting .em { font-size: 22px; flex: none; }
+  .waiting b { color: var(--ink-strong); }
+
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; animation: rise .5s .2s both; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+  .prod {
+    background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px;
+    position: relative; padding: 0 0 18px;
+  }
+  .prod .corner { position: absolute; width: 8px; height: 8px; background: var(--signal); border: 1.5px solid var(--border); top: -5px; left: -5px; }
+  .prod .phead {
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--grey); border-bottom: 1px dashed var(--rule); padding: 11px 18px;
+  }
+  .prod .pbody { padding: 18px 20px 0; }
+  .prod h2 { margin: 0 0 6px; font-size: 21px; font-weight: 800; letter-spacing: -.02em; color: var(--ink-strong); }
+  .prod .what { font-size: 14px; color: var(--ink); line-height: 1.6; margin: 0 0 4px; }
+  .prod .who { font-size: 13px; color: var(--grey); line-height: 1.55; margin: 0 0 14px; }
+  .prod .who b { color: var(--ink-strong); font-weight: 650; }
+
+  .lbl { color: var(--grey); border-top: 1px solid var(--rule); padding: 10px 0 8px; margin-top: 4px; }
+  .args { margin: 0; padding: 0 0 6px 2px; list-style: none; }
+  .args li { font-size: 13.5px; line-height: 1.55; padding: 4px 0 4px 22px; position: relative; }
+  .args li::before { content: "✓"; position: absolute; left: 2px; color: var(--green); font-weight: 800; }
+
+  .obj { padding: 6px 0 8px; }
+  .obj .they { font-size: 13.5px; color: var(--grey); font-style: italic; font-family: Georgia, serif; }
+  .obj .you { font-size: 13.5px; line-height: 1.55; margin-top: 3px; }
+  .obj .you b { color: var(--green); font-weight: 800; font-style: normal; }
+  .obj + .obj { border-top: 1px dashed var(--rule); margin-top: 8px; padding-top: 12px; }
+
+  .price {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    border-top: 1px solid var(--rule); margin-top: 10px; padding: 12px 0 0;
+  }
+  .price .p { font-size: 12px; color: var(--faint); font-style: italic; }
+  .copy { font-size: 12.5px; padding: 8px 13px; box-shadow: 2px 2px 0 var(--shadow); }
+
+  .foot { margin-top: 50px; animation: rise .5s .3s both; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="meta mono"><span><a href="index.html">← Home</a></span><span>Botler Sales HQ · Products</span></div>
+
+  <div class="head">
+    <h1>Your <em>anti-panic</em> cards</h1>
+    <p class="lede">Everything you need to <b>never freeze</b>: what each product is, who it helps,
+    what to say, and what to answer. You tested these products yourself, remember. You know them better than anyone.</p>
+  </div>
+
+  <div class="waiting">
+    <span class="em">📦</span>
+    <div><b>The official catalogue is on its way.</b> Exact prices and offers will land here as soon as
+    Maëva's catalogue is ready. Until then, these cards are your training wheels: everything on them is true and safe to say.</div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="foot">
+    <div class="mono">Sell with heart · you are not selling, you are helping</div>
+  </div>
+</div>
+
+<script src="assets/hq.js"></script>
+<script src="assets/products.js"></script>
+<script>
+  document.getElementById('grid').innerHTML = PRODUCTS.map((p, i) => {
+    const pitch = p.em + ' ' + p.name + ': ' + p.what + ' Perfect for: ' + p.who;
+    return '<div class="prod"><span class="corner"></span>'
+      + '<div class="phead mono"><span>0' + (i + 1) + ' · ' + HQ.esc(p.name) + '</span><span>' + p.em + '</span></div>'
+      + '<div class="pbody">'
+      + '<h2>' + p.em + ' ' + HQ.esc(p.name) + '</h2>'
+      + '<p class="what">' + HQ.esc(p.what) + '</p>'
+      + '<p class="who">Perfect for: <b>' + HQ.esc(p.who) + '</b></p>'
+      + '<div class="lbl mono">Why they will love it</div>'
+      + '<ul class="args">' + p.args.map(a => '<li>' + HQ.esc(a) + '</li>').join('') + '</ul>'
+      + '<div class="lbl mono">If they say… you say…</div>'
+      + p.objections.map(o =>
+          '<div class="obj"><div class="they">“' + HQ.esc(o.they) + '”</div>'
+          + '<div class="you"><b>→</b> ' + HQ.esc(o.you) + '</div></div>').join('')
+      + '<div class="price">'
+      + '<span class="p mono">Price · coming with the catalogue 📦</span>'
+      + '<button class="tool copy" onclick="copyPitch(this, ' + i + ')">Copy pitch 📋</button>'
+      + '</div>'
+      + '</div></div>';
+  }).join('');
+
+  function copyPitch(btn, i) {
+    const p = PRODUCTS[i];
+    navigator.clipboard && navigator.clipboard.writeText(p.name + ' · ' + p.what + ' Perfect for: ' + p.who);
+    btn.textContent = 'Copied ✅';
+    setTimeout(() => btn.textContent = 'Copy pitch 📋', 1600);
+  }
+</script>
+</body>
+</html>
