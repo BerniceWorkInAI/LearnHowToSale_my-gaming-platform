@@ -37,7 +37,13 @@
   .col.trophy .chead .n { background: var(--gold); }
   .col .cdesc { color: var(--grey); font-size: 12px; line-height: 1.5; margin: 0 2px 14px; }
 
-  .card { background: var(--panel); border: 1.5px solid var(--border); border-radius: 8px; padding: 14px 14px 12px; margin-bottom: 14px; position: relative; animation: slidein .4s both; }
+  .card { background: var(--panel); border: 1.5px solid var(--border); border-radius: 8px; padding: 14px 26px 12px 14px; margin-bottom: 14px; position: relative; animation: slidein .4s both; }
+  .del {
+    position: absolute; top: 6px; right: 7px; background: none; border: none;
+    color: var(--faint); font-size: 13px; padding: 4px 6px; border-radius: 6px;
+  }
+  .del:hover { color: var(--ink); background: var(--bar-bg); }
+  .del.arm { color: var(--paper); background: var(--ink); font-size: 10.5px; font-weight: 700; }
   .card .who { font-size: 15px; font-weight: 750; letter-spacing: -.01em; color: var(--ink-strong); }
   .card .who a { text-decoration: none; }
   .card .who a:hover { color: var(--gold); }
@@ -93,7 +99,8 @@
   <div class="foot">
     <div class="mono">Sell with heart · every name here is a future story</div>
     <div class="footlinks mono">
-      <button onclick="HQ.exportData()">💾 Save my data</button>
+      <button onclick="HQ.exportData()" title="Full backup file · use Restore on the Home page to load it back">💾 Backup (for Restore)</button>
+      <button onclick="HQ.exportCSV()" title="Opens in Excel or Google Sheets">📊 Excel / Sheets</button>
     </div>
   </div>
 </div>
@@ -125,10 +132,12 @@
         + '<p class="cdesc">' + L.desc + '</p>'
         + (cards.map(p => {
             const quiet = p.lastTouch ? HQ.daysBetween(p.lastTouch, HQ.today()) : null;
-            const wait = !p.helloSent ? 'in your book · say hi when ready'
+            const wait = li === 3 ? 'won · ' + (p.lastTouch ? HQ.nice(p.lastTouch) : '') + ' 🎉'
+              : !p.helloSent ? 'in your book · say hi when ready'
               : quiet === 0 ? 'touched today ✨'
               : quiet + ' day' + (quiet > 1 ? 's' : '') + ' quiet' + (quiet >= 3 && li < 3 ? ' · <span class="nudge">🌙 needs a nudge</span>' : '');
             return '<div class="card">'
+              + '<button class="del" onclick="del(this,' + p.id + ')" title="Remove from your book (a test, a mistake). No points lost.">✕</button>'
               + '<div class="who"><a href="prospect.html?id=' + p.id + '">' + HQ.esc(p.name) + '</a></div>'
               + '<div class="what">' + HQ.esc(p.trade) + ' · ' + HQ.esc(p.city) + (p.website ? '' : ' · no site yet 🎯') + '</div>'
               + '<div class="wait mono">' + wait + '</div>'
@@ -191,6 +200,17 @@
     render();
   }
   function closeParty() { document.getElementById('clientParty').style.display = 'none'; }
+  function del(btn, id) {
+    if (!btn.classList.contains('arm')) {          // premier clic : on demande confirmation
+      btn.classList.add('arm');
+      btn.textContent = 'remove?';
+      setTimeout(() => { btn.classList.remove('arm'); btn.textContent = '✕'; }, 2600);
+      return;
+    }
+    HQ.removeProspect(id);
+    HQ.toast('Removed from your book 🧹 (no points lost)');
+    render();
+  }
 
   render();
 </script>

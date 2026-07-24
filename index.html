@@ -129,8 +129,10 @@
   <div class="foot">
     <div class="mono">Sell with heart · one brave move a day</div>
     <div class="footlinks mono">
-      <button onclick="HQ.exportData()">💾 Save my data</button>
+      <button onclick="HQ.exportData()" title="Full backup file · the Restore button knows how to read it">💾 Backup (for Restore)</button>
+      <button onclick="HQ.exportCSV()" title="Opens in Excel or Google Sheets">📊 Excel / Sheets</button>
       <label>📂 Restore<input type="file" accept=".json" style="display:none" onchange="restore(this)"></label>
+      <button onclick="startFresh(this)" title="Erase everything and start from zero (after tests)">🧹 Start fresh</button>
     </div>
   </div>
 </div>
@@ -187,6 +189,17 @@
   document.getElementById('pcount').textContent = st.prospects.length || 'empty';
   document.getElementById('tcount').textContent = Object.keys(st.trophies).length + ' of ' + HQ.TROPHY_DEFS.length;
 
+  function startFresh(btn) {
+    if (!btn.dataset.arm) {                        // premier clic : on demande confirmation
+      btn.dataset.arm = '1';
+      btn.textContent = '🧹 Sure? This erases EVERYTHING';
+      setTimeout(() => { delete btn.dataset.arm; btn.textContent = '🧹 Start fresh'; }, 3200);
+      return;
+    }
+    HQ.resetAll();
+    HQ.toast('Fresh start 🌱 Your HQ is brand new.');
+    setTimeout(() => location.reload(), 700);
+  }
   function restore(inp) {
     if (!inp.files[0]) return;
     HQ.importData(inp.files[0], ok => { HQ.toast(ok ? 'Data restored ✅' : 'Hmm, that file does not look right'); if (ok) setTimeout(() => location.reload(), 800); });
