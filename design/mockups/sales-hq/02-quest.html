@@ -165,6 +165,20 @@
   .courage .em { font-size: 22px; flex: none; }
   .courage b { color: var(--ink); }
 
+  /* la friandise du cerveau : une mini-phrase gagnée à chaque action */
+  #treat {
+    display: none; gap: 14px; align-items: flex-start;
+    background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px;
+    position: relative; padding: 16px 18px; margin: 22px 0 4px;
+    animation: rise .5s both;
+  }
+  #treat .corner { position: absolute; width: 8px; height: 8px; background: var(--gold); border: 1.5px solid var(--border); top: -5px; left: -5px; }
+  #treat .em { font-size: 26px; flex: none; }
+  #treat .k { color: var(--grey); margin-bottom: 5px; }
+  #treat .phrase { font-size: 15.5px; font-weight: 700; color: var(--ink-strong); line-height: 1.5; }
+  #treat .phrase em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: var(--gold); }
+  #treat .hint { font-size: 13px; color: var(--grey); margin-top: 4px; line-height: 1.55; }
+
   /* toast de points */
   #toast {
     position: fixed; left: 50%; top: 22px; transform: translateX(-50%) translateY(-80px);
@@ -196,6 +210,16 @@
       <span class="dot now" id="d1"></span><span class="dot" id="d2"></span><span class="dot" id="d3"></span>
     </div>
     <span id="stepLbl">Move 1 of 3</span>
+  </div>
+
+  <div id="treat">
+    <span class="corner"></span>
+    <span class="em" id="treatEm">🎁</span>
+    <div>
+      <div class="k mono" id="treatK">You earned a brain treat · keep it!</div>
+      <div class="phrase" id="treatP"></div>
+      <div class="hint" id="treatH"></div>
+    </div>
   </div>
 
   <div id="moveBox" class="move"></div>
@@ -319,9 +343,39 @@ And if it's a no for now, that's completely fine too — just say so and I'll st
     setTimeout(() => t.classList.remove('show'), 1500);
   }
 
+  // ── les friandises du cerveau : culture IA + expressions anglaises courantes ──
+  // (aucune API : la réserve vit ici, une au hasard à chaque victoire)
+  const TREATS = [
+    { em: '🗣️', p: '<em>“Break a leg!”</em>', h: 'Means “good luck!” — nothing to do with legs. Say it before someone’s big demo.' },
+    { em: '🗣️', p: '<em>“Piece of cake”</em>', h: '= super easy. “Sending 3 messages a day? Piece of cake.”' },
+    { em: '🗣️', p: '<em>“Touch base”</em>', h: '= to check in quickly. Very common in work emails: “Just touching base!”' },
+    { em: '🗣️', p: '<em>“It’s not rocket science”</em>', h: '= it’s not that complicated. Selling with heart isn’t rocket science.' },
+    { em: '🗣️', p: '<em>“The ball is in their court”</em>', h: '= you did your part, now it’s their turn to answer. Perfect after a follow-up!' },
+    { em: '🧠', p: 'AI doesn’t “know” — it <em>predicts</em>.', h: 'Models like ChatGPT guess the next word, like a supercharged autocomplete.' },
+    { em: '🧠', p: 'A prompt is just a <em>good brief</em>.', h: 'Brief AI like you’d brief a colleague: context, goal, example. Better brief, better result.' },
+    { em: '🧠', p: 'The T in ChatGPT = <em>Transformer</em>.', h: 'An architecture invented in 2017 — it changed everything about AI.' },
+    { em: '🧠', p: 'AI “hallucinates” = it <em>invents with confidence</em>.', h: 'That’s why you always double-check names, prices and facts before sending.' },
+    { em: '🧠', p: 'Your voice assistants at Botler are <em>agents</em>.', h: 'An agent = an AI that can take actions (book, order), not just chat.' },
+  ];
+  let treatBag = [];
+
+  function showTreat() {
+    if (!treatBag.length) treatBag = TREATS.map((t, k) => k).sort(() => Math.random() - .5);
+    const t = TREATS[treatBag.pop()];
+    document.getElementById('treatEm').textContent = t.em;
+    document.getElementById('treatP').innerHTML = t.p;
+    document.getElementById('treatH').innerHTML = t.h;
+    const box = document.getElementById('treat');
+    box.style.display = 'flex';
+    box.style.animation = 'none';
+    void box.offsetWidth; // relance l'animation d'entrée
+    box.style.animation = '';
+  }
+
   function doneMove() {
     toast(MOVES[i].points);
     miniConfetti(14);
+    showTreat();
     next();
   }
   function skipMove() {
