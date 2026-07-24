@@ -1,0 +1,263 @@
+<title>Botler Sales HQ — Celebration · CLIENT! 🏆</title>
+<style>
+  /* ═══ PAPIER OFFICIEL : Gallery White — cf. design/CHARTE-SALES-HQ.md ═══ */
+  :root {
+    --paper: #ffffff;
+    --grid: rgba(29,27,23,.05);
+    --ink: #1d1b17;
+    --ink-strong: #14120e;
+    --panel: #fafaf7;
+    --rule: #e7e5df;
+    --rule-strong: #1d1b17;
+    --grey: #8f8b81;
+    --faint: #c2beb3;
+    --gold: #b8860b;
+    --signal: #ffd12e;
+    --signal-ink: #1d1b17;
+    --green: #23856f;
+    --orange: #d1571f;
+    --bar-bg: #efede8;
+    --shadow: #1d1b17;
+    --border: #1d1b17;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--paper); color: var(--ink);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 44px 44px;
+    overflow-x: hidden;
+  }
+  button { font: inherit; cursor: pointer; }
+  .stage { max-width: 620px; margin: 0 auto; padding: 46px 30px 70px; min-height: 100vh; display: flex; flex-direction: column; }
+
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .35;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes cardin {
+    0% { opacity: 0; transform: translateY(60px) rotateX(24deg) scale(.85); }
+    60% { opacity: 1; transform: translateY(-8px) rotateX(-4deg) scale(1.03); }
+    100% { opacity: 1; transform: none; }
+  }
+  @keyframes shine { 0% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(230%) skewX(-18deg); } }
+  @keyframes fall { to { transform: translateY(105vh) rotate(660deg); opacity: .9; } }
+  @keyframes zoom { 0% { transform: scale(.94); } 100% { transform: scale(1.04); } }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .2; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; }
+  .meta { display: flex; justify-content: space-between; color: var(--grey); border-bottom: 1px solid var(--rule-strong); padding-bottom: 14px; }
+
+  /* ── étape 0 : le déclencheur (démo) ── */
+  #before { text-align: center; margin: auto 0; padding: 60px 0; }
+  #before .big { font-size: clamp(36px, 10vw, 50px); font-weight: 800; letter-spacing: -.04em; margin: 16px 0 10px; animation: rise .5s both; color: var(--ink-strong); }
+  #before .big em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: var(--gold); }
+  #before .sub { color: var(--grey); font-size: 15px; margin: 0 0 34px; animation: rise .5s .08s both; }
+  .trigger {
+    padding: 19px 40px; font-size: 19px; font-weight: 800;
+    background: var(--signal); color: var(--signal-ink); border: 1.5px solid var(--border); border-radius: 8px;
+    box-shadow: 4px 4px 0 var(--shadow); transition: transform .08s ease, box-shadow .08s ease;
+    animation: rise .5s .16s both;
+  }
+  .trigger:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--shadow); }
+  .trigger:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--shadow); }
+  .alt {
+    display: block; margin: 22px auto 0; background: none; border: none;
+    color: var(--faint); text-decoration: underline; font-size: 13.5px;
+    animation: rise .5s .24s both;
+  }
+  .alt:hover { color: var(--grey); }
+
+  /* ── acte 1 : le cinéma ── */
+  #cinema {
+    position: fixed; inset: 0; z-index: 60; background: #000;
+    display: none; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity .6s ease;
+  }
+  #cinema.on { opacity: 1; }
+  .screen {
+    position: absolute; inset: 0; overflow: hidden;
+    display: grid; place-items: center;
+    background:
+      radial-gradient(80% 100% at 30% 20%, #233a55 0%, transparent 60%),
+      radial-gradient(70% 90% at 75% 75%, #6e4a13 0%, transparent 55%),
+      #0d1420;
+    animation: zoom 5s ease both;
+  }
+  .screen .label { text-align: center; color: #f2ead6; padding: 0 24px; }
+  .screen .label .clap { font-size: 52px; }
+  .screen .label .t1 { font-family: Georgia, serif; font-style: italic; font-size: clamp(22px, 5vw, 32px); color: #e9c15c; margin: 12px 0 8px; }
+  .screen .label .t2 { font-size: 12.5px; color: #98a4bb; letter-spacing: .14em; text-transform: uppercase; line-height: 1.8; }
+  .screen .rec { position: absolute; top: 14px; left: 16px; color: #ff5c5c; animation: blink 1.2s infinite; }
+  .screen .snd { position: absolute; top: 14px; right: 16px; color: #98a4bb; }
+  .skip {
+    position: absolute; bottom: 18px; right: 18px; background: rgba(255,255,255,.12);
+    color: #f2ead6; border: 1px solid rgba(255,255,255,.3); border-radius: 999px;
+    padding: 8px 16px; font-size: 13px; backdrop-filter: blur(6px);
+  }
+
+  /* ── acte 2 : la carte trophée ── */
+  #after { display: none; }
+  .announce { text-align: center; font-size: clamp(30px, 8vw, 42px); font-weight: 800; letter-spacing: -.035em; margin: 30px 0 20px; animation: rise .5s both; color: var(--ink-strong); }
+  .announce em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: var(--gold); }
+
+  .card {
+    position: relative; border-radius: 18px; overflow: hidden;
+    background: #fffdf6; color: var(--ink); padding: 30px 26px 24px;
+    border: 1.5px solid var(--border);
+    box-shadow: 0 24px 60px rgba(29,27,23,.22), 0 0 0 6px #fffdf6 inset, 0 0 0 7.5px rgba(184,134,11,.55) inset;
+    animation: cardin .9s .15s cubic-bezier(.2,.9,.3,1.2) both;
+  }
+  .card::before {
+    content: ""; position: absolute; top: 0; bottom: 0; width: 55%;
+    background: linear-gradient(100deg, transparent, rgba(255,209,46,.28), transparent);
+    animation: shine 2.6s 1.2s ease both;
+  }
+  .card .chead { display: flex; justify-content: space-between; color: #8a7a52; }
+  .card h2 { font-family: Georgia, serif; font-style: italic; font-weight: 500; font-size: clamp(34px, 9vw, 46px); color: var(--gold); margin: 16px 0 4px; line-height: 1.05; }
+  .card .who { font-size: 15.5px; font-weight: 650; margin: 0; }
+  .card .story {
+    font-size: 13.5px; color: #8a7a52; margin: 18px 0 0; line-height: 1.6;
+    border-top: 1px solid rgba(184,134,11,.3); padding-top: 14px;
+  }
+  .card .story b { color: var(--ink); }
+  .cfoot { display: flex; justify-content: space-between; margin-top: 14px; color: #8a7a52; }
+
+  .unlock {
+    display: flex; gap: 14px; align-items: center;
+    background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px;
+    position: relative; padding: 18px; margin-top: 22px;
+    animation: rise .6s 1s both;
+  }
+  .unlock .corner { position: absolute; width: 8px; height: 8px; background: var(--signal); border: 1.5px solid var(--border); top: -5px; left: -5px; }
+  .unlock .em { font-size: 32px; }
+  .unlock .t { font-size: 16px; font-weight: 700; color: var(--ink-strong); }
+  .unlock .d { font-size: 13px; color: var(--grey); margin-top: 3px; line-height: 1.5; }
+
+  .home {
+    width: 100%; margin-top: 22px; padding: 18px; font-size: 18px; font-weight: 800;
+    background: var(--signal); color: var(--signal-ink); border: 1.5px solid var(--border); border-radius: 8px;
+    box-shadow: 4px 4px 0 var(--shadow); animation: rise .6s 1.2s both;
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .home:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--shadow); }
+
+  .confetti { position: fixed; top: -4vh; z-index: 45; pointer-events: none; opacity: 0; animation: fall linear both; }
+  .foot { margin-top: auto; padding-top: 40px; text-align: center; color: var(--faint); }
+</style>
+
+<div class="stage">
+  <div class="meta mono"><span>Botler Sales HQ · Celebration</span><span id="pts">+50 points</span></div>
+
+  <!-- étape 0 : les déclencheurs de démo -->
+  <div id="before">
+    <div class="big">Something just <em>happened</em>…</div>
+    <p class="sub">Harbour Dental said YES — your 3rd client 🏆</p>
+    <button class="trigger" onclick="celebrate()">Play the celebration 🎬</button>
+    <button class="alt" onclick="mediumWin()">…or see a medium win instead (demo booked ✨)</button>
+  </div>
+
+  <!-- acte 1 : le cinéma plein écran -->
+  <div id="cinema">
+    <div class="screen">
+      <span class="rec mono">● Video</span>
+      <span class="snd mono">🔊 your music starts here</span>
+      <div class="label">
+        <div class="clap">🎬</div>
+        <div class="t1">Your victory video plays here</div>
+        <div class="t2">Drop your files in media/victory · one per milestone<br>Your soundtrack lives in media/music</div>
+      </div>
+    </div>
+    <button class="skip" onclick="showCard()">Skip ▶</button>
+  </div>
+
+  <!-- acte 2 : la carte trophée -->
+  <div id="after">
+    <h1 class="announce" id="headline">CLIENT! <em>You did it</em> 🏆</h1>
+
+    <div class="card" id="tcard">
+      <div class="chead mono"><span id="cardKind">Trophy card</span><span id="cardNo">Nº 003</span></div>
+      <h2 id="cardName">Harbour Dental</h2>
+      <p class="who" id="cardSub">Your 3rd client · Brighton 🦷</p>
+      <p class="story" id="cardStory">From first hello to <b>YES</b> in <b>12 days</b> · <b>6 brave moves</b> · 1 gentle nudge.<br>You sold with heart. This card is yours forever.</p>
+      <div class="cfoot mono"><span id="cardPts">+50 points</span><span>24 Jul 2026</span></div>
+    </div>
+
+    <div class="unlock" id="unlockBox">
+      <span class="corner"></span>
+      <span class="em">🏆</span>
+      <div>
+        <div class="t">New trophy in your Trophy Room!</div>
+        <div class="d">“Third Time's a Charm” — go spin it in 3D whenever you need a boost.</div>
+      </div>
+    </div>
+
+    <button class="home" onclick="location.reload()">Back to my world ▶</button>
+  </div>
+
+  <p class="foot mono">Sell with heart · one brave move a day</p>
+</div>
+
+<script>
+  const VIDEO_SECONDS = 6; // 🎛️ durée du placeholder (les vraies vidéos : 5-8s)
+
+  // ── la grande célébration : cinéma → carte → confettis ──
+  function celebrate() {
+    const c = document.getElementById('cinema');
+    c.style.display = 'flex';
+    requestAnimationFrame(() => c.classList.add('on'));
+    window._t = setTimeout(showCard, VIDEO_SECONDS * 1000);
+  }
+  function showCard() {
+    clearTimeout(window._t);
+    const c = document.getElementById('cinema');
+    c.classList.remove('on');
+    setTimeout(() => c.style.display = 'none', 600);
+    document.getElementById('before').style.display = 'none';
+    document.getElementById('after').style.display = 'block';
+    confetti(50);
+  }
+
+  // ── la célébration moyenne : pas de cinéma, carte directe ──
+  function mediumWin() {
+    document.getElementById('headline').innerHTML = 'Demo <em>booked</em> ✨';
+    document.getElementById('cardKind').textContent = 'Milestone card';
+    document.getElementById('cardNo').textContent = 'Nº 011';
+    document.getElementById('cardName').textContent = "Rosie's Bakery";
+    document.getElementById('cardSub').textContent = 'Demo booked · Thursday 3pm · Bristol 🥐';
+    document.getElementById('cardStory').innerHTML = 'She asked about pricing, you nudged gently, she said <b>“show me”</b>.<br>That’s the hardest door — and you just opened it.';
+    document.getElementById('cardPts').textContent = '+20 points';
+    document.getElementById('pts').textContent = '+20 points';
+    document.getElementById('unlockBox').style.display = 'none';
+    document.getElementById('before').style.display = 'none';
+    document.getElementById('after').style.display = 'block';
+    confetti(24);
+  }
+
+  function confetti(count) {
+    const colors = ['#ffd12e', '#e9c15c', '#23856f', '#d1571f', '#7fb3d8'];
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'confetti';
+      const s = 6 + (i % 3) * 3;
+      p.style.left = ((i * 37) % 100) + 'vw';
+      p.style.width = s + 'px';
+      p.style.height = (s * 1.6) + 'px';
+      p.style.background = colors[i % colors.length];
+      p.style.borderRadius = i % 2 ? '2px' : '50%';
+      p.style.animationDuration = (2.4 + (i % 5) * 0.35) + 's';
+      p.style.animationDelay = ((i % 7) * 0.12) + 's';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 6000);
+    }
+  }
+</script>
