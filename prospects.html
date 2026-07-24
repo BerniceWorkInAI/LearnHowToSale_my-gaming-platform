@@ -60,14 +60,6 @@
   .col.trophy .card .who::after { content: " 🏆"; }
   .empty { border: 1.5px dashed var(--faint); border-radius: 8px; color: var(--faint); font-size: 12.5px; text-align: center; padding: 22px 12px; line-height: 1.5; }
 
-  #clientParty {
-    position: fixed; inset: 0; z-index: 70; display: none; place-items: center;
-    background: rgba(255,255,255,.9); backdrop-filter: blur(4px); text-align: center; padding: 20px;
-  }
-  #clientParty .in { animation: pop .6s ease both; }
-  #clientParty .big { font-size: clamp(44px, 9vw, 76px); font-weight: 800; letter-spacing: -.04em; }
-  #clientParty p { color: var(--grey); font-size: 16px; margin: 12px 0 28px; }
-  #clientParty .go { width: auto; padding: 15px 30px; font-size: 17px; }
 
   .foot { margin-top: 46px; animation: rise .5s .3s both; }
 </style>
@@ -105,13 +97,6 @@
   </div>
 </div>
 
-<div id="clientParty">
-  <div class="in">
-    <div class="big">CLIENT! <em>You did it</em> 🏆</div>
-    <p id="partyMsg"></p>
-    <button class="go" onclick="closeParty()">Back to the board ▶</button>
-  </div>
-</div>
 
 <script src="assets/hq.js"></script>
 <script>
@@ -183,14 +168,10 @@
   function up(id) {
     const p = HQ.moveUp(id);
     if (!p) return;
-    if (p.level === 3) {
-      document.getElementById('partyMsg').textContent = p.name + ' said YES. Client number ' + HQ.state.clients + '. You sold with heart.';
-      document.getElementById('clientParty').style.display = 'grid';
-      HQ.confetti(60);
-    } else {
-      HQ.toast('+20 points ✨ ' + p.name + ' moved up!');
-      HQ.confetti(12);
-    }
+    if (p.level === 3) { location.href = 'celebrate.html?id=' + id + '&kind=client'; return; }
+    if (p.level === 2) { location.href = 'celebrate.html?id=' + id + '&kind=demo'; return; }
+    HQ.toast('+20 points ✨ ' + p.name + ' moved up!');
+    HQ.confetti(12);
     render();
   }
   function no(id) {
@@ -199,7 +180,6 @@
     HQ.confetti(8);
     render();
   }
-  function closeParty() { document.getElementById('clientParty').style.display = 'none'; }
   function del(btn, id) {
     if (!btn.classList.contains('arm')) {          // premier clic : on demande confirmation
       btn.classList.add('arm');

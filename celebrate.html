@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Botler Sales HQ · Celebration 🏆</title>
+<link rel="stylesheet" href="assets/hq.css">
+<style>
+  body { overflow-x: hidden; }
+  .stage { max-width: 620px; margin: 0 auto; padding: 46px 30px 70px; min-height: 100vh; display: flex; flex-direction: column; }
+
+  @keyframes cardin {
+    0% { opacity: 0; transform: translateY(60px) rotateX(24deg) scale(.85); }
+    60% { opacity: 1; transform: translateY(-8px) rotateX(-4deg) scale(1.03); }
+    100% { opacity: 1; transform: none; }
+  }
+  @keyframes shine { 0% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(230%) skewX(-18deg); } }
+  @keyframes zoom { 0% { transform: scale(.94); } 100% { transform: scale(1.04); } }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .2; } }
+
+  #cinema {
+    position: fixed; inset: 0; z-index: 60; background: #000;
+    display: none; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity .6s ease;
+  }
+  #cinema.on { opacity: 1; }
+  .screen {
+    position: absolute; inset: 0; overflow: hidden; display: grid; place-items: center;
+    background:
+      radial-gradient(80% 100% at 30% 20%, #233a55 0%, transparent 60%),
+      radial-gradient(70% 90% at 75% 75%, #6e4a13 0%, transparent 55%),
+      #0d1420;
+    animation: zoom 5s ease both;
+  }
+  .screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .screen .label { text-align: center; color: #f2ead6; padding: 0 24px; position: relative; }
+  .screen .label .clap { font-size: 52px; }
+  .screen .label .t1 { font-family: Georgia, serif; font-style: italic; font-size: clamp(22px, 5vw, 32px); color: #e9c15c; margin: 12px 0 8px; }
+  .screen .label .t2 { font-size: 12.5px; color: #98a4bb; letter-spacing: .14em; text-transform: uppercase; line-height: 1.8; }
+  .screen .rec { position: absolute; top: 14px; left: 16px; color: #ff5c5c; animation: blink 1.2s infinite; }
+  .skip {
+    position: absolute; bottom: 18px; right: 18px; background: rgba(255,255,255,.12);
+    color: #f2ead6; border: 1px solid rgba(255,255,255,.3); border-radius: 999px;
+    padding: 8px 16px; font-size: 13px; backdrop-filter: blur(6px);
+  }
+
+  #after { display: none; }
+  .announce { text-align: center; font-size: clamp(30px, 8vw, 42px); font-weight: 800; letter-spacing: -.035em; margin: 30px 0 20px; animation: rise .5s both; color: var(--ink-strong); }
+
+  .card {
+    position: relative; border-radius: 18px; overflow: hidden;
+    background: #fffdf6; color: var(--ink); padding: 30px 26px 24px;
+    border: 1.5px solid var(--border);
+    box-shadow: 0 24px 60px rgba(29,27,23,.22), 0 0 0 6px #fffdf6 inset, 0 0 0 7.5px rgba(184,134,11,.55) inset;
+    animation: cardin .9s .15s cubic-bezier(.2,.9,.3,1.2) both;
+  }
+  .card::before {
+    content: ""; position: absolute; top: 0; bottom: 0; width: 55%;
+    background: linear-gradient(100deg, transparent, rgba(255,209,46,.28), transparent);
+    animation: shine 2.6s 1.2s ease both;
+  }
+  .card .chead { display: flex; justify-content: space-between; color: #8a7a52; }
+  .card h2 { font-family: Georgia, serif; font-style: italic; font-weight: 500; font-size: clamp(34px, 9vw, 46px); color: var(--gold); margin: 16px 0 4px; line-height: 1.05; }
+  .card .who { font-size: 15.5px; font-weight: 650; margin: 0; }
+  .card .story { font-size: 13.5px; color: #8a7a52; margin: 18px 0 0; line-height: 1.6; border-top: 1px solid rgba(184,134,11,.3); padding-top: 14px; }
+  .card .story b { color: var(--ink); }
+  .cfoot { display: flex; justify-content: space-between; margin-top: 14px; color: #8a7a52; }
+
+  .unlock {
+    display: flex; gap: 14px; align-items: center;
+    background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px;
+    position: relative; padding: 18px; margin-top: 22px;
+    animation: rise .6s 1s both;
+  }
+  .unlock .corner { position: absolute; width: 8px; height: 8px; background: var(--signal); border: 1.5px solid var(--border); top: -5px; left: -5px; }
+  .unlock .em { font-size: 32px; }
+  .unlock .t { font-size: 16px; font-weight: 700; color: var(--ink-strong); }
+  .unlock .d { font-size: 13px; color: var(--grey); margin-top: 3px; line-height: 1.5; }
+
+  .home { margin-top: 22px; animation: rise .6s 1.2s both; }
+  .foot { margin-top: auto; padding-top: 40px; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="meta mono"><span>Botler Sales HQ · Celebration</span><span id="pts"></span></div>
+
+  <div id="cinema">
+    <div class="screen" id="screen">
+      <span class="rec mono">● Video</span>
+      <div class="label" id="cinLabel">
+        <div class="clap">🎬</div>
+        <div class="t1">Your victory video plays here</div>
+        <div class="t2">Drop your files in media/victory · sound included in your video</div>
+      </div>
+    </div>
+    <button class="skip" onclick="showCard()">Skip ▶</button>
+  </div>
+
+  <div id="after">
+    <h1 class="announce" id="headline"></h1>
+    <div class="card">
+      <div class="chead mono"><span id="cardKind"></span><span id="cardNo"></span></div>
+      <h2 id="cardName"></h2>
+      <p class="who" id="cardSub"></p>
+      <p class="story" id="cardStory"></p>
+      <div class="cfoot mono"><span id="cardPts"></span><span id="cardDate"></span></div>
+    </div>
+    <div class="unlock" id="unlockBox" style="display:none">
+      <span class="corner"></span>
+      <span class="em" id="unlockEm">🏆</span>
+      <div>
+        <div class="t" id="unlockT"></div>
+        <div class="d" id="unlockD"></div>
+      </div>
+    </div>
+    <button class="go home" onclick="location.href='prospects.html'">Back to my world ▶</button>
+  </div>
+
+  <p class="foot mono">Sell with heart · one brave move a day</p>
+</div>
+
+<script src="assets/hq.js"></script>
+<script>
+  const VIDEO_SECONDS = 6;   // 🎛️ durée du placeholder · les vraies vidéos remplaceront ce timer
+  const q = new URLSearchParams(location.search);
+  const pid = parseInt(q.get('id'), 10);
+  const kind = q.get('kind') === 'demo' ? 'demo' : 'client';
+  const st = HQ.state;
+  const p = st.prospects.find(x => x.id === pid);
+
+  const braveMoves = p ? p.history.filter(h => /said hi|nudge/.test(h.txt)).length : 0;
+  const days = p ? Math.max(1, HQ.daysBetween(p.createdAt, HQ.today())) : 0;
+  const name = p ? p.name : 'A prospect';
+  const ord = n => n + (n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th');
+
+  function fill() {
+    if (kind === 'client') {
+      document.getElementById('pts').textContent = '+20 points';
+      document.getElementById('headline').innerHTML = 'CLIENT! <em>You did it</em> 🏆';
+      document.getElementById('cardKind').textContent = 'Trophy card';
+      document.getElementById('cardNo').textContent = 'Client Nº ' + String(st.clients).padStart(3, '0');
+      document.getElementById('cardName').textContent = name;
+      document.getElementById('cardSub').textContent = 'Your ' + ord(st.clients) + ' client · ' + (p ? p.trade + ' · ' + p.city : '');
+      document.getElementById('cardStory').innerHTML =
+        'From first hello to <b>YES</b> in <b>' + days + ' day' + (days > 1 ? 's' : '') + '</b> · <b>' + braveMoves + ' brave move' + (braveMoves > 1 ? 's' : '') + '</b>.<br>You sold with heart. This card is yours forever.';
+      document.getElementById('cardPts').textContent = '+20 points';
+      const box = document.getElementById('unlockBox');
+      box.style.display = 'flex';
+      if (st.trophies.firstClient === HQ.today() && st.clients === 1) {
+        document.getElementById('unlockT').textContent = 'New trophy in your Trophy Room!';
+        document.getElementById('unlockD').textContent = '"First Client" now shines on its pedestal. Go spin it in 3D whenever you need a boost.';
+      } else {
+        document.getElementById('unlockT').textContent = 'Your Trophy Room remembers this win';
+        document.getElementById('unlockD').textContent = (10 - st.clients) > 0
+          ? (10 - st.clients) + ' more client' + (10 - st.clients > 1 ? 's' : '') + ' and the Crown of Ten is yours 👑'
+          : 'The Crown of Ten is yours 👑';
+      }
+    } else {
+      document.getElementById('pts').textContent = '+20 points';
+      document.getElementById('headline').innerHTML = 'Demo <em>booked</em> ✨';
+      document.getElementById('cardKind').textContent = 'Milestone card';
+      document.getElementById('cardNo').textContent = 'Nº ' + String(st.points).padStart(3, '0');
+      document.getElementById('cardName').textContent = name;
+      document.getElementById('cardSub').textContent = 'Demo booked · ' + (p ? p.trade + ' · ' + p.city : '');
+      document.getElementById('cardStory').innerHTML = 'They said <b>"show me"</b>.<br>That is the hardest door, and you just opened it.';
+      document.getElementById('cardPts').textContent = '+20 points';
+    }
+    document.getElementById('cardDate').textContent = HQ.nice(HQ.today()) + ' ' + new Date().getFullYear();
+  }
+
+  function tryVideo() {
+    // s'il existe une vidéo de victoire, on la joue ; sinon le placeholder élégant
+    const v = document.createElement('video');
+    v.src = 'media/victory/client.mp4';
+    v.autoplay = true; v.playsInline = true;
+    v.onloadeddata = () => { document.getElementById('cinLabel').style.display = 'none'; document.getElementById('screen').prepend(v); };
+    v.onended = showCard;
+    v.onerror = () => {};   // pas de vidéo : le placeholder reste
+  }
+
+  function celebrate() {
+    const c = document.getElementById('cinema');
+    c.style.display = 'flex';
+    requestAnimationFrame(() => c.classList.add('on'));
+    tryVideo();
+    window._t = setTimeout(showCard, VIDEO_SECONDS * 1000);
+  }
+  function showCard() {
+    clearTimeout(window._t);
+    const c = document.getElementById('cinema');
+    c.classList.remove('on');
+    setTimeout(() => c.style.display = 'none', 600);
+    document.getElementById('after').style.display = 'block';
+    HQ.confetti(kind === 'client' ? 55 : 26);
+  }
+
+  fill();
+  if (kind === 'client') celebrate();   // la grande : cinéma d'abord
+  else showCard();                      // la moyenne : carte directe
+</script>
+</body>
+</html>
