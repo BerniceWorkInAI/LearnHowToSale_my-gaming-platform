@@ -1,0 +1,276 @@
+<title>Botler Sales HQ — Home · Today's mission</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f6f4ef; color: #1d1b17;
+    background-image:
+      linear-gradient(rgba(29,27,23,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(29,27,23,.04) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  button { font: inherit; cursor: pointer; }
+  a { color: inherit; }
+  .stage { max-width: 500px; margin: 0 auto; padding: 50px 26px 70px; min-height: 100vh; }
+
+  /* grain tactile */
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+  @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+  @keyframes fall { to { transform: translateY(105vh) rotate(660deg); opacity: .9; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  .mono {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase;
+  }
+
+  /* ── en-tête éditorial ── */
+  .meta {
+    display: flex; justify-content: space-between; color: #a09a8c;
+    border-bottom: 1px solid #1d1b17; padding-bottom: 14px;
+    animation: rise .5s both;
+  }
+  h1 {
+    font-size: clamp(50px, 14vw, 72px); font-weight: 800; letter-spacing: -.04em;
+    line-height: .98; margin: 38px 0 8px; text-wrap: balance;
+    animation: rise .5s .08s both;
+  }
+  h1 em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: #b8860b; }
+  .lede { color: #a09a8c; font-size: 15px; margin: 0 0 40px; animation: rise .5s .14s both; }
+
+  /* ── LE panneau : la mission du jour ── */
+  .panel {
+    background: #fffefb; border: 1.5px solid #1d1b17; border-radius: 4px;
+    position: relative; margin-bottom: 34px;
+    animation: rise .5s .2s both;
+  }
+  .panel .corner { position: absolute; width: 8px; height: 8px; background: #ffd12e; border: 1.5px solid #1d1b17; top: -5px; left: -5px; }
+  .phead {
+    display: flex; justify-content: space-between; align-items: center;
+    color: #a09a8c; border-bottom: 1px dashed #ddd8ca; padding: 11px 18px;
+  }
+  .live { color: #23856f; }
+  .live::before {
+    content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: #23856f; margin-right: 7px; animation: pulse 2s infinite;
+  }
+  .pbody { padding: 26px 22px 24px; }
+  .pbody h2 { margin: 0 0 4px; font-size: 26px; font-weight: 750; letter-spacing: -.025em; text-align: center; }
+  .pbody h2 em { font-family: Georgia, serif; font-style: italic; font-weight: 400; }
+  .pbody .sub { margin: 0 0 18px; font-size: 14.5px; color: #a09a8c; text-align: center; }
+
+  .task {
+    display: flex; gap: 12px; align-items: baseline;
+    padding: 13px 2px; border-top: 1px dashed #ddd8ca;
+    transition: opacity .3s ease;
+  }
+  .task:last-of-type { border-bottom: 1px dashed #ddd8ca; margin-bottom: 20px; }
+  .task .em { flex: none; font-size: 18px; }
+  .task .t { font-size: 15px; font-weight: 650; }
+  .task .d { font-size: 12.5px; color: #a09a8c; margin-top: 3px; line-height: 1.5; }
+  .task .st { margin-left: auto; padding-left: 10px; color: #c4bfae; white-space: nowrap; align-self: center; }
+  .task.done { opacity: .55; }
+  .task.done .t { text-decoration: line-through; text-decoration-thickness: 1.5px; }
+  .task.done .st { color: #23856f; }
+
+  .go {
+    width: 100%; padding: 19px; font-size: 19px; font-weight: 800;
+    background: #ffd12e; color: #1d1b17; border: 1.5px solid #1d1b17; border-radius: 8px;
+    box-shadow: 4px 4px 0 #1d1b17;
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .go:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 #1d1b17; }
+  .go:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 #1d1b17; }
+  .go:focus-visible { outline: 2.5px solid #1d1b17; outline-offset: 3px; }
+  .gonote { margin: 12px 0 0; text-align: center; color: #c4bfae; }
+
+  /* état "mission complete" */
+  .panel.complete .corner { background: #23856f; }
+  #doneMsg { display: none; text-align: center; padding: 6px 0 2px; }
+  #doneMsg .big { font-size: 26px; font-weight: 750; letter-spacing: -.025em; margin: 0 0 6px; }
+  #doneMsg .big em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: #b8860b; }
+  #doneMsg p { margin: 0; font-size: 14.5px; color: #a09a8c; }
+
+  /* ── lignes éditoriales ── */
+  .line {
+    display: flex; gap: 14px; align-items: center;
+    border-top: 1px solid #ddd8ca; padding: 22px 2px;
+  }
+  .line:last-of-type { border-bottom: 1px solid #ddd8ca; }
+  .line.l1 { animation: rise .5s .28s both; }
+  .line.l2 { animation: rise .5s .36s both; }
+  .line.l3 { animation: rise .5s .44s both; }
+  .line .icon { font-size: 26px; flex: none; }
+  .line .t { font-size: 16.5px; font-weight: 650; }
+  .line .d { font-size: 13px; color: #a09a8c; margin-top: 4px; line-height: 1.55; }
+  .line .idx { margin-left: auto; color: #a09a8c; white-space: nowrap; padding-left: 14px; align-self: flex-start; padding-top: 4px; }
+  .snum { color: #d1571f; font-variant-numeric: tabular-nums; display: inline-block; }
+  .snum.grew { animation: pop .5s ease; }
+  .bar { height: 6px; background: #ece7d9; border: 1px solid #1d1b17; border-radius: 3px; margin-top: 11px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 42%; background: #23856f; transition: width .5s ease; }
+  .lesson q { font-family: Georgia, serif; font-style: italic; quotes: "“" "”"; font-size: 14.5px; line-height: 1.55; }
+
+  /* ── navigation minuscule + pied ── */
+  .nav {
+    display: flex; justify-content: center; gap: 26px; margin-top: 36px;
+    color: #a09a8c; animation: rise .5s .52s both;
+  }
+  .nav a { text-decoration: none; border-bottom: 1px solid #ddd8ca; padding-bottom: 3px; }
+  .nav a:hover { color: #1d1b17; border-color: #1d1b17; }
+  .foot { margin-top: 34px; text-align: center; color: #c4bfae; animation: rise .5s .58s both; }
+  .replay { display: block; margin: 18px auto 0; background: none; border: none; color: #c4bfae; text-decoration: underline; }
+
+  .confetti { position: fixed; top: -4vh; z-index: 45; pointer-events: none; opacity: 0; animation: fall linear both; }
+</style>
+
+<div class="stage">
+  <div class="meta mono"><span>Botler Sales HQ</span><span>Fri 24 Jul</span></div>
+
+  <h1>Hi <em>Berni♥</em></h1>
+  <p class="lede">Three small moves today. That's the whole job.</p>
+
+  <div class="panel" id="panel">
+    <span class="corner"></span>
+    <div class="phead mono"><span>01 · Today's mission</span><span class="live" id="plive">Ready</span></div>
+    <div class="pbody">
+      <div id="taskview">
+        <h2><em>Three moves</em>. Then you're free.</h2>
+        <p class="sub">Picked for you — no thinking required.</p>
+
+        <div class="task" id="task1">
+          <span class="em">✉️</span>
+          <div>
+            <div class="t">Say hi to Luigi's Pizzeria</div>
+            <div class="d">First LinkedIn message · Leeds · script ready to copy</div>
+          </div>
+          <span class="st mono" id="st1">to do</span>
+        </div>
+        <div class="task" id="task2">
+          <span class="em">🔁</span>
+          <div>
+            <div class="t">Follow up with Rosie's Bakery</div>
+            <div class="d">She asked about pricing on Tuesday — gentle nudge</div>
+          </div>
+          <span class="st mono" id="st2">to do</span>
+        </div>
+        <div class="task" id="task3">
+          <span class="em">📇</span>
+          <div>
+            <div class="t">Add one prospect to your book</div>
+            <div class="d">30 seconds, promise — name, trade, city</div>
+          </div>
+          <span class="st mono" id="st3">to do</span>
+        </div>
+
+        <button class="go" id="go" onclick="step()">Start ▶</button>
+        <p class="gonote mono">Opens quest mode · one action at a time · script included</p>
+      </div>
+
+      <div id="doneMsg">
+        <div class="big">Mission <em>complete</em> ✨</div>
+        <p>3 of 3 · +30 points · You're free — see you tomorrow 🌿</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="line l1">
+    <span class="icon">🔥</span>
+    <div>
+      <div class="t"><span class="snum" id="snum">4</span> days in a row</div>
+      <div class="d" id="sdesc">One action today makes it 5. Miss a day? You get one free pass every week 🛡️</div>
+    </div>
+    <span class="idx mono">02 · Streak</span>
+  </div>
+
+  <div class="line l2">
+    <span class="icon">🌿</span>
+    <div style="flex:1">
+      <div class="t">This week's brave moves</div>
+      <div class="bar"><i id="wbar"></i></div>
+      <div class="d" id="wdesc">A good rhythm is building — keep it gentle.</div>
+    </div>
+    <span class="idx mono">03 · This week</span>
+  </div>
+
+  <div class="line l3">
+    <span class="icon">🎓</span>
+    <div class="lesson">
+      <div class="t">Today's lesson</div>
+      <div class="d"><q>People don't buy a website. They buy fewer missed orders. Talk about that.</q></div>
+    </div>
+    <span class="idx mono">04 · Lesson</span>
+  </div>
+
+  <nav class="nav mono">
+    <a href="#" title="Screen 3 — coming next">My prospects →</a>
+    <a href="#" title="Screen 5 — coming next">Trophy Room 🏆</a>
+  </nav>
+
+  <p class="foot mono">Sell with heart · one brave move a day</p>
+  <button class="replay mono" onclick="location.reload()">↺ replay demo</button>
+</div>
+
+<script>
+  // Démo : chaque clic sur le bouton jaune "termine" l'action suivante.
+  // Dans le vrai HQ, ce bouton ouvrira le mode quête (écran 2).
+  let n = 0;
+  const labels = ['Nice — next one ▶', 'Last one ▶'];
+  let week = 5; const weekGoal = 12;
+
+  function step() {
+    n++;
+    const task = document.getElementById('task' + n);
+    task.classList.add('done');
+    document.getElementById('st' + n).textContent = 'done ✅';
+
+    week++;
+    document.getElementById('wbar').style.width = Math.round(week / weekGoal * 100) + '%';
+    document.getElementById('wdesc').textContent = week + ' brave moves this week — nearly there.';
+
+    if (n === 1) {
+      const s = document.getElementById('snum');
+      s.textContent = '5';
+      s.classList.add('grew');
+      document.getElementById('sdesc').textContent = 'Today counts 🔥 Your streak is safe.';
+    }
+
+    if (n < 3) {
+      document.getElementById('go').textContent = labels[n - 1];
+    } else {
+      document.getElementById('go').style.display = 'none';
+      document.querySelector('.gonote').style.display = 'none';
+      document.getElementById('doneMsg').style.display = 'block';
+      const panel = document.getElementById('panel');
+      panel.classList.add('complete');
+      document.getElementById('plive').textContent = 'Done ✨';
+      confetti();
+    }
+  }
+
+  function confetti() {
+    const colors = ['#ffd12e', '#e9c15c', '#23856f', '#d1571f', '#f2ead6'];
+    for (let i = 0; i < 40; i++) {
+      const p = document.createElement('div');
+      p.className = 'confetti';
+      const s = 6 + (i % 3) * 3;
+      p.style.left = ((i * 37) % 100) + 'vw';
+      p.style.width = s + 'px';
+      p.style.height = (s * 1.6) + 'px';
+      p.style.background = colors[i % colors.length];
+      p.style.borderRadius = i % 2 ? '2px' : '50%';
+      p.style.animationDuration = (2.4 + (i % 5) * 0.35) + 's';
+      p.style.animationDelay = ((i % 7) * 0.12) + 's';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 6000);
+    }
+  }
+</script>
