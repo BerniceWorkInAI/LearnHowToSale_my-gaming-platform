@@ -12,7 +12,7 @@
   }
   button { font: inherit; cursor: pointer; }
   a { color: inherit; }
-  .stage { max-width: 500px; margin: 0 auto; padding: 50px 26px 70px; min-height: 100vh; }
+  .stage { max-width: 1020px; margin: 0 auto; padding: 46px 34px 70px; min-height: 100vh; }
 
   /* grain tactile */
   body::after {
@@ -22,6 +22,7 @@
 
   @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+  @keyframes ring { 0%,100% { box-shadow: 0 0 0 0 rgba(35,133,111,.35); } 50% { box-shadow: 0 0 0 7px rgba(35,133,111,0); } }
   @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
   @keyframes fall { to { transform: translateY(105vh) rotate(660deg); opacity: .9; } }
   @media (prefers-reduced-motion: reduce) {
@@ -39,51 +40,65 @@
     border-bottom: 1px solid #1d1b17; padding-bottom: 14px;
     animation: rise .5s both;
   }
+
+  .head { animation: rise .5s .08s both; }
   h1 {
-    font-size: clamp(50px, 14vw, 72px); font-weight: 800; letter-spacing: -.04em;
-    line-height: .98; margin: 38px 0 8px; text-wrap: balance;
-    animation: rise .5s .08s both;
+    font-size: clamp(46px, 8vw, 66px); font-weight: 800; letter-spacing: -.04em;
+    line-height: .98; margin: 34px 0 10px; text-wrap: balance;
   }
   h1 em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: #b8860b; }
-  .lede { color: #a09a8c; font-size: 15px; margin: 0 0 40px; animation: rise .5s .14s both; }
+  .lede { color: #a09a8c; font-size: 15.5px; margin: 0 0 44px; max-width: 60ch; line-height: 1.55; }
+  .lede b { color: #1d1b17; font-weight: 650; }
 
-  /* ── LE panneau : la mission du jour ── */
-  .panel {
-    background: #fffefb; border: 1.5px solid #1d1b17; border-radius: 4px;
-    position: relative; margin-bottom: 34px;
-    animation: rise .5s .2s both;
+  /* ── deux colonnes : la mission | le tableau de bord ── */
+  .cols { display: grid; grid-template-columns: 1.55fr 1fr; gap: 64px; align-items: start; }
+  @media (max-width: 760px) { .cols { grid-template-columns: 1fr; gap: 40px; } }
+
+  .shead {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    color: #a09a8c; border-top: 1px solid #1d1b17; padding: 13px 2px 6px;
   }
-  .panel .corner { position: absolute; width: 8px; height: 8px; background: #ffd12e; border: 1.5px solid #1d1b17; top: -5px; left: -5px; }
-  .phead {
-    display: flex; justify-content: space-between; align-items: center;
-    color: #a09a8c; border-bottom: 1px dashed #ddd8ca; padding: 11px 18px;
-  }
-  .live { color: #23856f; }
-  .live::before {
+  .shead .live { color: #23856f; white-space: nowrap; }
+  .shead .live::before {
     content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
     background: #23856f; margin-right: 7px; animation: pulse 2s infinite;
   }
-  .pbody { padding: 26px 22px 24px; }
-  .pbody h2 { margin: 0 0 4px; font-size: 26px; font-weight: 750; letter-spacing: -.025em; text-align: center; }
-  .pbody h2 em { font-family: Georgia, serif; font-style: italic; font-weight: 400; }
-  .pbody .sub { margin: 0 0 18px; font-size: 14.5px; color: #a09a8c; text-align: center; }
+  .explain { color: #a09a8c; font-size: 13px; line-height: 1.55; margin: 4px 0 26px; }
 
-  .task {
-    display: flex; gap: 12px; align-items: baseline;
-    padding: 13px 2px; border-top: 1px dashed #ddd8ca;
-    transition: opacity .3s ease;
+  /* ── le parcours de quête, tracé sur le blueprint ── */
+  .quest { animation: rise .5s .16s both; }
+  .path { position: relative; margin: 0 0 8px; padding: 0; list-style: none; }
+  .path::before {
+    content: ""; position: absolute; left: 17px; top: 20px; bottom: 20px;
+    border-left: 1.5px dashed #b5af9f;
   }
-  .task:last-of-type { border-bottom: 1px dashed #ddd8ca; margin-bottom: 20px; }
-  .task .em { flex: none; font-size: 18px; }
-  .task .t { font-size: 15px; font-weight: 650; }
-  .task .d { font-size: 12.5px; color: #a09a8c; margin-top: 3px; line-height: 1.5; }
-  .task .st { margin-left: auto; padding-left: 10px; color: #c4bfae; white-space: nowrap; align-self: center; }
-  .task.done { opacity: .55; }
-  .task.done .t { text-decoration: line-through; text-decoration-thickness: 1.5px; }
-  .task.done .st { color: #23856f; }
+  .stop { position: relative; display: flex; gap: 20px; padding: 16px 0 16px 0; }
+  .node {
+    flex: none; width: 36px; height: 36px; border-radius: 50%; z-index: 1;
+    background: #fffefb; border: 1.5px solid #1d1b17;
+    display: grid; place-items: center;
+    font-family: ui-monospace, Consolas, monospace; font-size: 13px; font-weight: 700;
+    transition: background .3s ease, color .3s ease;
+  }
+  .stop.current .node { animation: ring 2s infinite; }
+  .stop.done .node { background: #23856f; border-color: #23856f; color: #f6f4ef; }
+  .stop .body { padding-top: 4px; }
+  .stop .t { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+  .stop .t em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: #b8860b; }
+  .stop .d { font-size: 13.5px; color: #a09a8c; margin-top: 4px; line-height: 1.55; max-width: 46ch; }
+  .stop .st { margin-left: auto; padding-left: 12px; padding-top: 10px; color: #c4bfae; white-space: nowrap; }
+  .stop.done .st { color: #23856f; }
+  .stop.done .t { text-decoration: line-through; text-decoration-thickness: 1.5px; opacity: .6; }
+  .stop.done .d { opacity: .6; }
+
+  /* la station finale : le cadeau */
+  .stop.goal .node { border-style: dashed; font-size: 16px; }
+  .stop.goal .t { color: #a09a8c; font-weight: 650; }
+  .stop.goal.won .node { background: #ffd12e; border-style: solid; border-color: #1d1b17; animation: pop .5s ease; }
+  .stop.goal.won .t { color: #1d1b17; }
 
   .go {
-    width: 100%; padding: 19px; font-size: 19px; font-weight: 800;
+    width: 100%; margin-top: 18px; padding: 19px; font-size: 19px; font-weight: 800;
     background: #ffd12e; color: #1d1b17; border: 1.5px solid #1d1b17; border-radius: 8px;
     box-shadow: 4px 4px 0 #1d1b17;
     transition: transform .08s ease, box-shadow .08s ease;
@@ -93,134 +108,149 @@
   .go:focus-visible { outline: 2.5px solid #1d1b17; outline-offset: 3px; }
   .gonote { margin: 12px 0 0; text-align: center; color: #c4bfae; }
 
-  /* état "mission complete" */
-  .panel.complete .corner { background: #23856f; }
-  #doneMsg { display: none; text-align: center; padding: 6px 0 2px; }
-  #doneMsg .big { font-size: 26px; font-weight: 750; letter-spacing: -.025em; margin: 0 0 6px; }
+  #doneMsg { display: none; text-align: center; margin-top: 22px; }
+  #doneMsg .big { font-size: 30px; font-weight: 800; letter-spacing: -.03em; margin: 0 0 6px; }
   #doneMsg .big em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: #b8860b; }
   #doneMsg p { margin: 0; font-size: 14.5px; color: #a09a8c; }
 
-  /* ── lignes éditoriales ── */
-  .line {
-    display: flex; gap: 14px; align-items: center;
-    border-top: 1px solid #ddd8ca; padding: 22px 2px;
-  }
-  .line:last-of-type { border-bottom: 1px solid #ddd8ca; }
-  .line.l1 { animation: rise .5s .28s both; }
-  .line.l2 { animation: rise .5s .36s both; }
-  .line.l3 { animation: rise .5s .44s both; }
-  .line .icon { font-size: 26px; flex: none; }
-  .line .t { font-size: 16.5px; font-weight: 650; }
-  .line .d { font-size: 13px; color: #a09a8c; margin-top: 4px; line-height: 1.55; }
-  .line .idx { margin-left: auto; color: #a09a8c; white-space: nowrap; padding-left: 14px; align-self: flex-start; padding-top: 4px; }
+  /* ── colonne de droite : le tableau de bord ── */
+  .rail section { animation: rise .5s .24s both; }
+  .rail section + section { margin-top: 30px; }
+  .rail .row { display: flex; gap: 13px; align-items: center; padding: 4px 2px 0; }
+  .rail .icon { font-size: 24px; flex: none; }
+  .rail .t { font-size: 16px; font-weight: 650; }
+  .rail .d { font-size: 12.5px; color: #a09a8c; margin-top: 4px; line-height: 1.55; }
   .snum { color: #d1571f; font-variant-numeric: tabular-nums; display: inline-block; }
   .snum.grew { animation: pop .5s ease; }
-  .bar { height: 6px; background: #ece7d9; border: 1px solid #1d1b17; border-radius: 3px; margin-top: 11px; overflow: hidden; }
+  .bar { height: 6px; background: #ece7d9; border: 1px solid #1d1b17; border-radius: 3px; margin-top: 10px; overflow: hidden; }
   .bar i { display: block; height: 100%; width: 42%; background: #23856f; transition: width .5s ease; }
-  .lesson q { font-family: Georgia, serif; font-style: italic; quotes: "“" "”"; font-size: 14.5px; line-height: 1.55; }
+  .lesson q { font-family: Georgia, serif; font-style: italic; quotes: "“" "”"; font-size: 15px; line-height: 1.6; color: #1d1b17; }
+  .lesson .who { color: #a09a8c; font-size: 12.5px; margin-top: 6px; }
 
-  /* ── navigation minuscule + pied ── */
-  .nav {
-    display: flex; justify-content: center; gap: 26px; margin-top: 36px;
-    color: #a09a8c; animation: rise .5s .52s both;
+  .rail .links { display: flex; flex-direction: column; }
+  .rail .links a {
+    display: flex; justify-content: space-between; gap: 10px;
+    text-decoration: none; font-size: 14.5px; font-weight: 650;
+    padding: 12px 2px; border-bottom: 1px solid #ddd8ca;
   }
-  .nav a { text-decoration: none; border-bottom: 1px solid #ddd8ca; padding-bottom: 3px; }
-  .nav a:hover { color: #1d1b17; border-color: #1d1b17; }
-  .foot { margin-top: 34px; text-align: center; color: #c4bfae; animation: rise .5s .58s both; }
-  .replay { display: block; margin: 18px auto 0; background: none; border: none; color: #c4bfae; text-decoration: underline; }
+  .rail .links a:first-child { border-top: 1px solid #ddd8ca; }
+  .rail .links a .mono { color: #c4bfae; align-self: center; }
+  .rail .links a:hover { color: #b8860b; }
+
+  .foot { margin-top: 56px; text-align: center; color: #c4bfae; animation: rise .5s .4s both; }
+  .replay { display: block; margin: 16px auto 0; background: none; border: none; color: #c4bfae; text-decoration: underline; }
 
   .confetti { position: fixed; top: -4vh; z-index: 45; pointer-events: none; opacity: 0; animation: fall linear both; }
 </style>
 
 <div class="stage">
-  <div class="meta mono"><span>Botler Sales HQ</span><span>Fri 24 Jul</span></div>
+  <div class="meta mono"><span>Botler Sales HQ · Berni's game</span><span>Fri 24 Jul</span></div>
 
-  <h1>Hi <em>Berni♥</em></h1>
-  <p class="lede">Three small moves today. That's the whole job.</p>
+  <div class="head">
+    <h1>Hi <em>Berni♥</em></h1>
+    <p class="lede">Your HQ picked <b>3 small moves</b> for today, straight from your prospect list.
+    About 15 minutes total, message scripts included — <b>and never a phone call.</b>
+    Finish the path, and your day is won.</p>
+  </div>
 
-  <div class="panel" id="panel">
-    <span class="corner"></span>
-    <div class="phead mono"><span>01 · Today's mission</span><span class="live" id="plive">Ready</span></div>
-    <div class="pbody">
-      <div id="taskview">
-        <h2><em>Three moves</em>. Then you're free.</h2>
-        <p class="sub">Picked for you — no thinking required.</p>
+  <div class="cols">
+    <!-- ══ LA MISSION : le parcours du jour ══ -->
+    <div class="quest">
+      <div class="shead mono"><span>01 · Today's mission — your only job today</span><span class="live" id="plive">Ready</span></div>
+      <p class="explain">Do them in any order. Each done move = points. One move is enough to protect your streak 🔥</p>
 
-        <div class="task" id="task1">
-          <span class="em">✉️</span>
-          <div>
-            <div class="t">Say hi to Luigi's Pizzeria</div>
-            <div class="d">First LinkedIn message · Leeds · script ready to copy</div>
+      <ol class="path">
+        <li class="stop current" id="stop1">
+          <span class="node" id="node1">1</span>
+          <div class="body">
+            <div class="t">Say hi to <em>Luigi's Pizzeria</em> ✉️</div>
+            <div class="d">First LinkedIn message · Leeds · your script is ready to copy — just add their name.</div>
           </div>
           <span class="st mono" id="st1">to do</span>
-        </div>
-        <div class="task" id="task2">
-          <span class="em">🔁</span>
-          <div>
-            <div class="t">Follow up with Rosie's Bakery</div>
-            <div class="d">She asked about pricing on Tuesday — gentle nudge</div>
+        </li>
+        <li class="stop" id="stop2">
+          <span class="node" id="node2">2</span>
+          <div class="body">
+            <div class="t">Follow up with <em>Rosie's Bakery</em> 🔁</div>
+            <div class="d">She asked about pricing on Tuesday — one gentle nudge by email, script ready.</div>
           </div>
           <span class="st mono" id="st2">to do</span>
-        </div>
-        <div class="task" id="task3">
-          <span class="em">📇</span>
-          <div>
-            <div class="t">Add one prospect to your book</div>
-            <div class="d">30 seconds, promise — name, trade, city</div>
+        </li>
+        <li class="stop" id="stop3">
+          <span class="node" id="node3">3</span>
+          <div class="body">
+            <div class="t">Add one prospect to <em>your book</em> 📇</div>
+            <div class="d">30 seconds, promise — a name, a trade, a city. Future-you says thanks.</div>
           </div>
           <span class="st mono" id="st3">to do</span>
-        </div>
+        </li>
+        <li class="stop goal" id="goal">
+          <span class="node">🎁</span>
+          <div class="body">
+            <div class="t" id="goalT">Finish all 3 → +30 points, and you're free</div>
+          </div>
+        </li>
+      </ol>
 
-        <button class="go" id="go" onclick="step()">Start ▶</button>
-        <p class="gonote mono">Opens quest mode · one action at a time · script included</p>
-      </div>
+      <button class="go" id="go" onclick="step()">Start ▶</button>
+      <p class="gonote mono" id="gonote">Opens quest mode · one action at a time · script included</p>
 
       <div id="doneMsg">
         <div class="big">Mission <em>complete</em> ✨</div>
         <p>3 of 3 · +30 points · You're free — see you tomorrow 🌿</p>
       </div>
     </div>
-  </div>
 
-  <div class="line l1">
-    <span class="icon">🔥</span>
-    <div>
-      <div class="t"><span class="snum" id="snum">4</span> days in a row</div>
-      <div class="d" id="sdesc">One action today makes it 5. Miss a day? You get one free pass every week 🛡️</div>
-    </div>
-    <span class="idx mono">02 · Streak</span>
-  </div>
+    <!-- ══ LE TABLEAU DE BORD ══ -->
+    <aside class="rail">
+      <section>
+        <div class="shead mono"><span>02 · Streak — your fire</span></div>
+        <div class="row">
+          <span class="icon">🔥</span>
+          <div>
+            <div class="t"><span class="snum" id="snum">4</span> days in a row</div>
+            <div class="d" id="sdesc">One action today makes it 5. Miss a day? You get one free pass every week 🛡️</div>
+          </div>
+        </div>
+      </section>
 
-  <div class="line l2">
-    <span class="icon">🌿</span>
-    <div style="flex:1">
-      <div class="t">This week's brave moves</div>
-      <div class="bar"><i id="wbar"></i></div>
-      <div class="d" id="wdesc">A good rhythm is building — keep it gentle.</div>
-    </div>
-    <span class="idx mono">03 · This week</span>
-  </div>
+      <section>
+        <div class="shead mono"><span>03 · This week — your effort</span></div>
+        <div class="row">
+          <span class="icon">🌿</span>
+          <div style="flex:1">
+            <div class="t">Brave moves this week</div>
+            <div class="bar"><i id="wbar"></i></div>
+            <div class="d" id="wdesc">A good rhythm is building — keep it gentle. Effort counts, answers don't.</div>
+          </div>
+        </div>
+      </section>
 
-  <div class="line l3">
-    <span class="icon">🎓</span>
-    <div class="lesson">
-      <div class="t">Today's lesson</div>
-      <div class="d"><q>People don't buy a website. They buy fewer missed orders. Talk about that.</q></div>
-    </div>
-    <span class="idx mono">04 · Lesson</span>
-  </div>
+      <section>
+        <div class="shead mono"><span>04 · Lesson of the day</span></div>
+        <div class="lesson">
+          <q>People don't buy a website. They buy fewer missed orders. Talk about that.</q>
+          <div class="who">Selling with heart · one idea a day</div>
+        </div>
+      </section>
 
-  <nav class="nav mono">
-    <a href="#" title="Screen 3 — coming next">My prospects →</a>
-    <a href="#" title="Screen 5 — coming next">Trophy Room 🏆</a>
-  </nav>
+      <section>
+        <div class="shead mono"><span>05 · Go to</span></div>
+        <div class="links">
+          <a href="#" title="Screen 3 — coming next">My prospects <span class="mono">soon</span></a>
+          <a href="#" title="Screen 5 — coming next">Trophy Room 🏆 <span class="mono">soon</span></a>
+          <a href="#" title="Screen 6 — waiting for Maëva's catalogue">Products <span class="mono">soon</span></a>
+        </div>
+      </section>
+    </aside>
+  </div>
 
   <p class="foot mono">Sell with heart · one brave move a day</p>
   <button class="replay mono" onclick="location.reload()">↺ replay demo</button>
 </div>
 
 <script>
-  // Démo : chaque clic sur le bouton jaune "termine" l'action suivante.
+  // Démo : chaque clic sur le bouton jaune "termine" l'étape suivante du parcours.
   // Dans le vrai HQ, ce bouton ouvrira le mode quête (écran 2).
   let n = 0;
   const labels = ['Nice — next one ▶', 'Last one ▶'];
@@ -228,8 +258,10 @@
 
   function step() {
     n++;
-    const task = document.getElementById('task' + n);
-    task.classList.add('done');
+    const stop = document.getElementById('stop' + n);
+    stop.classList.remove('current');
+    stop.classList.add('done');
+    document.getElementById('node' + n).textContent = '✓';
     document.getElementById('st' + n).textContent = 'done ✅';
 
     week++;
@@ -244,13 +276,15 @@
     }
 
     if (n < 3) {
+      document.getElementById('stop' + (n + 1)).classList.add('current');
       document.getElementById('go').textContent = labels[n - 1];
     } else {
+      const goal = document.getElementById('goal');
+      goal.classList.add('won');
+      document.getElementById('goalT').textContent = 'Mission complete — you did the whole path 🏁';
       document.getElementById('go').style.display = 'none';
-      document.querySelector('.gonote').style.display = 'none';
+      document.getElementById('gonote').style.display = 'none';
       document.getElementById('doneMsg').style.display = 'block';
-      const panel = document.getElementById('panel');
-      panel.classList.add('complete');
       document.getElementById('plive').textContent = 'Done ✨';
       confetti();
     }
