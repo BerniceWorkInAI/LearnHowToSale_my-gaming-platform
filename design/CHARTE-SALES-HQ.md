@@ -44,3 +44,14 @@ Toujours utiliser ces **variables CSS** (`:root`) — jamais de couleurs en dur.
 - L'effort compte, pas les réponses : "brave moves", "Effort counts, answers don't."
 - Jamais d'action téléphonique. Jamais de pression ("You're free — see you tomorrow 🌿").
 - Pied de page : "Sell with heart · one brave move a day".
+
+## Brain treats 🎁 (validé sur l'écran 2)
+Chaque action terminée offre une mini-phrase mémorisable ("brain treat"), tirée
+au sort localement (jamais d'API). Deux familles :
+- 🗣️ **Expressions anglaises courantes** du monde du travail, avec exemple lié à la vente.
+- 🧠⚛️📐 **Culture générale historique & scientifique** : histoire de l'IA (Turing,
+  Ada Lovelace, Deep Blue, AlphaGo, ELIZA…), physique quantique, mathématiques —
+  des idées complexes rendues simples. **Jamais de trucs "déjà connus" de Berni**
+  (prompting, bases de ChatGPT…) : elle vit dedans, ça ne récompense pas.
+Format : l'idée en une phrase (mot-clé en serif doré) + une ligne d'explication
+imagée qui sert de moyen mnémotechnique.
