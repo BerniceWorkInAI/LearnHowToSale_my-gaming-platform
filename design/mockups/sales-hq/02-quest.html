@@ -1,0 +1,349 @@
+<title>Botler Sales HQ — Quest mode · One move at a time</title>
+<style>
+  /* ═══ PAPIER OFFICIEL : Gallery White — cf. design/CHARTE-SALES-HQ.md ═══ */
+  :root {
+    --paper: #ffffff;
+    --grid: rgba(29,27,23,.05);
+    --ink: #1d1b17;
+    --ink-strong: #14120e;
+    --panel: #fafaf7;
+    --rule: #e7e5df;
+    --rule-strong: #1d1b17;
+    --grey: #8f8b81;
+    --faint: #c2beb3;
+    --gold: #b8860b;
+    --signal: #ffd12e;
+    --signal-ink: #1d1b17;
+    --green: #23856f;
+    --orange: #d1571f;
+    --bar-bg: #efede8;
+    --shadow: #1d1b17;
+    --border: #1d1b17;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--paper); color: var(--ink);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  button { font: inherit; cursor: pointer; }
+  a { color: inherit; }
+  .stage { max-width: 660px; margin: 0 auto; padding: 46px 30px 70px; min-height: 100vh; }
+
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .35;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+  @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+  @keyframes fall { to { transform: translateY(105vh) rotate(660deg); opacity: .9; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  .mono {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase;
+  }
+
+  .meta {
+    display: flex; justify-content: space-between; color: var(--grey);
+    border-bottom: 1px solid var(--rule-strong); padding-bottom: 14px;
+    animation: rise .5s both;
+  }
+
+  /* ── barre de progression de la quête ── */
+  .qbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 20px 0 8px; color: var(--grey); animation: rise .5s .06s both;
+  }
+  .qbar a { text-decoration: none; }
+  .qbar a:hover { color: var(--ink); }
+  .dots { display: flex; gap: 8px; align-items: center; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--panel); }
+  .dot.on { background: var(--green); border-color: var(--green); }
+  .dot.now { background: var(--signal); }
+
+  /* ── la carte de l'action ── */
+  .move { animation: rise .5s .12s both; }
+  .shead {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    color: var(--grey); border-top: 1px solid var(--rule-strong); padding: 13px 2px 6px; margin-top: 18px;
+  }
+  .shead .live { color: var(--green); white-space: nowrap; }
+  .shead .live::before {
+    content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green); margin-right: 7px; animation: pulse 2s infinite;
+  }
+
+  h1 {
+    font-size: clamp(34px, 7vw, 48px); font-weight: 800; letter-spacing: -.04em;
+    line-height: 1.02; margin: 18px 0 12px; text-wrap: balance; color: var(--ink-strong);
+  }
+  h1 em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: var(--gold); }
+
+  .who { color: var(--grey); font-size: 14.5px; line-height: 1.6; margin: 0 0 6px; }
+  .why { color: var(--ink); font-size: 14.5px; line-height: 1.6; margin: 0 0 24px; }
+  .why b { font-weight: 700; }
+  .why .tag { color: var(--gold); font-family: Georgia, serif; font-style: italic; }
+
+  /* le script à copier */
+  .script {
+    background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px;
+    position: relative; margin-bottom: 14px;
+  }
+  .script .corner { position: absolute; width: 8px; height: 8px; background: var(--signal); border: 1.5px solid var(--border); top: -5px; left: -5px; }
+  .script .head {
+    display: flex; justify-content: space-between; color: var(--grey);
+    border-bottom: 1px dashed var(--rule); padding: 10px 16px;
+  }
+  .script .txt { padding: 18px 18px 16px; font-size: 15px; line-height: 1.7; }
+  .hole {
+    background: var(--bar-bg); border-bottom: 1.5px dashed var(--gold);
+    padding: 0 4px; border-radius: 3px; font-weight: 650; white-space: nowrap;
+  }
+
+  .tools { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 26px; }
+  .tool {
+    background: var(--paper); color: var(--ink); font-weight: 700; font-size: 14px;
+    border: 1.5px solid var(--border); border-radius: 8px; padding: 11px 16px;
+    box-shadow: 2.5px 2.5px 0 var(--shadow); text-decoration: none; display: inline-block;
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .tool:hover { transform: translate(-1px,-1px); box-shadow: 3.5px 3.5px 0 var(--shadow); }
+  .tool:active { transform: translate(2px,2px); box-shadow: .5px .5px 0 var(--shadow); }
+  .tool:focus-visible { outline: 2.5px solid var(--ink); outline-offset: 3px; }
+
+  /* mini-formulaire (action "ajouter un prospect") */
+  .mini { display: grid; gap: 12px; margin-bottom: 26px; }
+  .mini input {
+    font: inherit; font-size: 15px; padding: 13px 14px; color: var(--ink);
+    background: var(--panel); border: 1.5px solid var(--border); border-radius: 8px;
+  }
+  .mini input::placeholder { color: var(--faint); }
+  .mini input:focus-visible { outline: 2.5px solid var(--gold); outline-offset: 2px; }
+
+  /* LE bouton — c'est Berni qui clique, c'est son geste de victoire */
+  .go {
+    width: 100%; padding: 19px; font-size: 19px; font-weight: 800;
+    background: var(--signal); color: var(--signal-ink); border: 1.5px solid var(--border); border-radius: 8px;
+    box-shadow: 4px 4px 0 var(--shadow);
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .go:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--shadow); }
+  .go:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--shadow); }
+  .go:focus-visible { outline: 2.5px solid var(--ink); outline-offset: 3px; }
+
+  .skip {
+    display: block; margin: 16px auto 0; background: none; border: none;
+    color: var(--faint); text-decoration: underline; font-size: 13px;
+  }
+  .skip:hover { color: var(--grey); }
+  .skipnote { text-align: center; color: var(--faint); margin-top: 8px; }
+
+  .courage {
+    display: flex; gap: 12px; align-items: center; margin: 22px 0 0;
+    border-top: 1px solid var(--rule); padding-top: 16px; color: var(--grey);
+    font-size: 13px; line-height: 1.6;
+  }
+  .courage .em { font-size: 22px; flex: none; }
+  .courage b { color: var(--ink); }
+
+  /* toast de points */
+  #toast {
+    position: fixed; left: 50%; top: 22px; transform: translateX(-50%) translateY(-80px);
+    z-index: 60; background: var(--ink); color: var(--paper);
+    padding: 12px 22px; border-radius: 999px; font-weight: 800; font-size: 15px;
+    transition: transform .35s cubic-bezier(.2,.9,.3,1.3); pointer-events: none;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* fin de mission */
+  #final { display: none; text-align: center; padding: 70px 0 30px; }
+  #final .big { font-size: clamp(38px, 9vw, 54px); font-weight: 800; letter-spacing: -.04em; margin: 14px 0 10px; animation: rise .5s both; }
+  #final .big em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: var(--gold); }
+  #final p { color: var(--grey); font-size: 15px; margin: 0 0 34px; animation: rise .5s .08s both; }
+  #final .go { max-width: 340px; animation: rise .5s .16s both; }
+
+  .foot { margin-top: 56px; text-align: center; color: var(--faint); animation: rise .5s .3s both; }
+  .replay { display: block; margin: 16px auto 0; background: none; border: none; color: var(--faint); text-decoration: underline; }
+
+  .confetti { position: fixed; top: -4vh; z-index: 45; pointer-events: none; opacity: 0; animation: fall linear both; }
+</style>
+
+<div class="stage">
+  <div class="meta mono"><span>Botler Sales HQ · Quest mode</span><span>Fri 24 Jul</span></div>
+
+  <div class="qbar mono">
+    <a href="#" title="Retour au Home — sans culpabilité">← Back home</a>
+    <div class="dots" aria-label="progress">
+      <span class="dot now" id="d1"></span><span class="dot" id="d2"></span><span class="dot" id="d3"></span>
+    </div>
+    <span id="stepLbl">Move 1 of 3</span>
+  </div>
+
+  <div id="moveBox" class="move"></div>
+
+  <div id="final">
+    <div class="big">Mission <em>complete</em> ✨</div>
+    <p>3 of 3 · +30 points today · Your streak is safe 🔥<br>You showed up. That's the whole secret.</p>
+    <button class="go" onclick="location.reload()">Back to home ▶</button>
+  </div>
+
+  <p class="foot mono">Sell with heart · one brave move a day</p>
+  <button class="replay mono" onclick="location.reload()">↺ replay demo</button>
+</div>
+
+<div id="toast">+10 points ✨</div>
+
+<script>
+  // ── Les 3 actions du jour (démo — dans le vrai HQ, elles viennent du pipeline) ──
+  const MOVES = [
+    {
+      head: '01 · Move 1 — first hello',
+      title: 'Say hi to <em>Luigi’s Pizzeria</em> ✉️',
+      who: '🍕 Family pizzeria in Leeds · found on LinkedIn · never contacted before.',
+      why: 'Why them: <b>no online ordering on their site</b> — customers must phone. <span class="tag">Exactly what Botler fixes.</span>',
+      script: `Hi <span class="hole">[first name]</span> 👋 I came across Luigi's while browsing Leeds food spots — <span class="hole">[something you liked]</span>!
+Quick question: when someone wants to order for tonight, do they have to call you?
+I work at Botler — we build simple ordering sites for pizzerias. One-off price, no monthly fees.
+Worth a 10-minute look?`,
+      tools: [
+        { label: 'Copy message 📋', copy: true },
+        { label: 'Open their LinkedIn ↗', href: '#' }
+      ],
+      btn: 'I sent it ✔ +10',
+      points: '+10 points ✨',
+      courage: null
+    },
+    {
+      head: '02 · Move 2 — gentle follow-up',
+      title: 'Follow up with <em>Rosie’s Bakery</em> 🔁',
+      who: '🥐 Bakery in Bristol · asked about pricing on Tuesday · one email so far.',
+      why: 'Why now: <b>she showed interest 3 days ago</b> — a gentle nudge doubles your chances. <span class="tag">Nudging is caring.</span>',
+      script: `Hi Rosie, just a gentle nudge on the pricing I sent Tuesday 🙂
+No rush — happy to answer any question, or show you a 10-minute demo whenever suits.
+And if it's a no for now, that's completely fine too — just say so and I'll stop nudging.`,
+      tools: [
+        { label: 'Copy message 📋', copy: true },
+        { label: 'Open email draft ✉️', href: 'mailto:rosie@example.com?subject=Quick%20follow-up%20from%20Botler' }
+      ],
+      btn: 'I sent it ✔ +10',
+      points: '+10 points ✨',
+      courage: 'If Rosie answers <b>no</b>, tap "brave no" on her card later → <b>+15 courage points</b>. A no beats silence — it means you dared to ask.'
+    },
+    {
+      head: '03 · Move 3 — grow your book',
+      title: 'Add one prospect to <em>your book</em> 📇',
+      who: '30 seconds, promise. A name, a trade, a city — that’s all.',
+      why: 'Why it matters: <b>tomorrow’s mission is built from your book.</b> <span class="tag">Future-you says thanks.</span>',
+      script: null,
+      form: true,
+      tools: [],
+      btn: 'Added to my book ✔ +5',
+      points: '+5 points ✨',
+      courage: null
+    }
+  ];
+
+  let i = 0;
+  const box = document.getElementById('moveBox');
+
+  function render() {
+    const m = MOVES[i];
+    box.innerHTML = `
+      <div class="shead mono"><span>${m.head}</span><span class="live">In progress</span></div>
+      <h1>${m.title}</h1>
+      <p class="who">${m.who}</p>
+      <p class="why">${m.why}</p>
+      ${m.script ? `
+        <div class="script">
+          <span class="corner"></span>
+          <div class="head mono"><span>Your script — short &amp; warm</span><span>2 holes to fill</span></div>
+          <div class="txt" id="scriptTxt">${m.script.replace(/\n/g, '<br>')}</div>
+        </div>` : ''}
+      ${m.form ? `
+        <div class="mini">
+          <input placeholder="Business name — e.g. The Corner Bakery" aria-label="Business name">
+          <input placeholder="Trade — pizzeria, bakery, butcher, club, salon…" aria-label="Trade">
+          <input placeholder="City" aria-label="City">
+        </div>` : ''}
+      ${m.tools.length ? `<div class="tools">` + m.tools.map((t, k) =>
+        t.copy
+          ? `<button class="tool" onclick="copyScript(this)">${t.label}</button>`
+          : `<a class="tool" href="${t.href}">${t.label}</a>`
+      ).join('') + `</div>` : ''}
+      <button class="go" onclick="doneMove()">${m.btn}</button>
+      <button class="skip" onclick="skipMove()">Not today →</button>
+      <p class="skipnote mono">Skipping never breaks your streak · it comes back tomorrow</p>
+      ${m.courage ? `<div class="courage"><span class="em">🦁</span><div>${m.courage}</div></div>` : ''}
+    `;
+    document.getElementById('stepLbl').textContent = 'Move ' + (i + 1) + ' of 3';
+    for (let k = 1; k <= 3; k++) {
+      const d = document.getElementById('d' + k);
+      d.className = 'dot' + (k - 1 < i ? ' on' : (k - 1 === i ? ' now' : ''));
+    }
+  }
+
+  function copyScript(btn) {
+    const raw = document.getElementById('scriptTxt').innerText;
+    navigator.clipboard && navigator.clipboard.writeText(raw);
+    btn.textContent = 'Copied ✅';
+    setTimeout(() => btn.textContent = 'Copy message 📋', 1600);
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1500);
+  }
+
+  function doneMove() {
+    toast(MOVES[i].points);
+    miniConfetti(14);
+    next();
+  }
+  function skipMove() {
+    toast('Saved for tomorrow 🌿');
+    next();
+  }
+  function next() {
+    i++;
+    if (i < MOVES.length) { render(); }
+    else {
+      document.getElementById('d3').className = 'dot on';
+      document.getElementById('stepLbl').textContent = 'Done';
+      box.style.display = 'none';
+      document.getElementById('final').style.display = 'block';
+      miniConfetti(44);
+    }
+  }
+
+  function miniConfetti(count) {
+    const colors = ['#ffd12e', '#e9c15c', '#23856f', '#d1571f', '#7fb3d8'];
+    for (let k = 0; k < count; k++) {
+      const p = document.createElement('div');
+      p.className = 'confetti';
+      const s = 6 + (k % 3) * 3;
+      p.style.left = ((k * 41) % 100) + 'vw';
+      p.style.width = s + 'px';
+      p.style.height = (s * 1.6) + 'px';
+      p.style.background = colors[k % colors.length];
+      p.style.borderRadius = k % 2 ? '2px' : '50%';
+      p.style.animationDuration = (2.2 + (k % 5) * 0.3) + 's';
+      p.style.animationDelay = ((k % 6) * 0.1) + 's';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 5500);
+    }
+  }
+
+  render();
+</script>
