@@ -97,6 +97,26 @@
   .hint { color: #6f6a5c; }
   .foot { color: #57523f; }
   .go:disabled { opacity: .35; }
+
+  /* ── la console musique 🎵 : discrète, en bas à gauche ── */
+  .vol {
+    position: fixed; left: 18px; bottom: 18px; z-index: 50;
+    display: flex; align-items: center; gap: 11px;
+    background: #1b1812; border: 1.5px solid #3c372b; border-radius: 999px;
+    padding: 9px 16px 9px 12px;
+    transition: border-color .2s ease;
+    animation: rise .5s .4s both;
+  }
+  .vol:hover { border-color: #e0b64f; }
+  .vol .note { background: none; border: none; color: #ece5d3; font-size: 16px; padding: 0 2px; cursor: pointer; }
+  .vol .note:focus-visible { outline: 2px solid #e0b64f; outline-offset: 3px; border-radius: 4px; }
+  .vol .lbl { color: #8d8776; }
+  .vol input[type="range"] {
+    width: 110px; accent-color: #e0b64f; cursor: pointer;
+    background: transparent;
+  }
+  .vol input[type="range"]:focus-visible { outline: 2px solid #e0b64f; outline-offset: 4px; border-radius: 4px; }
+  @media (max-width: 640px) { .vol { left: 12px; bottom: 12px; } .vol input[type="range"] { width: 80px; } }
 </style>
 </head>
 <body>
@@ -140,6 +160,12 @@
   <p class="foot mono">Sell with heart · every legend needs a first move</p>
 </div>
 
+<div class="vol" title="Menu music · plays only on this screen">
+  <button class="note" id="muteBtn" onclick="toggleMute()" aria-label="Music on or off">🎵</button>
+  <span class="lbl mono">Music</span>
+  <input type="range" id="volSlider" min="0" max="100" aria-label="Music volume" oninput="setVol(this.value)">
+</div>
+
 <script src="assets/hq.js"></script>
 <script>
   document.getElementById('dateLine').textContent = HQ.dateLine();
@@ -149,6 +175,53 @@
   const sndChoose = new Audio('media/sfx/choosing-character.mp3');
   const sndStart = new Audio('media/sfx/character-selected.mp3');
   sndChoose.preload = sndStart.preload = 'auto';
+
+  // 🎵 la musique du menu : douce par défaut, en boucle, UNIQUEMENT sur cet écran
+  const music = new Audio('media/music/menu-theme.mp3');
+  music.loop = true;
+  music.preload = 'auto';
+  let vol = parseFloat(localStorage.getItem('hq-music-vol'));
+  if (isNaN(vol)) vol = 0.18;                        // doux par défaut : les clics restent audibles
+  let muted = localStorage.getItem('hq-music-muted') === '1';
+  let musicOn = false;
+
+  function paintVol() {
+    document.getElementById('volSlider').value = Math.round(vol * 100);
+    document.getElementById('muteBtn').textContent = (muted || vol === 0) ? '🔇' : '🎵';
+  }
+  function setVol(v) {
+    vol = v / 100;
+    localStorage.setItem('hq-music-vol', vol);
+    if (vol > 0 && muted) { muted = false; localStorage.setItem('hq-music-muted', '0'); startMusic(); }
+    music.volume = muted ? 0 : vol;
+    paintVol();
+  }
+  function toggleMute() {
+    muted = !muted;
+    localStorage.setItem('hq-music-muted', muted ? '1' : '0');
+    if (!muted) startMusic();
+    music.volume = muted ? 0 : vol;
+    paintVol();
+  }
+  function fadeTo(target, ms) {
+    const from = music.volume, t0 = performance.now();
+    (function step(t) {
+      const k = Math.min(1, (t - t0) / ms);
+      music.volume = from + (target - from) * k;
+      if (k < 1) requestAnimationFrame(step);
+      else if (target === 0) music.pause();
+    })(t0);
+  }
+  function startMusic() {
+    if (musicOn || muted) return;
+    music.volume = 0;
+    music.play().then(() => { musicOn = true; fadeTo(vol, 1200); }).catch(() => {});
+  }
+  // les navigateurs exigent un premier geste avant tout son : on guette le premier clic ou touche
+  startMusic();
+  addEventListener('pointerdown', startMusic);
+  addEventListener('keydown', startMusic);
+  paintVol();
 
   function paint() {
     document.getElementById('cBernice').classList.toggle('sel', chosen === 'bernice');
@@ -168,6 +241,7 @@
   function start() {
     HQ.setCharacter(chosen);
     sndChoose.pause();
+    if (musicOn) fadeTo(0, 1600);                    // la musique s'éteint en douceur, jamais brusquement
     sndStart.play().catch(() => {});
     const b = document.getElementById('start');
     b.disabled = true;
