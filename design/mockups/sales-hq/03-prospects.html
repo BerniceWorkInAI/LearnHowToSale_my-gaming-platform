@@ -105,12 +105,18 @@
   @media (max-width: 560px) { .board { grid-template-columns: 1fr; } }
 
   .col .chead {
-    display: flex; justify-content: space-between; align-items: baseline;
-    color: var(--grey); border-top: 1.5px solid var(--rule-strong); padding: 12px 2px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--ink-strong); font-size: 12.5px; font-weight: 700;
+    background: var(--bar-bg); border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 10px 12px; margin-bottom: 6px;
   }
-  .col .chead .n { color: var(--ink-strong); }
-  .col.trophy .chead { border-top-color: var(--gold); color: var(--gold); }
-  .col.trophy .chead .n { color: var(--gold); }
+  .col .chead .n {
+    color: var(--paper); background: var(--ink); border-radius: 999px;
+    min-width: 22px; height: 22px; display: grid; place-items: center; font-size: 11px;
+  }
+  .col.trophy .chead { background: #fdf3d1; border-color: var(--gold); color: var(--gold); }
+  .col.trophy .chead .n { background: var(--gold); }
+  .col .cdesc { color: var(--grey); font-size: 12px; line-height: 1.5; margin: 0 2px 14px; }
 
   .card {
     background: var(--panel); border: 1.5px solid var(--border); border-radius: 8px;
@@ -209,10 +215,10 @@
 <script>
   // ── Le plateau (démo — dans le vrai HQ : localStorage) ──
   const LEVELS = [
-    { key: 'contacted',  label: '01 · Contacted' },
-    { key: 'interested', label: '02 · Interested' },
-    { key: 'demo',       label: '03 · Demo' },
-    { key: 'client',     label: '04 · Client 🏆' },
+    { key: 'contacted',  label: '01 · CONTACTED',  desc: 'You said hi — waiting for a reply.',              up: '↗ They replied! → Interested +20' },
+    { key: 'interested', label: '02 · INTERESTED', desc: 'They replied — curious, asking questions.',       up: '↗ Demo booked! → Demo +20' },
+    { key: 'demo',       label: '03 · DEMO',       desc: 'A demo is booked or already done.',               up: '🏆 They said YES! → Client +20' },
+    { key: 'client',     label: '04 · CLIENT 🏆',  desc: 'They said yes. You sold with heart.',             up: null },
   ];
   let seq = 0;
   const P = [
@@ -231,6 +237,7 @@
       const cards = P.filter(p => p.lvl === li);
       return `<div class="col ${li === 3 ? 'trophy' : ''}">
         <div class="chead mono"><span>${L.label}</span><span class="n">${cards.length}</span></div>
+        <p class="cdesc">${L.desc}</p>
         ${cards.map(p => `
           <div class="card">
             <div class="who">${p.name}</div>
@@ -238,7 +245,7 @@
             <div class="wait mono">${p.wait}</div>
             ${li < 3 ? `
               <div class="acts">
-                <button class="up" onclick="moveUp(${p.id})">↗ Move up${li === 2 ? ' — CLIENT!' : ''} +20</button>
+                <button class="up" onclick="moveUp(${p.id})">${L.up}</button>
                 <button class="no" onclick="braveNo(${p.id})" title="They said no — that's +15 courage points">🦁 no +15</button>
               </div>` : ''}
           </div>`).join('') || `<div class="empty">Nobody here yet —<br>your next move fills this box ✨</div>`}
