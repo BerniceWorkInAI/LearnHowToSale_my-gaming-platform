@@ -176,6 +176,35 @@
     if (m) { m.skipped = true; m.done = true; save(); }
   }
 
+  /* ── agir directement depuis la fiche prospect ──
+     Si l'action fait partie de la quête du jour, elle y est cochée aussi
+     (jamais de double comptage de points). */
+  function touchProspect(pid, type) {
+    const m = st.quest.find(x => !x.done && x.pid === pid && x.type === type);
+    if (m) return completeMove(m.id);
+    const p = st.prospects.find(x => x.id === pid);
+    if (!p) return null;
+    p.lastTouch = today();
+    if (type === 'hello') {
+      p.helloSent = true;
+      p.history.push({ d: today(), txt: 'You said hi ✉️ First brave move.' });
+      if (!st.trophies.firstHello) st.trophies.firstHello = today();
+    } else {
+      p.history.push({ d: today(), txt: 'You sent a gentle nudge 🔁' });
+    }
+    award(10);
+    return { pts: 10 };
+  }
+
+  /* la prochaine action suggérée pour UN prospect */
+  function nextMoveFor(p) {
+    if (!p || p.level === 3) return null;
+    if (!p.helloSent) return { type: 'hello', pid: p.id };
+    const quiet = p.lastTouch ? daysBetween(p.lastTouch, today()) : 99;
+    if (quiet >= 3) return { type: 'nudge', pid: p.id };
+    return null;
+  }
+
   /* ── prospects ── */
   function addProspect(f) {
     const p = {
@@ -372,6 +401,7 @@
     get state() { return st; },
     save, ensureDay, genQuest, moveView, completeMove, skipMove,
     addProspect, moveUp, braveNo, addNote, removeProspect, resetAll,
+    touchProspect, nextMoveFor,
     TROPHY_DEFS, nextTreat, lessonOfDay,
     exportData, exportCSV, importData,
     esc, toast, confetti, dateLine, today, nice, daysBetween,

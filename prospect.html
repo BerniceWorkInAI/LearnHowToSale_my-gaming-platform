@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Botler Sales HQ · Prospect</title>
+<link rel="stylesheet" href="assets/hq.css">
+<style>
+  .stage { max-width: 980px; margin: 0 auto; padding: 46px 34px 70px; min-height: 100vh; }
+  .head { animation: rise .5s .08s both; }
+  .lvlbadge {
+    display: inline-flex; align-items: center; gap: 8px; margin-top: 30px;
+    background: var(--bar-bg); border: 1.5px solid var(--border); border-radius: 999px;
+    padding: 8px 16px; color: var(--ink-strong); font-weight: 700;
+  }
+  .lvlbadge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  .lvlbadge.won { background: #fdf3d1; border-color: var(--gold); color: var(--gold); }
+  .lvlbadge.won::before { background: var(--gold); }
+  h1 { font-size: clamp(40px, 7vw, 60px); font-weight: 800; letter-spacing: -.04em; line-height: 1; margin: 14px 0 8px; color: var(--ink-strong); }
+  .sub { color: var(--grey); font-size: 15px; margin: 0 0 10px; }
+  .journey { display: flex; gap: 6px; align-items: center; margin: 14px 0 0; }
+  .journey .seg { height: 7px; flex: 1; max-width: 90px; border: 1px solid var(--border); border-radius: 4px; background: var(--panel); }
+  .journey .seg.on { background: var(--green); border-color: var(--green); }
+  .journey .lbl { color: var(--grey); margin-left: 10px; }
+
+  .cols { display: grid; grid-template-columns: 1.15fr 1fr; gap: 60px; align-items: start; margin-top: 40px; }
+  @media (max-width: 760px) { .cols { grid-template-columns: 1fr; gap: 40px; } }
+
+  .next { animation: rise .5s .16s both; }
+  .why { font-size: 14.5px; line-height: 1.6; margin: 0 0 16px; }
+  .why .tag { color: var(--gold); font-family: Georgia, serif; font-style: italic; }
+  .chan { display: inline-flex; align-items: center; gap: 8px; background: var(--panel); border: 1.5px solid var(--border); border-radius: 999px; padding: 8px 16px; margin: 0 0 14px; color: var(--grey); }
+  .chan b { color: var(--ink-strong); letter-spacing: .1em; }
+  .script { background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px; position: relative; margin-bottom: 14px; }
+  .script .corner { position: absolute; width: 8px; height: 8px; background: var(--signal); border: 1.5px solid var(--border); top: -5px; left: -5px; }
+  .script .head { display: flex; justify-content: space-between; color: var(--grey); border-bottom: 1px dashed var(--rule); padding: 10px 16px; }
+  .script .txt { padding: 16px 18px; font-size: 14.5px; line-height: 1.7; white-space: pre-line; }
+  .hole { background: var(--bar-bg); border-bottom: 1.5px dashed var(--gold); padding: 0 4px; border-radius: 3px; font-weight: 650; white-space: nowrap; }
+  .quick { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .quick .tool { font-size: 13px; padding: 9px 14px; }
+  .no { font-size: 12.5px; background: none; border: none; color: var(--faint); text-decoration: underline; padding: 9px 4px; }
+  .no:hover { color: var(--orange); }
+  .calm { border: 1.5px dashed var(--faint); border-radius: 8px; color: var(--grey); font-size: 14px; text-align: center; padding: 26px 16px; line-height: 1.6; }
+
+  .story { animation: rise .5s .24s both; }
+  .tline { position: relative; margin: 0; padding: 0; list-style: none; }
+  .tline::before { content: ""; position: absolute; left: 5px; top: 14px; bottom: 14px; border-left: 1.5px dashed var(--faint); }
+  .ev { position: relative; display: flex; gap: 18px; padding: 12px 0; }
+  .ev .pt { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--panel); border: 1.5px solid var(--border); margin-top: 4px; z-index: 1; }
+  .ev.win .pt { background: var(--green); border-color: var(--green); }
+  .ev .when { color: var(--faint); white-space: nowrap; padding-top: 3px; min-width: 58px; }
+  .ev .what { font-size: 14px; line-height: 1.55; }
+
+  .facts { margin-top: 30px; }
+  .facts .row { display: flex; gap: 12px; padding: 11px 2px; border-bottom: 1px solid var(--rule); font-size: 14px; align-items: baseline; }
+  .facts .row:first-of-type { border-top: 1px solid var(--rule); }
+  .facts .k { color: var(--faint); min-width: 88px; }
+  .facts a { color: var(--gold); }
+  #noteIn { width: 100%; margin-top: 14px; border-style: dashed; }
+
+  .danger { margin-top: 26px; text-align: right; }
+  .danger button { background: none; border: none; color: var(--faint); text-decoration: underline; font-size: 12px; }
+  .danger button:hover { color: var(--orange); }
+
+  .foot { margin-top: 56px; animation: rise .5s .34s both; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="meta mono"><span><a href="prospects.html">← My prospects</a></span><span id="dateLine"></span></div>
+  <div id="page"></div>
+  <p class="foot mono">Sell with heart · every name here is a future story</p>
+</div>
+
+<script src="assets/hq.js"></script>
+<script>
+  HQ.ensureDay();
+  document.getElementById('dateLine').textContent = HQ.dateLine();
+
+  const pid = parseInt(new URLSearchParams(location.search).get('id'), 10);
+  const LVL = [
+    { badge: '01 · Contacted · waiting for a reply', up: '↗ They replied! → Interested +20' },
+    { badge: '02 · Interested · curious, asking questions', up: '↗ Demo booked! → Demo +20' },
+    { badge: '03 · Demo · booked or already done', up: '🏆 They said YES! → Client +20' },
+    { badge: '04 · Client · they said yes 🏆', up: null },
+  ];
+
+  function render() {
+    const p = HQ.state.prospects.find(x => x.id === pid);
+    if (!p) {
+      document.getElementById('page').innerHTML =
+        '<div class="head"><h1>Hmm, <em>nobody here</em></h1>'
+        + '<p class="sub">This prospect is not in your book (removed, or the link is old).</p>'
+        + '<p><a class="tool" href="prospects.html">← Back to my prospects</a></p></div>';
+      return;
+    }
+
+    const next = HQ.nextMoveFor(p);
+    const v = next ? HQ.moveView(next) : null;
+    const segs = [0, 1, 2, 3].map(i => '<span class="seg' + (i <= p.level ? ' on' : '') + '"></span>').join('');
+    const nextLbl = p.level === 3 ? 'the top 🏆' : ['Interested', 'Demo', 'Client'][p.level];
+
+    let nextHtml;
+    if (p.level === 3) {
+      nextHtml = '<div class="calm">🏆 ' + HQ.esc(p.name) + ' is a client. Nothing to do but be proud.<br>Keep them happy, they are your best ambassador.</div>';
+    } else if (v) {
+      const scriptHtml = HQ.esc(v.script).replace(/\[(.+?)\]/g, '<span class="hole">[$1]</span>');
+      nextHtml =
+        '<div class="chan mono">' + v.channel + '</div>'
+        + '<p class="why">' + HQ.esc(v.why) + ' <span class="tag">' + (next.type === 'nudge' ? 'Nudging is caring.' : 'Start a conversation, not a sale.') + '</span></p>'
+        + '<div class="script"><span class="corner"></span>'
+        + '<div class="head mono"><span>Your script · short &amp; warm</span><span>fill the [holes]</span></div>'
+        + '<div class="txt" id="scriptTxt">' + scriptHtml + '</div></div>'
+        + '<button class="go" onclick="doMove(\'' + next.type + '\')">' + HQ.esc(v.btn) + '</button>'
+        + '<div class="quick">'
+        + '<button class="tool" onclick="copyIt(this)">Copy message 📋</button>'
+        + (p.linkedin ? '<a class="tool" href="' + HQ.esc(p.linkedin) + '" target="_blank" rel="noopener">Open their LinkedIn ↗</a>' : '')
+        + (p.email ? '<a class="tool" href="mailto:' + HQ.esc(p.email) + '">Open email draft ✉️</a>' : '')
+        + '</div>';
+    } else {
+      nextHtml = '<div class="calm">🌿 Nothing to do right now. You reached out recently.<br>Let it breathe. If they stay quiet 3 days, a gentle nudge will appear here.</div>';
+    }
+
+    const acts = p.level < 3
+      ? '<div class="quick" style="margin-top:22px">'
+        + '<button class="tool" onclick="up()">' + LVL[p.level].up + '</button>'
+        + '<button class="no" onclick="no(this)" title="They said no, that is +15 courage points">🦁 they said no +15</button>'
+        + '</div>'
+      : '';
+
+    document.getElementById('page').innerHTML =
+      '<div class="head">'
+      + '<span class="lvlbadge mono' + (p.level === 3 ? ' won' : '') + '">' + LVL[p.level].badge + '</span>'
+      + '<h1>' + HQ.esc(p.name) + '</h1>'
+      + '<p class="sub">' + HQ.esc(p.trade) + ' · ' + HQ.esc(p.city) + ' · in your book since ' + HQ.nice(p.createdAt) + '</p>'
+      + '<div class="journey">' + segs + '<span class="lbl mono">' + (p.level + 1) + ' of 4 · next stop: ' + nextLbl + '</span></div>'
+      + '</div>'
+      + '<div class="cols">'
+      +   '<div class="next">'
+      +     '<div class="shead mono"><span>01 · Next move · picked for you</span></div>'
+      +     '<p class="explain">One move at a time. It also appears in your daily mission when it is due.</p>'
+      +     nextHtml + acts
+      +   '</div>'
+      +   '<div class="story">'
+      +     '<div class="shead mono"><span>02 · Your story so far</span></div>'
+      +     '<p class="explain">Every move you make is written here by itself. You never fill a report.</p>'
+      +     '<ul class="tline">'
+      +     p.history.map(h => '<li class="ev' + (/replied|YES|Interested|Demo/.test(h.txt) ? ' win' : '') + '">'
+          + '<span class="pt"></span><span class="when mono">' + HQ.nice(h.d) + '</span>'
+          + '<div class="what">' + HQ.esc(h.txt) + '</div></li>').join('')
+      +     '</ul>'
+      +     '<div class="facts">'
+      +       '<div class="shead mono" style="border-top:0; padding-top:24px;"><span>03 · Details</span></div>'
+      +       '<div class="row"><span class="k mono">LinkedIn</span>' + (p.linkedin ? '<a href="' + HQ.esc(p.linkedin) + '" target="_blank" rel="noopener">' + HQ.esc(p.linkedin.replace(/^https?:\/\//, '')) + ' ↗</a>' : '<span>not filled yet</span>') + '</div>'
+      +       '<div class="row"><span class="k mono">Email</span><span>' + (HQ.esc(p.email) || 'not filled yet') + '</span></div>'
+      +       '<div class="row"><span class="k mono">Website</span>' + (p.website ? '<a href="' + HQ.esc(p.website) + '" target="_blank" rel="noopener">' + HQ.esc(p.website.replace(/^https?:\/\//, '')) + ' ↗</a>' : '<span>none yet 🎯 your best opening: they need one!</span>') + '</div>'
+      +       '<input class="hq" id="noteIn" placeholder="Add a note, press Enter (e.g. \'closed on Mondays\')" onkeydown="if(event.key===\'Enter\')note(this)">'
+      +     '</div>'
+      +     '<div class="danger"><button onclick="del(this)">✕ remove from my book (no points lost)</button></div>'
+      +   '</div>'
+      + '</div>';
+  }
+
+  function copyIt(btn) {
+    const raw = document.getElementById('scriptTxt').innerText;
+    navigator.clipboard && navigator.clipboard.writeText(raw);
+    btn.textContent = 'Copied ✅';
+    setTimeout(() => btn.textContent = 'Copy message 📋', 1600);
+  }
+  function doMove(type) {
+    const r = HQ.touchProspect(pid, type);
+    if (r) { HQ.toast('+' + r.pts + ' points ✨'); HQ.confetti(14); }
+    render();
+  }
+  function up() {
+    const p = HQ.moveUp(pid);
+    if (!p) return;
+    if (p.level === 3) { location.href = 'celebrate.html?id=' + pid + '&kind=client'; return; }
+    if (p.level === 2) { location.href = 'celebrate.html?id=' + pid + '&kind=demo'; return; }
+    HQ.toast('+20 points ✨ ' + p.name + ' moved up!');
+    HQ.confetti(12);
+    render();
+  }
+  function no(btn) {
+    if (!btn.dataset.arm) {
+      btn.dataset.arm = '1';
+      btn.textContent = '🦁 sure? they said no';
+      setTimeout(() => { delete btn.dataset.arm; btn.textContent = '🦁 they said no +15'; }, 2600);
+      return;
+    }
+    HQ.braveNo(pid);
+    HQ.toast('+15 courage points 🦁 A no beats silence.');
+    setTimeout(() => location.href = 'prospects.html', 900);
+  }
+  function note(inp) {
+    const t = inp.value.trim();
+    if (!t) return;
+    HQ.addNote(pid, t);
+    HQ.toast('Note saved ✨');
+    render();
+  }
+  function del(btn) {
+    if (!btn.dataset.arm) {
+      btn.dataset.arm = '1';
+      btn.textContent = '✕ sure? this removes the whole card';
+      setTimeout(() => { delete btn.dataset.arm; btn.textContent = '✕ remove from my book (no points lost)'; }, 2800);
+      return;
+    }
+    HQ.removeProspect(pid);
+    location.href = 'prospects.html';
+  }
+
+  render();
+</script>
+</body>
+</html>
