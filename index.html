@@ -9,8 +9,34 @@
   .stage { max-width: 1020px; margin: 0 auto; padding: 46px 34px 70px; min-height: 100vh; }
   .head { animation: rise .5s .08s both; }
   h1 { font-size: clamp(46px, 8vw, 66px); font-weight: 800; letter-spacing: -.04em; line-height: .98; margin: 34px 0 10px; text-wrap: balance; color: var(--ink-strong); }
-  .lede { color: var(--grey); font-size: 15.5px; margin: 0 0 44px; max-width: 60ch; line-height: 1.55; }
+  .lede { color: var(--grey); font-size: 15.5px; margin: 0 0 24px; max-width: 60ch; line-height: 1.55; }
   .lede b { color: var(--ink-strong); font-weight: 650; }
+
+  /* la bulle de dialogue du personnage 🎭 */
+  .say {
+    display: flex; gap: 13px; align-items: center; max-width: 560px;
+    margin: 0 0 40px; animation: rise .5s .12s both;
+  }
+  .say .face {
+    flex: none; width: 46px; height: 46px; border-radius: 50%; overflow: hidden;
+    border: 1.5px solid var(--border); background: var(--bar-bg);
+    display: grid; place-items: center; font-size: 22px;
+  }
+  .say .face img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: none; }
+  .say .face.hasimg img { display: block; }
+  .say .face.hasimg .em { display: none; }
+  .say .bubble {
+    position: relative; background: var(--panel); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 10px 15px;
+  }
+  .say .bubble::before {
+    content: ""; position: absolute; left: -7px; top: 16px; width: 10px; height: 10px;
+    background: var(--panel); border-left: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border);
+    transform: rotate(45deg);
+  }
+  .say .who { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; font-family: ui-monospace, Consolas, monospace; color: var(--grey); margin-bottom: 3px; }
+  .say.injection .who { color: #7d3bd8; }
+  .say .line { font-size: 14px; line-height: 1.5; font-family: Georgia, serif; font-style: italic; }
 
   .cols { display: grid; grid-template-columns: 1.55fr 1fr; gap: 64px; align-items: start; }
   @media (max-width: 760px) { .cols { grid-template-columns: 1fr; gap: 40px; } }
@@ -71,6 +97,13 @@
   <div class="head">
     <h1>Hi <em>Berni♥</em></h1>
     <p class="lede" id="lede"></p>
+    <div class="say" id="say" style="display:none">
+      <div class="face" id="sayFace"><span class="em" id="sayEm"></span><img id="sayImg" alt=""></div>
+      <div class="bubble">
+        <div class="who" id="sayWho"></div>
+        <div class="line" id="sayLine"></div>
+      </div>
+    </div>
   </div>
 
   <div class="cols">
@@ -133,6 +166,7 @@
       <button onclick="HQ.exportCSV()" title="Opens in Excel or Google Sheets">📊 Excel / Sheets</button>
       <label>📂 Restore<input type="file" accept=".json" style="display:none" onchange="restore(this)"></label>
       <button onclick="startFresh(this)" title="Erase everything and start from zero (after tests)">🧹 Start fresh</button>
+      <button onclick="location.href='select.html'" title="Bernice or Injection, who shows up tomorrow?">🎭 Switch character</button>
     </div>
   </div>
 </div>
@@ -141,8 +175,22 @@
 <script>
   HQ.ensureDay();
   const st = HQ.state;
+  if (!st.character) location.replace('select.html');   // premier lancement : choisis ta légende 🎭
   document.getElementById('dateLine').textContent = HQ.dateLine();
   document.getElementById('lesson').textContent = HQ.lessonOfDay();
+
+  // la ligne du jour de ton personnage
+  const c = HQ.charLine();
+  if (c) {
+    document.getElementById('say').style.display = 'flex';
+    document.getElementById('say').classList.toggle('injection', st.character === 'injection');
+    document.getElementById('sayEm').textContent = c.em;
+    document.getElementById('sayWho').textContent = c.name + ' · today';
+    document.getElementById('sayLine').textContent = '“' + c.line + '”';
+    const img = document.getElementById('sayImg');
+    img.src = c.img;
+    img.onload = () => document.getElementById('sayFace').classList.add('hasimg');
+  }
 
   const empty = st.prospects.length === 0;
   document.getElementById('lede').innerHTML = empty

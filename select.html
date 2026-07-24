@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Botler Sales HQ · Select your legend</title>
+<link rel="stylesheet" href="assets/hq.css">
+<style>
+  .stage { max-width: 900px; margin: 0 auto; padding: 46px 30px 70px; min-height: 100vh; display: flex; flex-direction: column; }
+  .head { text-align: center; animation: rise .5s .08s both; }
+  h1 { font-size: clamp(40px, 7vw, 58px); font-weight: 800; letter-spacing: -.04em; line-height: 1; margin: 34px 0 8px; color: var(--ink-strong); }
+  .lede { color: var(--grey); font-size: 15px; margin: 0 0 40px; }
+
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; animation: rise .5s .16s both; }
+  @media (max-width: 640px) { .duo { grid-template-columns: 1fr; } }
+
+  .char {
+    position: relative; text-align: left; padding: 0; overflow: hidden;
+    background: var(--panel); border: 1.5px solid var(--border); border-radius: 10px;
+    cursor: pointer; transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .char:hover, .char:focus-visible { transform: translateY(-6px); }
+  .char:focus-visible { outline: 2.5px solid var(--ink); outline-offset: 3px; }
+  .char.bernice:hover { box-shadow: 6px 8px 0 var(--gold); }
+  .char.injection:hover { box-shadow: 6px 8px 0 #7d3bd8; }
+
+  .pic { aspect-ratio: 3 / 4; width: 100%; position: relative; background: var(--bar-bg); overflow: hidden; }
+  .pic img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; transition: transform .4s ease; }
+  .char:hover .pic img { transform: scale(1.04); }
+  .pic .ph {
+    position: absolute; inset: 0; display: none; place-items: center; text-align: center;
+    color: var(--grey); font-size: 13px; line-height: 1.6; padding: 20px;
+  }
+  .pic .ph .em { font-size: 74px; display: block; margin-bottom: 12px; }
+  .pic.noimg .ph { display: grid; }
+  .pic.noimg img { display: none; }
+
+  /* le voile "you are about to choose…" au survol */
+  .veil {
+    position: absolute; inset: auto 0 0 0; padding: 42px 16px 12px; text-align: center;
+    color: #fff; background: linear-gradient(transparent, rgba(20,18,14,.82));
+    opacity: 0; transform: translateY(8px); transition: opacity .22s ease, transform .22s ease;
+    pointer-events: none;
+  }
+  .char:hover .veil, .char:focus-visible .veil { opacity: 1; transform: none; }
+  .char.sel .veil { opacity: 0; }
+
+  .plate { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 16px 4px; }
+  .plate .n { font-size: 20px; font-weight: 800; letter-spacing: -.02em; color: var(--ink-strong); }
+  .char.injection .plate .n { color: #7d3bd8; }
+  .plate .em { font-size: 22px; }
+  .tag { color: var(--grey); font-size: 12.5px; line-height: 1.5; padding: 2px 16px 16px; }
+
+  .badge {
+    position: absolute; top: 12px; right: 12px; z-index: 2;
+    background: var(--green); color: #fff; border: 1.5px solid var(--border);
+    border-radius: 999px; padding: 6px 14px; font-weight: 800; font-size: 13px;
+    display: none; animation: pop .4s ease;
+  }
+  .char.sel { transform: none; }
+  .char.sel .badge { display: block; }
+  .char.bernice.sel { box-shadow: 6px 8px 0 var(--gold); border-color: var(--gold); }
+  .char.injection.sel { box-shadow: 6px 8px 0 #7d3bd8; border-color: #7d3bd8; }
+
+  .startzone { text-align: center; margin-top: 38px; animation: rise .5s .24s both; }
+  .go { max-width: 380px; }
+  .hint { color: var(--faint); margin-top: 12px; }
+
+  .foot { margin-top: auto; padding-top: 40px; animation: rise .5s .3s both; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="meta mono"><span>Botler Sales HQ · Character select</span><span id="dateLine"></span></div>
+
+  <div class="head">
+    <h1>Select your <em>legend</em></h1>
+    <p class="lede">Two Bernis, one mission. Who shows up today?</p>
+  </div>
+
+  <div class="duo">
+    <button class="char bernice" id="cBernice" onclick="pick('bernice')">
+      <span class="badge">Chosen ✓</span>
+      <div class="pic" id="picB">
+        <img src="media/art/select-bernice.png" alt="Bernice, the calm one" onerror="this.parentElement.classList.add('noimg')">
+        <div class="ph"><span class="em">🕵🏾‍♀️</span>Bernice's portrait goes here<br><span class="mono">media/art/select-bernice.png</span></div>
+        <div class="veil mono">You are about to choose the calm one…</div>
+      </div>
+      <div class="plate"><span class="n">Bernice</span><span class="em">🕵🏾‍♀️</span></div>
+      <div class="tag">Calm mind. Sharp instinct. Always in control.</div>
+    </button>
+
+    <button class="char injection" id="cInjection" onclick="pick('injection')">
+      <span class="badge">Chosen ✓</span>
+      <div class="pic" id="picI">
+        <img src="media/art/select-injection.png" alt="Berni Injection, the chaotic one" onerror="this.parentElement.classList.add('noimg')">
+        <div class="ph"><span class="em">😈</span>Injection's portrait goes here<br><span class="mono">media/art/select-injection.png</span></div>
+        <div class="veil mono">You are about to unleash the chaos…</div>
+      </div>
+      <div class="plate"><span class="n">Berni · INJECTION</span><span class="em">😈</span></div>
+      <div class="tag">Chaos mode · powered by prompt injection. She has been waiting for this.</div>
+    </button>
+  </div>
+
+  <div class="startzone">
+    <button class="go" id="start" disabled onclick="start()">Choose your Berni first</button>
+    <p class="hint mono" id="hint">Pick a legend · you can switch any day from the Home page</p>
+  </div>
+
+  <p class="foot mono">Sell with heart · every legend needs a first move</p>
+</div>
+
+<script src="assets/hq.js"></script>
+<script>
+  document.getElementById('dateLine').textContent = HQ.dateLine();
+  let chosen = HQ.state.character || null;
+
+  function paint() {
+    document.getElementById('cBernice').classList.toggle('sel', chosen === 'bernice');
+    document.getElementById('cInjection').classList.toggle('sel', chosen === 'injection');
+    const b = document.getElementById('start');
+    if (chosen) {
+      b.disabled = false;
+      b.textContent = chosen === 'injection' ? 'Start · unleash Injection 😈 ▶' : 'Start as Bernice ▶';
+    }
+  }
+  function pick(k) { chosen = k; paint(); }
+  function start() {
+    HQ.setCharacter(chosen);
+    location.href = 'index.html';
+  }
+  paint();
+</script>
+</body>
+</html>
