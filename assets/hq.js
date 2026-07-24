@@ -333,15 +333,29 @@
     a.download = 'botler-sales-hq-backup-' + today() + '.json';
     a.click();
   }
-  /* export CSV : s'ouvre directement dans Excel ou Google Sheets */
+  /* export CSV organisé : en-tête daté, totaux, puis un bloc par niveau
+     (Clients d'abord). S'ouvre proprement dans Excel ou Google Sheets. */
   function exportCSV() {
-    const lvl = ['Contacted', 'Interested', 'Demo', 'Client 🏆'];
-    const head = ['Name', 'Trade', 'City', 'Level', 'Website', 'LinkedIn', 'Email', 'Added', 'Last touch', 'Story'];
-    const rows = st.prospects.map(p => [
-      p.name, p.trade, p.city, lvl[p.level], p.website, p.linkedin, p.email,
-      p.createdAt, p.lastTouch || '', p.history.map(h => h.d + ' · ' + h.txt).join('  |  '),
-    ]);
-    const csv = [head].concat(rows)
+    const lvl = ['CONTACTED · you said hi', 'INTERESTED · they replied', 'DEMO · booked or done', 'CLIENTS 🏆 · they said yes'];
+    const head = ['Name', 'Trade', 'City', 'Website', 'LinkedIn', 'Email', 'Added', 'Last touch', 'Days quiet', 'Story so far'];
+    const lines = [];
+    lines.push(['BOTLER SALES HQ · MY PROSPECTS']);
+    lines.push(['Exported', today()]);
+    lines.push(['Prospects', st.prospects.length, 'Clients won', st.clients, 'Points', st.points, 'Streak', st.streak.count + ' days', 'Brave nos', st.braveNos]);
+    lines.push([]);
+    [3, 2, 1, 0].forEach(li => {
+      const rows = st.prospects.filter(p => p.level === li);
+      lines.push([lvl[li] + ' (' + rows.length + ')']);
+      lines.push(head);
+      rows.forEach(p => lines.push([
+        p.name, p.trade, p.city, p.website || 'no site yet 🎯', p.linkedin, p.email,
+        p.createdAt, p.lastTouch || '',
+        p.lastTouch ? daysBetween(p.lastTouch, today()) : '',
+        p.history.map(h => h.d + ' · ' + h.txt).join('  |  '),
+      ]));
+      lines.push([]);
+    });
+    const csv = lines
       .map(r => r.map(c => '"' + String(c ?? '').replace(/"/g, '""') + '"').join(','))
       .join('\r\n');
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });  // le BOM aide Excel avec les accents
