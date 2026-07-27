@@ -312,6 +312,7 @@
       tag: 'Calm mind. Sharp instinct. Always in control.',
       img: 'media/art/select-bernice.png',
       chibi: 'media/art/chibi-bernice.png',
+      chibiAlt: 'media/chibi-bernice.png',
       em: '🕵🏾‍♀️',
       /* une réplique par écran, tirée au sort à chaque visite (jamais deux fois
          la même d'affilée) : le HQ doit sonner vivant, jamais scripté */
@@ -364,6 +365,7 @@
       tag: 'Chaos mode · powered by prompt injection 😈',
       img: 'media/art/select-injection.png',
       chibi: 'media/art/chibi-injection.png',
+      chibiAlt: 'media/chibi-injection.png',
       em: '😈',
       say: {
         select: [
@@ -437,7 +439,9 @@
     if (!c) return '';
     return '<div class="say' + (st.character === 'injection' ? ' injection' : '') + '">'
       + '<div class="face"><span class="em">' + c.em + '</span>'
-      + '<img src="' + c.chibi + '" alt="" onload="this.parentElement.classList.add(\'hasimg\')"></div>'
+      + '<img src="' + c.chibi + '" alt="" data-alt="' + c.chibiAlt + '"'
+      + ' onload="this.parentElement.classList.add(\'hasimg\')"'
+      + ' onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt=\'\';}"></div>'
       + '<div class="bubble"><div class="who">' + esc(c.name) + '</div>'
       + '<div class="line">“' + esc(c.line) + '”</div></div></div>';
   }

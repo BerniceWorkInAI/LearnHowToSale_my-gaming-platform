@@ -163,8 +163,9 @@
     document.getElementById('sayWho').textContent = c.name + ' · today';
     document.getElementById('sayLine').textContent = '“' + c.line + '”';
     const img = document.getElementById('sayImg');
-    img.src = c.chibi;
     img.onload = () => document.getElementById('sayFace').classList.add('hasimg');
+    img.onerror = () => { if (img.src.indexOf('/art/') > -1) img.src = c.chibiAlt; };
+    img.src = c.chibi;
   }
 
   const empty = st.prospects.length === 0;

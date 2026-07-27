@@ -142,7 +142,7 @@
     <button class="char bernice" id="cBernice" onclick="pick('bernice')">
       <span class="badge">Chosen ✓</span>
       <div class="pic" id="picB">
-        <img src="media/art/select-bernice.png" alt="Bernice, the calm one" onerror="this.parentElement.classList.add('noimg')">
+        <img src="media/art/select-bernice.png" data-alt="media/select-bernice.png" alt="Bernice, the calm one" onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt='';}else{this.parentElement.classList.add('noimg');}">
         <div class="ph"><span class="em">🕵🏾‍♀️</span>Bernice's portrait goes here<br><span class="mono">media/art/select-bernice.png</span></div>
         <div class="veil mono">You are about to choose the calm one…</div>
       </div>
@@ -153,7 +153,7 @@
     <button class="char injection" id="cInjection" onclick="pick('injection')">
       <span class="badge">Chosen ✓</span>
       <div class="pic" id="picI">
-        <img src="media/art/select-injection.png" alt="Berni Injection, the chaotic one" onerror="this.parentElement.classList.add('noimg')">
+        <img src="media/art/select-injection.png" data-alt="media/select-injection.png" alt="Berni Injection, the chaotic one" onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt='';}else{this.parentElement.classList.add('noimg');}">
         <div class="ph"><span class="em">😈</span>Injection's portrait goes here<br><span class="mono">media/art/select-injection.png</span></div>
         <div class="veil mono">You are about to unleash the chaos…</div>
       </div>
