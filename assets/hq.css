@@ -123,3 +123,26 @@ input.hq:focus-visible, textarea.hq:focus-visible { outline: 2.5px solid var(--g
   font-size: 12px; cursor: pointer;
 }
 .footlinks button:hover, .footlinks label:hover { color: var(--grey); }
+
+/* ── la bulle de dialogue du personnage 🎭 (toutes les pages) ── */
+.say { display: flex; gap: 13px; align-items: center; max-width: 620px; margin: 0 0 34px; animation: rise .5s .12s both; }
+.say .face {
+  flex: none; width: 54px; height: 54px; border-radius: 50%; overflow: hidden;
+  border: 1.5px solid var(--border); background: var(--bar-bg);
+  display: grid; place-items: center; font-size: 24px;
+}
+.say .face img { width: 118%; height: 118%; object-fit: cover; object-position: 50% 12%; display: none; }
+.say .face.hasimg img { display: block; }
+.say .face.hasimg .em { display: none; }
+.say.injection .face { background: #f2e9ff; border-color: #7d3bd8; }
+.say .bubble { position: relative; background: var(--panel); border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 15px; }
+.say.injection .bubble { border-color: #7d3bd8; }
+.say .bubble::before {
+  content: ""; position: absolute; left: -7px; top: 16px; width: 10px; height: 10px;
+  background: var(--panel); border-left: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border);
+  transform: rotate(45deg);
+}
+.say.injection .bubble::before { border-color: #7d3bd8; }
+.say .who { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; font-family: ui-monospace, Consolas, monospace; color: var(--grey); margin-bottom: 3px; }
+.say.injection .who { color: #7d3bd8; }
+.say .line { font-size: 14.5px; line-height: 1.5; font-family: Georgia, serif; font-style: italic; }
