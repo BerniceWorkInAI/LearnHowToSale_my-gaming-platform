@@ -211,7 +211,7 @@
       id: ++st.seq,
       name: f.name, trade: f.trade || 'local business', city: f.city || '',
       website: f.website || '', linkedin: f.linkedin || '', email: f.email || '',
-      level: 0, helloSent: false, lastTouch: null,
+      level: 0, maxLevel: 0, helloSent: false, lastTouch: null,
       history: [{ d: today(), txt: 'Added to your book 📇' }],
       createdAt: today(),
     };
@@ -222,16 +222,39 @@
     return p;
   }
   function moveUp(id) {
+    return setLevel(id, (st.prospects.find(x => x.id === id) || {}).level + 1);
+  }
+
+  /* poser un prospect sur un niveau précis (bouton Move up ou glisser-déposer).
+     En avant : points. En arrière : simple correction, aucun point perdu.
+     Les points d'un niveau ne sont donnés qu'une fois (pas de re-farming). */
+  function setLevel(id, lvl) {
     const p = st.prospects.find(x => x.id === id);
-    if (!p || p.level >= 3) return null;
-    p.level++;
+    if (!p) return null;
+    lvl = Math.max(0, Math.min(3, lvl | 0));
+    if (lvl === p.level) return null;
+    if (p.maxLevel === undefined) p.maxLevel = p.level;   // migration des anciennes fiches
+
+    const forward = lvl > p.level;
+    const fresh_ = lvl > p.maxLevel;                      // niveau jamais atteint avant
+    p.level = lvl;
     p.lastTouch = today();
-    const label = ['', 'They replied! Moved up to Interested ✨', 'Demo booked! Moved up to Demo 📅', 'They said YES! CLIENT 🏆'][p.level];
-    p.history.push({ d: today(), txt: label });
-    if (p.level === 1 && !st.trophies.firstReply) st.trophies.firstReply = today();
-    if (p.level === 2 && !st.trophies.firstDemo) st.trophies.firstDemo = today();
-    if (p.level === 3) { st.clients++; if (!st.trophies.firstClient) st.trophies.firstClient = today(); }
-    award(20);
+
+    if (forward) {
+      p.history.push({ d: today(), txt: [
+        '', 'They replied! Moved up to Interested ✨',
+        'Demo booked! Moved up to Demo 📅', 'They said YES! CLIENT 🏆',
+      ][lvl] || 'Moved up ✨' });
+      if (lvl === 1 && !st.trophies.firstReply) st.trophies.firstReply = today();
+      if (lvl === 2 && !st.trophies.firstDemo) st.trophies.firstDemo = today();
+      if (lvl === 3 && !st.trophies.firstClient) st.trophies.firstClient = today();
+    } else {
+      p.history.push({ d: today(), txt: 'Moved back to ' + ['Contacted', 'Interested', 'Demo', 'Client'][lvl] + ' 🔧' });
+    }
+    if (lvl > p.maxLevel) p.maxLevel = lvl;
+
+    st.clients = st.prospects.filter(x => x.level === 3).length;   // toujours juste
+    if (forward && fresh_) { award(20); p.gained = 20; } else { checkTrophies(); save(); p.gained = 0; }
     return p;
   }
   function braveNo(id) {
@@ -556,7 +579,7 @@
   window.HQ = {
     get state() { return st; },
     save, ensureDay, genQuest, moveView, completeMove, skipMove,
-    addProspect, moveUp, braveNo, addNote, removeProspect, resetAll,
+    addProspect, moveUp, setLevel, braveNo, addNote, removeProspect, resetAll,
     touchProspect, nextMoveFor,
     TROPHY_DEFS, nextTreat, lessonOfDay,
     CHARACTERS, setCharacter, charLine, charSay, sayBubble,

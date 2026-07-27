@@ -60,6 +60,15 @@
   .col.trophy .card .who::after { content: " 🏆"; }
   .empty { border: 1.5px dashed var(--faint); border-radius: 8px; color: var(--faint); font-size: 12.5px; text-align: center; padding: 22px 12px; line-height: 1.5; }
 
+  /* ── glisser-déposer : attraper une carte et la poser où on veut ── */
+  .card { cursor: grab; }
+  .card:active { cursor: grabbing; }
+  .card.dragging { opacity: .45; transform: rotate(-1.5deg) scale(.98); }
+  .col .drop { border-radius: 8px; transition: background .15s ease, outline-color .15s ease; outline: 2px dashed transparent; outline-offset: 3px; min-height: 60px; }
+  .col.over .drop { background: rgba(255,209,46,.14); outline-color: var(--signal); }
+  .col.trophy.over .drop { background: rgba(184,134,11,.14); outline-color: var(--gold); }
+  .draghint { color: var(--faint); font-size: 12px; margin: 14px 2px 0; }
+
 
   .foot { margin-top: 46px; animation: rise .5s .3s both; }
 </style>
@@ -90,6 +99,8 @@
 
   <div class="board" id="board"></div>
 
+  <p class="draghint mono">Tip · you can also drag a card straight into another column</p>
+
   <div class="foot">
     <div class="mono">Sell with heart · every name here is a future story</div>
     <div class="footlinks mono">
@@ -115,18 +126,21 @@
     const st = HQ.state;
     document.getElementById('board').innerHTML = LEVELS.map((L, li) => {
       const cards = st.prospects.filter(p => p.level === li);
-      return '<div class="col ' + (li === 3 ? 'trophy' : '') + '">'
+      return '<div class="col ' + (li === 3 ? 'trophy' : '') + '" data-lvl="' + li + '"'
+        + ' ondragover="over(event,' + li + ')" ondragleave="out(' + li + ')" ondrop="drop(event,' + li + ')">'
         + '<div class="chead mono"><span>' + L.label + '</span><span class="n">' + cards.length + '</span></div>'
         + '<p class="cdesc">' + L.desc + '</p>'
+        + '<div class="drop">'
         + (cards.map(p => {
             const quiet = p.lastTouch ? HQ.daysBetween(p.lastTouch, HQ.today()) : null;
             const wait = li === 3 ? 'won · ' + (p.lastTouch ? HQ.nice(p.lastTouch) : '') + ' 🎉'
               : !p.helloSent ? 'in your book · say hi when ready'
               : quiet === 0 ? 'touched today ✨'
               : quiet + ' day' + (quiet > 1 ? 's' : '') + ' quiet' + (quiet >= 3 && li < 3 ? ' · <span class="nudge">🌙 needs a nudge</span>' : '');
-            return '<div class="card">'
+            return '<div class="card" draggable="true"'
+              + ' ondragstart="start(event,' + p.id + ')" ondragend="end(event)">'
               + '<button class="del" onclick="del(this,' + p.id + ')" title="Remove from your book (a test, a mistake). No points lost.">✕</button>'
-              + '<div class="who"><a href="prospect.html?id=' + p.id + '">' + HQ.esc(p.name) + '</a></div>'
+              + '<div class="who"><a href="prospect.html?id=' + p.id + '" draggable="false">' + HQ.esc(p.name) + '</a></div>'
               + '<div class="what">' + HQ.esc(p.trade) + ' · ' + HQ.esc(p.city) + (p.website ? '' : ' · no site yet 🎯') + '</div>'
               + '<div class="wait mono">' + wait + '</div>'
               + (li < 3 ? '<div class="acts">'
@@ -136,7 +150,7 @@
                 : '<div class="acts"><a class="up" href="celebrate.html?id=' + p.id + '&kind=client" style="text-decoration:none" title="Replay the celebration whenever you need a boost">🎬 replay the party</a></div>')
               + '</div>';
           }).join('') || '<div class="empty">Nobody here yet.<br>Your next move fills this box ✨</div>')
-        + '</div>';
+        + '</div></div>';
     }).join('');
 
     const total = st.prospects.length;
@@ -184,6 +198,48 @@
     HQ.confetti(8);
     render();
   }
+  /* ── glisser-déposer ── */
+  let dragId = null;
+  function start(e, id) {
+    dragId = id;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(id));
+    e.currentTarget.classList.add('dragging');
+  }
+  function end(e) { e.currentTarget.classList.remove('dragging'); clearOver(); }
+  function over(e, li) {
+    const p = HQ.state.prospects.find(x => x.id === dragId);
+    if (!p || p.level === li) return;          // pas de surbrillance sur sa propre colonne
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    clearOver();
+    const c = document.querySelector('.col[data-lvl="' + li + '"]');
+    if (c) c.classList.add('over');
+  }
+  function out(li) {
+    const c = document.querySelector('.col[data-lvl="' + li + '"]');
+    if (c) c.classList.remove('over');
+  }
+  function clearOver() { document.querySelectorAll('.col.over').forEach(c => c.classList.remove('over')); }
+
+  function drop(e, li) {
+    e.preventDefault();
+    clearOver();
+    const id = dragId || parseInt(e.dataTransfer.getData('text/plain'), 10);
+    dragId = null;
+    const before = HQ.state.prospects.find(x => x.id === id);
+    if (!before || before.level === li) return;
+    const forward = li > before.level;
+    const p = HQ.setLevel(id, li);
+    if (!p) return;
+    if (forward && p.level === 3) { location.href = 'celebrate.html?id=' + id + '&kind=client'; return; }
+    if (forward && p.level === 2 && p.gained) { location.href = 'celebrate.html?id=' + id + '&kind=demo'; return; }
+    if (p.gained) { HQ.toast('+' + p.gained + ' points ✨ ' + p.name + ' moved up!'); HQ.confetti(12); }
+    else if (forward) HQ.toast(p.name + ' moved up ✨ (points already counted)');
+    else HQ.toast(p.name + ' moved back 🔧 no points lost');
+    render();
+  }
+
   function del(btn, id) {
     if (!btn.classList.contains('arm')) {          // premier clic : on demande confirmation
       btn.classList.add('arm');
