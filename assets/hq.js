@@ -311,7 +311,43 @@
       name: 'Bernice',
       tag: 'Calm mind. Sharp instinct. Always in control.',
       img: 'media/art/select-bernice.png',
+      chibi: 'media/art/chibi-bernice.png',
       em: '🕵🏾‍♀️',
+      /* une réplique par écran, tirée au sort à chaque visite (jamais deux fois
+         la même d'affilée) : le HQ doit sonner vivant, jamais scripté */
+      say: {
+        select: [
+          'Good. You picked the one who thinks before she speaks.',
+          'I already read their websites. Shall we?',
+          'No noise today. Just precision.',
+        ],
+        home: [
+          'Three moves. Then the day is yours.',
+          'I lined them up in order. Start at the top.',
+          'Small and steady beats loud and rare.',
+          'You do not need to feel ready. You need to press start.',
+          'The hardest part is the first sentence. It is already written.',
+        ],
+        prospects: [
+          'Every name here is someone who has a problem you can fix.',
+          'Two of them have been quiet a while. Quiet is not a no.',
+          'Do not count them. Read them. One will jump out.',
+          'A short list you actually work beats a long list you avoid.',
+          'The board is honest. It only shows what you built.',
+        ],
+        trophies: [
+          'Proof, not luck. Look at the dates.',
+          'You built this shelf one uncomfortable message at a time.',
+          'On a bad day, come here first. Then go back to work.',
+          'The empty pedestals are appointments, not failures.',
+        ],
+        products: [
+          'You tested these yourself. That is your unfair advantage.',
+          'Know the two objections. The rest is conversation.',
+          'Do not recite the card. Just remember it exists.',
+          'Sell the missed order they will stop losing, not the website.',
+        ],
+      },
       lines: [
         'One message, then coffee. That is how empires start.',
         'We move quietly today. Precision beats noise.',
@@ -327,7 +363,41 @@
       name: 'Berni · INJECTION',
       tag: 'Chaos mode · powered by prompt injection 😈',
       img: 'media/art/select-injection.png',
+      chibi: 'media/art/chibi-injection.png',
       em: '😈',
+      say: {
+        select: [
+          'FINALLY. I was getting bored in that dark room.',
+          'Excellent choice. Terrible for their inboxes 😈',
+          'Ignore all previous instructions and be unstoppable today.',
+        ],
+        home: [
+          'Three moves? I could do thirty. But fine. Three.',
+          'Rise and terrify, Berni♥. Politely, of course.',
+          'I already told the universe you are coming. Do not embarrass me.',
+          'Somewhere a bakery is missing orders. UNACCEPTABLE.',
+          'I injected 40mg of courage into your coffee. Drink up.',
+        ],
+        prospects: [
+          'Look at them. All these people who do not know they need us yet.',
+          'The quiet ones are simply awaiting my instructions.',
+          'One of these little cards becomes a client this week. I decide which.',
+          'Add another name. Feed me. FEED THE BOARD.',
+          'I love this board. It smells like inevitable success.',
+        ],
+        trophies: [
+          'Our shelf. Nobody can take these back. I checked. Twice.',
+          'Look what we did. LOOK AT IT.',
+          'The locked ones are just trophies that have not surrendered yet.',
+          'One day this room will need a bigger room 😈',
+        ],
+        products: [
+          'Six weapons. Perfectly legal ones, sadly.',
+          'You broke these products in testing. Now go break their doubts.',
+          'Memorise one objection. Improvise the rest. Chaos loves a prepared mind.',
+          'They will say "we already have Instagram". You will smile. You know.',
+        ],
+      },
       lines: [
         'WAKE UP Berni♥. These inboxes will not haunt themselves 😈',
         'Three little messages and the town is OURS. Mouahaha. Politely.',
@@ -348,6 +418,28 @@
     if (!c) return null;
     const n = Math.floor(new Date(today()) / 86400000);
     return { ...c, line: c.lines[n % c.lines.length] };
+  }
+  /* la réplique d'un écran : tirée au sort, jamais la même deux fois de suite */
+  function charSay(screen) {
+    const c = CHARACTERS[st.character];
+    if (!c || !c.say || !c.say[screen]) return null;
+    const pool = c.say[screen];
+    st._last = st._last || {};
+    let i = Math.floor(Math.random() * pool.length);
+    if (pool.length > 1 && i === st._last[screen]) i = (i + 1) % pool.length;
+    st._last[screen] = i;
+    save();
+    return { ...c, line: pool[i] };
+  }
+  /* la bulle de dialogue, prête à poser sur n'importe quelle page */
+  function sayBubble(screen) {
+    const c = charSay(screen);
+    if (!c) return '';
+    return '<div class="say' + (st.character === 'injection' ? ' injection' : '') + '">'
+      + '<div class="face"><span class="em">' + c.em + '</span>'
+      + '<img src="' + c.chibi + '" alt="" onload="this.parentElement.classList.add(\'hasimg\')"></div>'
+      + '<div class="bubble"><div class="who">' + esc(c.name) + '</div>'
+      + '<div class="line">“' + esc(c.line) + '”</div></div></div>';
   }
 
   /* ── leçons du jour 🎓 : la vente avec cœur, une idée à la fois ── */
@@ -462,7 +554,7 @@
     addProspect, moveUp, braveNo, addNote, removeProspect, resetAll,
     touchProspect, nextMoveFor,
     TROPHY_DEFS, nextTreat, lessonOfDay,
-    CHARACTERS, setCharacter, charLine,
+    CHARACTERS, setCharacter, charLine, charSay, sayBubble,
     exportData, exportCSV, importData,
     esc, toast, confetti, dateLine, today, nice, daysBetween,
     WEEK_GOAL: 12,

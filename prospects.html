@@ -76,6 +76,8 @@
     <button class="go add" onclick="toggleAdd()">Add a prospect +</button>
   </div>
 
+  <div id="say"></div>
+
   <div id="addForm">
     <input class="hq" placeholder="Business name" id="fName">
     <input class="hq" placeholder="Trade: pizzeria, bakery, club…" id="fTrade">
@@ -101,6 +103,7 @@
 <script src="assets/hq.js"></script>
 <script>
   HQ.ensureDay();
+  document.getElementById('say').innerHTML = HQ.sayBubble('prospects');
   const LEVELS = [
     { label: '01 · CONTACTED',  desc: 'You said hi. Waiting for a reply.',           up: '↗ They replied! → Interested +20' },
     { label: '02 · INTERESTED', desc: 'They replied. Curious, asking questions.',    up: '↗ Demo booked! → Demo +20' },

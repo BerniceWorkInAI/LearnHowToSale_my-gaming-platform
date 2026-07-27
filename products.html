@@ -70,6 +70,8 @@
     what to say, and what to answer. You tested these products yourself, remember. You know them better than anyone.</p>
   </div>
 
+  <div id="say"></div>
+
   <div class="waiting">
     <span class="em">📦</span>
     <div><b>The official catalogue is on its way.</b> Exact prices and offers will land here as soon as
@@ -86,6 +88,7 @@
 <script src="assets/hq.js"></script>
 <script src="assets/products.js"></script>
 <script>
+  document.getElementById('say').innerHTML = HQ.sayBubble('products');
   document.getElementById('grid').innerHTML = PRODUCTS.map((p, i) => {
     const pitch = p.em + ' ' + p.name + ': ' + p.what + ' Perfect for: ' + p.who;
     return '<div class="prod"><span class="corner"></span>'

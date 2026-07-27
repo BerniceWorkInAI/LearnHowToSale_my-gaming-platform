@@ -98,6 +98,16 @@
   .foot { color: #57523f; }
   .go:disabled { opacity: .35; }
 
+  /* la bulle de dialogue, version salle sombre */
+  #say { max-width: 620px; }
+  #say .bubble { background: #1b1812; border-color: #3c372b; }
+  #say .bubble::before { background: #1b1812; border-color: #3c372b; }
+  #say .face { background: #211d15; border-color: #3c372b; }
+  #say .who { color: #8d8776; }
+  #say .line { color: #ece5d3; }
+  #say.injection .bubble, #say.injection .bubble::before, #say.injection .face { border-color: #7d3bd8; }
+  #say.injection .who { color: #b27bff; }
+
   /* ── la console musique 🎵 : discrète, en bas à gauche ── */
   .vol {
     position: fixed; left: 18px; bottom: 18px; z-index: 50;
@@ -151,6 +161,8 @@
       <div class="tag">Chaos mode · powered by prompt injection. She has been waiting for this.</div>
     </button>
   </div>
+
+  <div id="say" style="margin: 30px auto 0; justify-content: center"></div>
 
   <div class="startzone">
     <button class="go" id="start" disabled onclick="start()">Choose your Berni first</button>
@@ -236,6 +248,7 @@
     chosen = k;
     sndChoose.currentTime = 0;
     sndChoose.play().catch(() => {});
+    document.getElementById('say').innerHTML = HQ.sayBubble('select');
     paint();
   }
   function start() {
