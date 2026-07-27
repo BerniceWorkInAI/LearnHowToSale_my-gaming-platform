@@ -422,8 +422,8 @@
     return { ...c, line: c.lines[n % c.lines.length] };
   }
   /* la réplique d'un écran : tirée au sort, jamais la même deux fois de suite */
-  function charSay(screen) {
-    const c = CHARACTERS[st.character];
+  function charSay(screen, key) {
+    const c = CHARACTERS[key || st.character];
     if (!c || !c.say || !c.say[screen]) return null;
     const pool = c.say[screen];
     st._last = st._last || {};
@@ -434,10 +434,11 @@
     return { ...c, line: pool[i] };
   }
   /* la bulle de dialogue, prête à poser sur n'importe quelle page */
-  function sayBubble(screen) {
-    const c = charSay(screen);
+  function sayBubble(screen, key) {
+    const who = key || st.character;
+    const c = charSay(screen, who);
     if (!c) return '';
-    return '<div class="say' + (st.character === 'injection' ? ' injection' : '') + '">'
+    return '<div class="say' + (who === 'injection' ? ' injection' : '') + '">'
       + '<div class="face"><span class="em">' + c.em + '</span>'
       + '<img src="' + c.chibi + '" alt="" data-alt="' + c.chibiAlt + '"'
       + ' onload="this.parentElement.classList.add(\'hasimg\')"'

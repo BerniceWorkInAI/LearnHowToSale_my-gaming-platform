@@ -49,6 +49,14 @@
   .plate .n { font-size: 20px; font-weight: 800; letter-spacing: -.02em; color: var(--ink-strong); }
   .char.injection .plate .n { color: #7d3bd8; }
   .plate .em { font-size: 22px; }
+  .plate .chibi {
+    flex: none; width: 46px; height: 46px; border-radius: 50%; overflow: hidden;
+    border: 1.5px solid #3c372b; background: #211d15; display: grid; place-items: center; font-size: 22px;
+  }
+  .plate .chibi img { width: 122%; height: 122%; object-fit: cover; object-position: 50% 10%; opacity: 0; transition: opacity .3s ease; }
+  .plate .chibi img.ok { opacity: 1; }
+  .char.bernice:hover .plate .chibi { border-color: #e0b64f; }
+  .char.injection .plate .chibi { border-color: #7d3bd8; background: #1d1226; }
   .tag { color: var(--grey); font-size: 12.5px; line-height: 1.5; padding: 2px 16px 16px; }
 
   .badge {
@@ -146,7 +154,11 @@
         <div class="ph"><span class="em">🕵🏾‍♀️</span>Bernice's portrait goes here<br><span class="mono">media/art/select-bernice.png</span></div>
         <div class="veil mono">You are about to choose the calm one…</div>
       </div>
-      <div class="plate"><span class="n">Bernice</span><span class="em">🕵🏾‍♀️</span></div>
+      <div class="plate"><span class="n">Bernice</span>
+        <span class="chibi"><img src="media/art/chibi-bernice.png" data-alt="media/chibi-bernice.png" alt=""
+          onload="this.classList.add('ok')"
+          onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt='';}else{this.replaceWith(document.createTextNode('🕵🏾‍♀️'));}"></span>
+      </div>
       <div class="tag">Calm mind. Sharp instinct. Always in control.</div>
     </button>
 
@@ -157,7 +169,11 @@
         <div class="ph"><span class="em">😈</span>Injection's portrait goes here<br><span class="mono">media/art/select-injection.png</span></div>
         <div class="veil mono">You are about to unleash the chaos…</div>
       </div>
-      <div class="plate"><span class="n">Berni · INJECTION</span><span class="em">😈</span></div>
+      <div class="plate"><span class="n">Berni · INJECTION</span>
+        <span class="chibi"><img src="media/art/chibi-injection.png" data-alt="media/chibi-injection.png" alt=""
+          onload="this.classList.add('ok')"
+          onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt='';}else{this.replaceWith(document.createTextNode('😈'));}"></span>
+      </div>
       <div class="tag">Chaos mode · powered by prompt injection. She has been waiting for this.</div>
     </button>
   </div>
@@ -248,7 +264,7 @@
     chosen = k;
     sndChoose.currentTime = 0;
     sndChoose.play().catch(() => {});
-    document.getElementById('say').innerHTML = HQ.sayBubble('select');
+    document.getElementById('say').innerHTML = HQ.sayBubble('select', k);
     paint();
   }
   function start() {
