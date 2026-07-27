@@ -257,7 +257,7 @@
     const b = document.getElementById('start');
     if (chosen) {
       b.disabled = false;
-      b.textContent = chosen === 'injection' ? 'Start · unleash Injection 😈 ▶' : 'Start as Bernice ▶';
+      b.textContent = chosen === 'injection' ? 'Start · unleash Injection ▶' : 'Start as Bernice ▶';
     }
   }
   function pick(k) {
@@ -274,7 +274,7 @@
     sndStart.play().catch(() => {});
     const b = document.getElementById('start');
     b.disabled = true;
-    b.textContent = chosen === 'injection' ? 'Unleashing… 😈' : 'Here we go ✨';
+    b.textContent = chosen === 'injection' ? 'Unleashing…' : 'Here we go ✨';
     // on laisse le son se jouer, puis on entre dans le HQ
     let gone = false;
     const go = () => { if (!gone) { gone = true; location.href = 'index.html'; } };
