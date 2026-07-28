@@ -54,6 +54,9 @@ Réponds UNIQUEMENT par des lignes à ce format exact, une par prospect,
 sans en-tête et sans commentaire :
 nom ; métier ; ville ; site web ou "none" ; lien linkedin ; email
 ```
+*(Astuce : si tu as choisi une marque dans les filtres du plateau avant de coller,
+tous les prospects importés lui sont rattachés automatiquement. Sinon tu peux
+ajouter une 7e colonne `; nom de la marque`.)*
 
 **Geste 2 · il te répond** quelque chose comme :
 ```
@@ -89,8 +92,16 @@ les 3 choses à leur montrer en priorité, les 3 questions à leur poser,
 et les 2 objections les plus probables avec ma réponse.
 ```
 
-### 5. Vider ta tête dans le carnet 📓
-Le HQ a son carnet (lien "My notebook" sur le Home) : capture rapide
+### 5. Séparer tes campagnes par marque 🏷️
+Chaque prospect a un champ **Brand** (libre : "Botler 360", "BFF Studio", une
+enseigne…). Sur le plateau, des **filtres cliquables** en haut te montrent une
+marque à la fois, avec ses propres compteurs. Rien ne se mélange jamais.
+Le champ se modifie aussi depuis la fiche d'un prospect.
+
+### 6. Vider ta tête dans le carnet 📓
+Deux endroits pour écrire. Sur le **Home**, le bloc "05 · Quick note" attrape
+une idée en deux secondes sans quitter la page (avec ses 2 dernières notes
+affichées en dessous). Et le **carnet complet** (lien "My notebook") : capture rapide
 (**Ctrl + Entrée** enregistre), étiquettes, recherche, épinglage. Une note peut
 être rattachée à un prospect : elle apparaît alors directement sur sa fiche.
 Tout part dans la sauvegarde 💾 et dans l'export Excel 📊.

@@ -212,6 +212,7 @@
     const p = {
       id: ++st.seq,
       name: f.name, trade: f.trade || 'local business', city: f.city || '',
+      brand: (f.brand || '').trim(),
       website: f.website || '', linkedin: f.linkedin || '', email: f.email || '',
       level: 0, maxLevel: 0, helloSent: false, lastTouch: null,
       history: [{ d: today(), txt: 'Added to your book 📇' }],
@@ -287,6 +288,18 @@
     save();
   }
 
+  /* ── les marques : séparer les campagnes sans rien mélanger ── */
+  function brands() {
+    return [...new Set(st.prospects.map(p => (p.brand || '').trim()).filter(Boolean))].sort();
+  }
+  function setBrandFilter(b) { st.brandFilter = b || ''; save(); }
+  function brandFilter() { return st.brandFilter || ''; }
+  function setBrand(id, b) {
+    const p = st.prospects.find(x => x.id === id);
+    if (p) { p.brand = (b || '').trim(); save(); }
+    return p;
+  }
+
   /* ══ le carnet de notes 📓 ══
      Une note peut être libre, étiquetée, et rattachée à un prospect. */
   function noteAdd(f) {
@@ -324,7 +337,7 @@
      Un prospect par ligne. Séparateurs acceptés : point-virgule, tabulation,
      ou virgule. Ordre : nom ; métier ; ville ; site ; linkedin ; email.
      Les doublons de nom sont ignorés, rien n'écrase l'existant. */
-  function importProspects(text) {
+  function importProspects(text, defBrand) {
     const res = { added: 0, skipped: 0, names: [] };
     String(text || '').split(/\r?\n/).forEach(raw => {
       const line = raw.trim();
@@ -343,6 +356,7 @@
         website: /^(none|no|aucun|-|n\/a)$/.test(site) ? '' : (c[3] || ''),
         linkedin: c[4] || '',
         email: c[5] || '',
+        brand: c[6] || defBrand || '',
       });
       res.added++;
       res.names.push(name);
@@ -579,7 +593,7 @@
      (Clients d'abord). S'ouvre proprement dans Excel ou Google Sheets. */
   function exportCSV() {
     const lvl = ['CONTACTED · you said hi', 'INTERESTED · they replied', 'DEMO · booked or done', 'CLIENTS 🏆 · they said yes'];
-    const head = ['Name', 'Trade', 'City', 'Website', 'LinkedIn', 'Email', 'Added', 'Last touch', 'Days quiet', 'Story so far'];
+    const head = ['Name', 'Brand', 'Trade', 'City', 'Website', 'LinkedIn', 'Email', 'Added', 'Last touch', 'Days quiet', 'Story so far'];
     const lines = [];
     lines.push(['BOTLER SALES HQ · MY PROSPECTS']);
     lines.push(['Exported', today()]);
@@ -590,7 +604,7 @@
       lines.push([lvl[li] + ' (' + rows.length + ')']);
       lines.push(head);
       rows.forEach(p => lines.push([
-        p.name, p.trade, p.city, p.website || 'no site yet 🎯', p.linkedin, p.email,
+        p.name, p.brand || '', p.trade, p.city, p.website || 'no site yet 🎯', p.linkedin, p.email,
         p.createdAt, p.lastTouch || '',
         p.lastTouch ? daysBetween(p.lastTouch, today()) : '',
         p.history.map(h => h.d + ' · ' + h.txt).join('  |  '),
@@ -667,6 +681,7 @@
     save, ensureDay, genQuest, moveView, completeMove, skipMove,
     addProspect, moveUp, setLevel, braveNo, addNote, removeProspect, resetAll,
     noteAdd, noteUpdate, noteDelete, notesFor, noteTags, importProspects,
+    brands, brandFilter, setBrandFilter, setBrand,
     touchProspect, nextMoveFor,
     TROPHY_DEFS, nextTreat, lessonOfDay,
     CHARACTERS, setCharacter, charLine, charSay, sayBubble,

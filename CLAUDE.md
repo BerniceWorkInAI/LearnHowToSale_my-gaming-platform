@@ -37,6 +37,8 @@ COURAGE et l'EFFORT, pas seulement les ventes.
 - `assets/hq.js` : LE moteur (état localStorage clé `botler-sales-hq-v1`,
   série 🔥 avec joker hebdo, génération de quête, points, trophées, scripts,
   brain treats, leçons, export/import JSON).
+- Prospects : champ `brand` libre (campagnes séparées, filtres sur le plateau,
+  mémorisés dans `state.brandFilter`).
 - `notes.html` : carnet de notes (capture rapide, tags, recherche, épinglage,
   rattachement à un prospect). Notes dans `state.notes`.
 - `assets/hq.css` : styles communs charte.
@@ -45,7 +47,7 @@ COURAGE et l'EFFORT, pas seulement les ventes.
 
 ## Trouver des prospects pour Berni (demande fréquente)
 Quand Berni demande une liste de prospects, réponds UNIQUEMENT par des lignes
-`nom ; métier ; ville ; site ou "none" ; linkedin ; email`, sans en-tête ni
+`nom ; métier ; ville ; site ou "none" ; linkedin ; email ; marque`, sans en-tête ni
 commentaire : elle les colle directement via le bouton "📋 Paste a list" du
 plateau (fonction `HQ.importProspects`). Privilégie les commerces SANS site web,
 c'est le meilleur angle de vente.
