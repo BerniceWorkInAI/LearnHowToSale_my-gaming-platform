@@ -69,6 +69,23 @@
   .col.trophy.over .drop { background: rgba(184,134,11,.14); outline-color: var(--gold); }
   .draghint { color: var(--faint); font-size: 12px; margin: 14px 2px 0; }
 
+  /* ── filtres par marque : ne jamais mélanger les campagnes ── */
+  .brands { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; margin: 26px 0 0; animation: rise .5s .12s both; }
+  .brands .lbl { color: var(--grey); }
+  .bchip {
+    font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 999px;
+    background: var(--paper); color: var(--grey); border: 1.5px solid var(--rule); cursor: pointer;
+  }
+  .bchip:hover { border-color: var(--border); color: var(--ink); }
+  .bchip.on { background: var(--ink); color: var(--paper); border-color: var(--border); }
+  .bchip .n { opacity: .6; margin-left: 5px; }
+  .card .brand {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    font-family: ui-monospace, Consolas, monospace;
+    background: var(--bar-bg); color: var(--ink-strong); border: 1px solid var(--rule);
+    border-radius: 999px; padding: 3px 9px; margin-bottom: 7px;
+  }
+
   /* ── coller une liste (venue de Claude Code) ── */
   #pasteBox {
     display: none; border: 1.5px dashed var(--border); border-radius: 8px; background: var(--panel);
@@ -97,7 +114,7 @@
   </div>
 
   <div id="pasteBox">
-    <div class="lbl mono">Paste one prospect per line · name ; trade ; city ; website ; linkedin ; email</div>
+    <div class="lbl mono">Paste one prospect per line · name ; trade ; city ; website ; linkedin ; email ; brand</div>
     <textarea class="hq" id="pasteTxt" placeholder="Luigi's Pizzeria; pizzeria; Leeds; none; linkedin.com/company/luigis;&#10;Rosie Bakery; bakery; Bristol; rosiebakery.co.uk; ; rosie@rosiebakery.co.uk"></textarea>
     <div style="display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap">
       <span class="mono" style="color:var(--faint)">Missing bits are fine · duplicates are skipped · "none" means no website 🎯</span>
@@ -109,6 +126,8 @@
 
   <div id="addForm">
     <input class="hq" placeholder="Business name" id="fName">
+    <input class="hq" placeholder="Brand or campaign (optional)" id="fBrand" list="brandList">
+    <datalist id="brandList"></datalist>
     <input class="hq" placeholder="Trade: pizzeria, bakery, club…" id="fTrade">
     <input class="hq" placeholder="City" id="fCity">
     <input class="hq" placeholder="Website (optional · empty = no site yet 🎯)" id="fSite">
@@ -116,6 +135,8 @@
     <input class="hq" placeholder="Email (optional)" id="fEm">
     <button class="tool ok" onclick="add()">Add ✔ +5</button>
   </div>
+
+  <div class="brands" id="brands"></div>
 
   <div class="board" id="board"></div>
 
@@ -142,10 +163,34 @@
     { label: '04 · CLIENT 🏆',  desc: 'They said yes. You sold with heart.',         up: null },
   ];
 
+  function renderBrands() {
+    const list = HQ.brands();
+    const cur = HQ.brandFilter();
+    const box = document.getElementById('brands');
+    document.getElementById('brandList').innerHTML = list.map(b => '<option value="' + HQ.esc(b) + '">').join('');
+    if (!list.length) { box.innerHTML = ''; return; }
+    const count = b => HQ.state.prospects.filter(p => (p.brand || '') === b).length;
+    const noBrand = HQ.state.prospects.filter(p => !(p.brand || '').trim()).length;
+    box.innerHTML = '<span class="lbl mono">Brand</span>'
+      + '<button class="bchip' + (cur ? '' : ' on') + '" onclick="pickBrand(\'\')">All<span class="n">' + HQ.state.prospects.length + '</span></button>'
+      + list.map(b => '<button class="bchip' + (cur === b ? ' on' : '') + '" onclick="pickBrand(' + JSON.stringify(b).replace(/"/g, '&quot;') + ')">'
+          + HQ.esc(b) + '<span class="n">' + count(b) + '</span></button>').join('')
+      + (noBrand ? '<button class="bchip' + (cur === '·none' ? ' on' : '') + '" onclick="pickBrand(\'·none\')">No brand<span class="n">' + noBrand + '</span></button>' : '');
+  }
+  function pickBrand(b) { HQ.setBrandFilter(b); render(); }
+  function visible() {
+    const f = HQ.brandFilter();
+    if (!f) return HQ.state.prospects;
+    if (f === '·none') return HQ.state.prospects.filter(p => !(p.brand || '').trim());
+    return HQ.state.prospects.filter(p => (p.brand || '') === f);
+  }
+
   function render() {
     const st = HQ.state;
+    renderBrands();
+    const pool = visible();
     document.getElementById('board').innerHTML = LEVELS.map((L, li) => {
-      const cards = st.prospects.filter(p => p.level === li);
+      const cards = pool.filter(p => p.level === li);
       return '<div class="col ' + (li === 3 ? 'trophy' : '') + '" data-lvl="' + li + '"'
         + ' ondragover="over(event,' + li + ')" ondragleave="out(' + li + ')" ondrop="drop(event,' + li + ')">'
         + '<div class="chead mono"><span>' + L.label + '</span><span class="n">' + cards.length + '</span></div>'
@@ -160,6 +205,7 @@
             return '<div class="card" draggable="true"'
               + ' ondragstart="start(event,' + p.id + ')" ondragend="end(event)">'
               + '<button class="del" onclick="del(this,' + p.id + ')" title="Remove from your book (a test, a mistake). No points lost.">✕</button>'
+              + (p.brand && !HQ.brandFilter() ? '<div class="brand">' + HQ.esc(p.brand) + '</div>' : '')
               + '<div class="who"><a href="prospect.html?id=' + p.id + '" draggable="false">' + HQ.esc(p.name) + '</a></div>'
               + '<div class="what">' + HQ.esc(p.trade) + ' · ' + HQ.esc(p.city) + (p.website ? '' : ' · no site yet 🎯') + '</div>'
               + '<div class="wait mono">' + wait + '</div>'
@@ -173,12 +219,15 @@
         + '</div></div>';
     }).join('');
 
-    const total = st.prospects.length;
-    const close = st.prospects.filter(p => p.level === 2).length;
+    const total = pool.length;
+    const close = pool.filter(p => p.level === 2).length;
+    const won = pool.filter(p => p.level === 3).length;
+    const f = HQ.brandFilter();
     document.getElementById('score').innerHTML =
-      '<b>' + total + '</b> friend' + (total > 1 ? 's' : '') + ' in your book'
+      '<b>' + total + '</b> friend' + (total !== 1 ? 's' : '')
+      + (f ? ' in <b>' + HQ.esc(f === '·none' ? 'no brand' : f) + '</b>' : ' in your book')
       + (close ? ' · <span class="hot">' + close + ' getting close 🔥</span>' : '')
-      + (st.clients ? ' · <b>' + st.clients + '</b> client' + (st.clients > 1 ? 's' : '') + ' won 🏆' : '');
+      + (won ? ' · <b>' + won + '</b> client' + (won > 1 ? 's' : '') + ' won 🏆' : '');
   }
 
   function togglePaste() {
@@ -187,7 +236,7 @@
     if (b.style.display === 'block') document.getElementById('pasteTxt').focus();
   }
   function doImport() {
-    const r = HQ.importProspects(document.getElementById('pasteTxt').value);
+    const r = HQ.importProspects(document.getElementById('pasteTxt').value, HQ.brandFilter() === '·none' ? '' : HQ.brandFilter());
     if (!r.added) { HQ.toast(r.skipped ? 'They are all in your book already 🙂' : 'Nothing to read in there. One prospect per line.'); return; }
     document.getElementById('pasteTxt').value = '';
     togglePaste();
@@ -208,6 +257,7 @@
       name,
       trade: document.getElementById('fTrade').value.trim(),
       city: document.getElementById('fCity').value.trim(),
+      brand: document.getElementById('fBrand').value.trim() || HQ.brandFilter(),
       website: document.getElementById('fSite').value.trim(),
       linkedin: document.getElementById('fLi').value.trim(),
       email: document.getElementById('fEm').value.trim(),

@@ -149,7 +149,7 @@
       '<div class="head">'
       + '<span class="lvlbadge mono' + (p.level === 3 ? ' won' : '') + '">' + LVL[p.level].badge + '</span>'
       + '<h1>' + HQ.esc(p.name) + '</h1>'
-      + '<p class="sub">' + HQ.esc(p.trade) + ' · ' + HQ.esc(p.city) + ' · in your book since ' + HQ.nice(p.createdAt) + '</p>'
+      + '<p class="sub">' + (p.brand ? '<b>' + HQ.esc(p.brand) + '</b> · ' : '') + HQ.esc(p.trade) + ' · ' + HQ.esc(p.city) + ' · in your book since ' + HQ.nice(p.createdAt) + '</p>'
       + '<div class="journey">' + segs + '<span class="lbl mono">' + (p.level + 1) + ' of 4 · next stop: ' + nextLbl + '</span></div>'
       + '</div>'
       + '<div class="cols">'
@@ -168,6 +168,12 @@
       +     '</ul>'
       +     '<div class="facts">'
       +       '<div class="shead mono" style="border-top:0; padding-top:24px;"><span>03 · Details</span></div>'
+      +       '<div class="row"><span class="k mono">Brand</span>'
+      +         '<input class="hq" id="brandIn" value="' + HQ.esc(p.brand || '') + '" list="brandList"'
+      +         ' placeholder="none yet" style="flex:1; padding:7px 10px; font-size:13px"'
+      +         ' onchange="setBrand(this)" onkeydown="if(event.key===\'Enter\')setBrand(this)">'
+      +         '<datalist id="brandList">' + HQ.brands().map(b => '<option value="' + HQ.esc(b) + '">').join('') + '</datalist>'
+      +       '</div>'
       +       '<div class="row"><span class="k mono">LinkedIn</span>' + (p.linkedin ? '<a href="' + HQ.esc(p.linkedin) + '" target="_blank" rel="noopener">' + HQ.esc(p.linkedin.replace(/^https?:\/\//, '')) + ' ↗</a>' : '<span>not filled yet</span>') + '</div>'
       +       '<div class="row"><span class="k mono">Email</span><span>' + (HQ.esc(p.email) || 'not filled yet') + '</span></div>'
       +       '<div class="row"><span class="k mono">Website</span>' + (p.website ? '<a href="' + HQ.esc(p.website) + '" target="_blank" rel="noopener">' + HQ.esc(p.website.replace(/^https?:\/\//, '')) + ' ↗</a>' : '<span>none yet 🎯 your best opening: they need one!</span>') + '</div>'
@@ -213,6 +219,10 @@
     HQ.braveNo(pid);
     HQ.toast('+15 courage points 🦁 A no beats silence.');
     setTimeout(() => location.href = 'prospects.html', 900);
+  }
+  function setBrand(inp) {
+    HQ.setBrand(pid, inp.value);
+    HQ.toast(inp.value.trim() ? 'Brand set: ' + inp.value.trim() + ' ✨' : 'Brand cleared');
   }
   function note(inp) {
     const t = inp.value.trim();

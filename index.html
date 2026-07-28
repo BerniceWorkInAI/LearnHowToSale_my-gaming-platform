@@ -62,6 +62,30 @@
   .links a:hover { color: var(--gold); }
   .links a .mono { color: var(--faint); align-self: center; }
 
+  /* ── note vite fait : capturer une idée sans quitter le Home ── */
+  .qnote { animation: rise .5s .32s both; }
+  .qnote textarea {
+    width: 100%; min-height: 62px; resize: vertical; font-size: 14px; line-height: 1.55;
+    margin-top: 8px; background: var(--panel);
+  }
+  .qnote .row2 { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  .qnote .row2 input { flex: 1; min-width: 0; padding: 8px 10px; font-size: 12.5px; background: var(--panel); }
+  .qnote .row2 button {
+    flex: none; font-size: 12.5px; font-weight: 800; padding: 9px 14px;
+    background: var(--paper); color: var(--ink); border: 1.5px solid var(--border); border-radius: 8px;
+    box-shadow: 2px 2px 0 var(--shadow);
+  }
+  .qnote .row2 button:active { transform: translate(2px,2px); box-shadow: 0 0 0 var(--shadow); }
+  .qnote .recent { margin-top: 14px; }
+  .qnote .rn {
+    font-size: 12.5px; color: var(--grey); line-height: 1.5;
+    border-top: 1px solid var(--rule); padding: 9px 2px;
+    display: block; text-decoration: none;
+  }
+  .qnote .rn:hover { color: var(--ink); }
+  .qnote .rn b { color: var(--gold); font-weight: 700; }
+  .qnote .all { color: var(--faint); text-decoration: underline; font-size: 12px; }
+
   .foot { margin-top: 56px; animation: rise .5s .4s both; }
 </style>
 </head>
@@ -123,8 +147,20 @@
           <div class="who">Selling with heart · one idea a day</div>
         </div>
       </section>
+      <section class="qnote">
+        <div class="shead mono"><span>05 · Quick note</span><span id="qcount"></span></div>
+        <p class="explain" style="margin-bottom:0">Something just crossed your mind? Drop it here, sort it later.</p>
+        <textarea class="hq" id="qtxt" placeholder="e.g. Rosie mentioned she closes on Mondays…"></textarea>
+        <div class="row2">
+          <input class="hq" id="qtag" placeholder="Tag (optional)" list="qtagList">
+          <datalist id="qtagList"></datalist>
+          <button onclick="quickSave()">Save ✔</button>
+        </div>
+        <div class="recent" id="qrecent"></div>
+      </section>
+
       <section>
-        <div class="shead mono"><span>05 · Go to</span></div>
+        <div class="shead mono"><span>06 · Go to</span></div>
         <div class="links">
           <a href="prospects.html">My prospects <span class="mono" id="pcount"></span></a>
           <a href="trophies.html">Trophy Room 🏆 <span class="mono" id="tcount"></span></a>
@@ -214,6 +250,31 @@
   document.getElementById('pcount').textContent = st.prospects.length || 'empty';
   document.getElementById('ncount').textContent = (st.notes || []).length || 'empty';
   document.getElementById('tcount').textContent = Object.keys(st.trophies).length + ' of ' + HQ.TROPHY_DEFS.length;
+
+  /* ── la note vite fait ── */
+  function paintNotes() {
+    const notes = HQ.state.notes || [];
+    document.getElementById('qcount').textContent = notes.length ? notes.length + ' kept' : '';
+    document.getElementById('qtagList').innerHTML = HQ.noteTags().map(t => '<option value="' + HQ.esc(t) + '">').join('');
+    const recent = notes.slice().sort((a, b) => (b.pinned - a.pinned) || (b.id - a.id)).slice(0, 2);
+    document.getElementById('qrecent').innerHTML = recent.map(n =>
+      '<a class="rn" href="notes.html">' + (n.pinned ? '📌 ' : '') + (n.tag ? '<b>' + HQ.esc(n.tag) + '</b> · ' : '')
+      + HQ.esc(n.txt.length > 90 ? n.txt.slice(0, 90) + '…' : n.txt) + '</a>').join('')
+      + '<a class="all mono" href="notes.html" style="display:inline-block; margin-top:10px">'
+      + (notes.length ? 'Open my notebook 📓' : 'Open my notebook 📓') + '</a>';
+  }
+  function quickSave() {
+    const txt = document.getElementById('qtxt').value;
+    if (!txt.trim()) { HQ.toast('Write something first 🙂'); return; }
+    HQ.noteAdd({ txt, tag: document.getElementById('qtag').value });
+    document.getElementById('qtxt').value = '';
+    HQ.toast('Note saved 📓');
+    paintNotes();
+  }
+  document.getElementById('qtxt').addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); quickSave(); }
+  });
+  paintNotes();
 
   function startFresh(btn) {
     if (!btn.dataset.arm) {                        // premier clic : on demande confirmation
