@@ -108,6 +108,8 @@
       <p class="score" id="score"></p>
     </div>
     <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+      <button class="tool" onclick="document.getElementById('fileIn').click()" title="Load a CSV from Claude Code or a Google Sheet download">📂 Import a file</button>
+      <input type="file" id="fileIn" accept=".csv,.tsv,.txt" style="display:none" onchange="importFile(this)">
       <button class="tool" onclick="togglePaste()" title="Paste a list from Claude Code, one prospect per line">📋 Paste a list</button>
       <button class="go add" onclick="toggleAdd()">Add a prospect +</button>
     </div>
@@ -243,6 +245,25 @@
     HQ.toast('+' + r.added + ' in your book ✨ ' + (r.skipped ? '(' + r.skipped + ' already known)' : ''));
     HQ.confetti(Math.min(30, r.added * 4));
     render();
+  }
+
+  /* ── importer un fichier CSV (venu de Claude Code ou d'une Google Sheet téléchargée) ── */
+  function importFile(inp) {
+    const f = inp.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const r = HQ.importProspects(String(reader.result || ''), HQ.brandFilter() === '·none' ? '' : HQ.brandFilter());
+      if (!r.added) { HQ.toast(r.skipped ? 'They are all in your book already 🙂' : 'Hmm, I could not read that file. CSV with one prospect per line 🙂'); }
+      else {
+        HQ.toast('+' + r.added + ' in your book ✨ ' + (r.skipped ? '(' + r.skipped + ' already known)' : ''));
+        HQ.confetti(Math.min(30, r.added * 4));
+        render();
+      }
+      inp.value = '';   // permet de recharger le même fichier plus tard
+    };
+    reader.onerror = () => { HQ.toast('Hmm, I could not open that file 🙂'); inp.value = ''; };
+    reader.readAsText(f);
   }
 
   function toggleAdd() {

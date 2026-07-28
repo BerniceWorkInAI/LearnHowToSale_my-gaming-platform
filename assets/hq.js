@@ -157,7 +157,15 @@
     const t = today();
     if (st.streak.lastActive !== t) { st.streak.count++; st.streak.lastActive = t; }
   }
-  function award(pts) { st.points += pts; st.week.moves++; bumpStreak(); checkTrophies(); save(); }
+  function award(pts) {
+    st.points += pts;
+    st.week.moves++;
+    const t = today();
+    if (!st.day || st.day.d !== t) st.day = { d: t, moves: 0 };   // le compteur du jour
+    st.day.moves++;
+    bumpStreak(); checkTrophies(); save();
+  }
+  function dayMoves() { return (st.day && st.day.d === today()) ? st.day.moves : 0; }
 
   function completeMove(qid) {
     const m = st.quest.find(x => x.id === qid);
@@ -337,14 +345,28 @@
      Un prospect par ligne. Séparateurs acceptés : point-virgule, tabulation,
      ou virgule. Ordre : nom ; métier ; ville ; site ; linkedin ; email.
      Les doublons de nom sont ignorés, rien n'écrase l'existant. */
+  /* découpe une ligne CSV en respectant les guillemets ("Pizza, Pasta & Co") */
+  function splitCSV(line, sep) {
+    const out = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { if (inQ && line[i + 1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+      else if (ch === sep && !inQ) { out.push(cur); cur = ''; }
+      else cur += ch;
+    }
+    out.push(cur);
+    return out.map(x => x.trim());
+  }
+
   function importProspects(text, defBrand) {
     const res = { added: 0, skipped: 0, names: [] };
     String(text || '').split(/\r?\n/).forEach(raw => {
       const line = raw.trim();
       if (!line) return;
-      if (/^(name|nom)\s*[;,\t]/i.test(line)) return;             // ligne d'en-tête
+      if (/^"?(name|nom)"?\s*[;,\t]/i.test(line)) return;         // ligne d'en-tête (Sheets inclus)
       const sep = line.includes(';') ? ';' : (line.includes('\t') ? '\t' : ',');
-      const c = line.split(sep).map(x => x.trim().replace(/^["']|["']$/g, ''));
+      const c = splitCSV(line, sep);
       const name = c[0];
       if (!name) return;
       if (st.prospects.some(p => p.name.toLowerCase() === name.toLowerCase())) { res.skipped++; return; }
@@ -681,7 +703,7 @@
     save, ensureDay, genQuest, moveView, completeMove, skipMove,
     addProspect, moveUp, setLevel, braveNo, addNote, removeProspect, resetAll,
     noteAdd, noteUpdate, noteDelete, notesFor, noteTags, importProspects,
-    brands, brandFilter, setBrandFilter, setBrand,
+    brands, brandFilter, setBrandFilter, setBrand, dayMoves,
     touchProspect, nextMoveFor,
     TROPHY_DEFS, nextTreat, lessonOfDay,
     CHARACTERS, setCharacter, charLine, charSay, sayBubble,

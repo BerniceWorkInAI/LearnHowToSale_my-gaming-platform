@@ -114,7 +114,7 @@
       <p class="gonote mono" id="gonote">Opens quest mode · one action at a time · script included</p>
       <div id="doneMsg">
         <div class="big">Mission <em>complete</em> ✨</div>
-        <p>You're free. See you tomorrow 🌿</p>
+        <p id="doneTxt">You're free. See you tomorrow 🌿</p>
       </div>
     </div>
 
@@ -229,6 +229,13 @@
     document.getElementById('gonote').style.display = 'none';
     document.getElementById('doneMsg').style.display = 'block';
     document.getElementById('plive').textContent = 'Done ✨';
+    // les actions faites EN PLUS de la mission (plateau, fiches…) comptent aussi : on les fête ici
+    if (HQ.dayMoves) {
+      const questDone = st.quest.filter(m => m.done && !m.skipped).length;
+      const bonus = Math.max(0, HQ.dayMoves() - questDone);
+      if (bonus > 0) document.getElementById('doneTxt').innerHTML =
+        'You\'re free. And you still did <b>' + bonus + ' bonus move' + (bonus > 1 ? 's' : '') + '</b> on top, all counted 🔥';
+    }
   } else if (empty) {
     document.getElementById('go').textContent = 'Plant my first seeds 🌱';
     document.getElementById('go').onclick = () => location.href = 'prospects.html';

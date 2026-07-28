@@ -45,12 +45,29 @@ COURAGE et l'EFFORT, pas seulement les ventes.
 - `vendor/three-0.147.0.min.js` : three.js local (jamais de CDN).
 - Déploiement : GitHub Pages depuis `main`. Pas de build, pas de dépendances.
 
-## Trouver des prospects pour Berni (demande fréquente)
-Quand Berni demande une liste de prospects, réponds UNIQUEMENT par des lignes
-`nom ; métier ; ville ; site ou "none" ; linkedin ; email ; marque`, sans en-tête ni
-commentaire : elle les colle directement via le bouton "📋 Paste a list" du
-plateau (fonction `HQ.importProspects`). Privilégie les commerces SANS site web,
-c'est le meilleur angle de vente.
+## Règle d'or de prospection (demande fréquente · NE JAMAIS redemander le format)
+Dès que Berni demande des prospects ("prospecte", "trouve-moi", "va chercher
+tel type de commerce pour tel produit"), applique TOUT ce rituel sans poser de
+question sur le format ou la destination :
+
+1. **Cherche de VRAIS commerces** (recherche web) correspondant au métier, à la
+   ville et à la marque demandés. Priorité absolue aux commerces SANS site web,
+   c'est le meilleur angle de vente. Vérifie que chaque commerce existe encore.
+2. **Écris un fichier CSV** dans `private/prospection/` (crée le dossier si
+   besoin) nommé `AAAA-MM-JJ_<marque>_<ville>.csv`, avec cette première ligne
+   d'en-tête exactement :
+   `name;trade;city;website;linkedin;email;brand`
+   puis une ligne par prospect, séparateur `;`, `none` quand pas de site web,
+   champ vide quand l'info manque. Ce fichier ne sera JAMAIS commité
+   (`private/` est dans .gitignore) : Berni le charge sur le plateau via le
+   bouton "📂 Import a file" (il accepte aussi les CSV exportés de Google Sheets).
+3. **Affiche AUSSI les lignes brutes dans le chat** (sans en-tête, sans
+   commentaire autour) : elle peut les coller via "📋 Paste a list" si elle
+   préfère.
+4. **Sans qu'elle le demande**, propose ensuite 2 emails personnalisés (dans
+   SON style, voir Règles d'écriture) pour les 2 prospects les plus
+   prometteurs de la liste, en expliquant en une ligne pourquoi ces deux-là.
+5. Termine en rappelant le chemin du fichier CSV et le bouton d'import.
 
 ## Méthode git
 - Développer sur une branche `claude/*`, JAMAIS pousser sur `main` : c'est
