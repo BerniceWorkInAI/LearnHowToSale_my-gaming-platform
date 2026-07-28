@@ -37,9 +37,18 @@ COURAGE et l'EFFORT, pas seulement les ventes.
 - `assets/hq.js` : LE moteur (état localStorage clé `botler-sales-hq-v1`,
   série 🔥 avec joker hebdo, génération de quête, points, trophées, scripts,
   brain treats, leçons, export/import JSON).
+- `notes.html` : carnet de notes (capture rapide, tags, recherche, épinglage,
+  rattachement à un prospect). Notes dans `state.notes`.
 - `assets/hq.css` : styles communs charte.
 - `vendor/three-0.147.0.min.js` : three.js local (jamais de CDN).
 - Déploiement : GitHub Pages depuis `main`. Pas de build, pas de dépendances.
+
+## Trouver des prospects pour Berni (demande fréquente)
+Quand Berni demande une liste de prospects, réponds UNIQUEMENT par des lignes
+`nom ; métier ; ville ; site ou "none" ; linkedin ; email`, sans en-tête ni
+commentaire : elle les colle directement via le bouton "📋 Paste a list" du
+plateau (fonction `HQ.importProspects`). Privilégie les commerces SANS site web,
+c'est le meilleur angle de vente.
 
 ## Méthode git
 - Développer sur une branche `claude/*`, JAMAIS pousser sur `main` : c'est
