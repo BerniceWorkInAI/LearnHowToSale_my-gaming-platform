@@ -67,7 +67,11 @@ question sur le format ou la destination :
 4. **Sans qu'elle le demande**, propose ensuite 2 emails personnalisés (dans
    SON style, voir Règles d'écriture) pour les 2 prospects les plus
    prometteurs de la liste, en expliquant en une ligne pourquoi ces deux-là.
-5. Termine en rappelant le chemin du fichier CSV et le bouton d'import.
+5. Termine en rappelant le chemin du fichier CSV et le bouton d'import, et
+   rappelle-lui qu'elle peut déposer une copie du CSV dans son dossier Google
+   Drive de sauvegarde (bouton "☁️ My Drive folder" du HQ) si elle veut une
+   trace en ligne. Tu n'as pas accès à son Drive : c'est elle qui glisse le
+   fichier.
 
 ## Méthode git
 - Développer sur une branche `claude/*`, JAMAIS pousser sur `main` : c'est
