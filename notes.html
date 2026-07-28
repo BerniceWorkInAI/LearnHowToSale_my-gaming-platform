@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Botler Sales HQ · My notebook</title>
+<link rel="stylesheet" href="assets/hq.css">
+<style>
+  .stage { max-width: 1020px; margin: 0 auto; padding: 46px 34px 70px; min-height: 100vh; }
+  .head { animation: rise .5s .08s both; }
+  h1 { font-size: clamp(40px, 6vw, 58px); font-weight: 800; letter-spacing: -.04em; line-height: 1; margin: 30px 0 8px; color: var(--ink-strong); }
+  .lede { color: var(--grey); font-size: 15px; margin: 0 0 30px; max-width: 62ch; line-height: 1.55; }
+
+  /* ── la capture rapide : un seul geste, Entrée suffit ── */
+  .capture {
+    background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px;
+    position: relative; padding: 18px 20px 16px; margin-bottom: 34px;
+    animation: rise .5s .16s both;
+  }
+  .capture .corner { position: absolute; width: 8px; height: 8px; background: var(--signal); border: 1.5px solid var(--border); top: -5px; left: -5px; }
+  .capture .lbl { color: var(--grey); margin-bottom: 10px; }
+  #txt {
+    width: 100%; min-height: 76px; resize: vertical; line-height: 1.6; font-size: 15px;
+    background: var(--paper);
+  }
+  .cbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  .cbar select, .cbar input { background: var(--paper); font-size: 13.5px; padding: 9px 11px; }
+  .cbar select { font: inherit; color: var(--ink); border: 1.5px solid var(--border); border-radius: 8px; }
+  .cbar .save { width: auto; padding: 12px 22px; font-size: 15px; margin-left: auto; }
+  .cbar .hint { color: var(--faint); }
+
+  /* ── filtres ── */
+  .filters { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 0 0 20px; animation: rise .5s .22s both; }
+  #search { flex: 1; min-width: 200px; }
+  .chip {
+    font-size: 12px; font-weight: 700; padding: 7px 13px; border-radius: 999px;
+    background: var(--paper); color: var(--grey); border: 1.5px solid var(--rule); cursor: pointer;
+  }
+  .chip:hover { border-color: var(--border); color: var(--ink); }
+  .chip.on { background: var(--ink); color: var(--paper); border-color: var(--border); }
+
+  /* ── les notes ── */
+  .notes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; animation: rise .5s .28s both; }
+  @media (max-width: 780px) { .notes { grid-template-columns: 1fr; } }
+
+  .note {
+    background: var(--panel); border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 14px 16px 12px; position: relative;
+    display: flex; flex-direction: column; gap: 9px;
+  }
+  .note.pin { box-shadow: 3px 3px 0 var(--signal); }
+  .note .nhead { display: flex; align-items: center; gap: 8px; color: var(--faint); }
+  .note .tag {
+    background: var(--bar-bg); color: var(--ink-strong); border: 1px solid var(--rule);
+    border-radius: 999px; padding: 3px 9px; font-weight: 700;
+  }
+  .note .about { color: var(--gold); text-decoration: none; font-weight: 700; }
+  .note .about:hover { text-decoration: underline; }
+  .note .body { font-size: 14.5px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+  .note .acts { display: flex; gap: 12px; align-items: center; margin-top: auto; padding-top: 4px; }
+  .note .acts button {
+    background: none; border: none; color: var(--faint); font-size: 12px; padding: 3px 2px;
+  }
+  .note .acts button:hover { color: var(--ink); }
+  .note .acts .del:hover { color: var(--orange); }
+  .note .acts .pinb.on { color: var(--gold); }
+  .note textarea { width: 100%; min-height: 90px; font-size: 14.5px; line-height: 1.6; background: var(--paper); }
+
+  .empty {
+    border: 1.5px dashed var(--faint); border-radius: 8px; color: var(--grey);
+    text-align: center; padding: 40px 20px; line-height: 1.7; grid-column: 1 / -1; font-size: 14px;
+  }
+  .empty b { color: var(--ink-strong); }
+
+  .foot { margin-top: 46px; animation: rise .5s .36s both; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="meta mono"><span><a href="index.html">← Home</a></span><span>Botler Sales HQ · My notebook</span></div>
+
+  <div class="head">
+    <h1>Your <em>notebook</em></h1>
+    <p class="lede">Everything you notice, in one place. A detail about a shop, a phrase that
+    worked, an idea at 11pm. Write it here, find it in one second.</p>
+  </div>
+
+  <div id="say"></div>
+
+  <div class="capture">
+    <span class="corner"></span>
+    <div class="lbl mono">01 · Quick note · press Ctrl + Enter to save</div>
+    <textarea class="hq" id="txt" placeholder="What did you notice? (e.g. Rosie loves talking about sourdough. Never call before 10am.)"></textarea>
+    <div class="cbar">
+      <input class="hq" id="tag" list="tagList" placeholder="Tag (optional)" style="width:170px">
+      <datalist id="tagList"></datalist>
+      <select id="pid" aria-label="Link to a prospect"></select>
+      <span class="hint mono" id="chint"></span>
+      <button class="go save" onclick="saveNote()">Save note ✔</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input class="hq" id="search" placeholder="🔍 Search your notes…" oninput="render()">
+    <div id="chips" style="display:flex; gap:8px; flex-wrap:wrap"></div>
+  </div>
+
+  <div class="notes" id="list"></div>
+
+  <div class="foot">
+    <div class="mono">Sell with heart · your memory, kept safe</div>
+    <div class="footlinks mono">
+      <button onclick="HQ.exportData()" title="Full backup, notes included">💾 Backup (for Restore)</button>
+      <button onclick="HQ.exportCSV()" title="Prospects and notes, opens in Excel or Google Sheets">📊 Excel / Sheets</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/hq.js"></script>
+<script>
+  HQ.ensureDay();
+  document.getElementById('say').innerHTML = HQ.sayBubble('notes');
+  let tagFilter = '';
+  let editing = null;
+
+  function fillPicker() {
+    const sel = document.getElementById('pid');
+    const keep = sel.value;
+    sel.innerHTML = '<option value="">Not about anyone in particular</option>'
+      + HQ.state.prospects.map(p => '<option value="' + p.id + '">About: ' + HQ.esc(p.name) + '</option>').join('');
+    sel.value = keep;
+    document.getElementById('tagList').innerHTML = HQ.noteTags().map(t => '<option value="' + HQ.esc(t) + '">').join('');
+    document.getElementById('chint').textContent = HQ.state.notes.length
+      ? HQ.state.notes.length + ' note' + (HQ.state.notes.length > 1 ? 's' : '') + ' kept'
+      : 'your first note';
+  }
+
+  function render() {
+    fillPicker();
+    const q = document.getElementById('search').value.trim().toLowerCase();
+    let list = HQ.state.notes.slice();
+    if (tagFilter) list = list.filter(n => n.tag === tagFilter);
+    if (q) list = list.filter(n => {
+      const p = n.pid ? HQ.state.prospects.find(x => x.id === n.pid) : null;
+      return (n.txt + ' ' + n.tag + ' ' + (p ? p.name : '')).toLowerCase().includes(q);
+    });
+    list.sort((a, b) => (b.pinned - a.pinned) || (a.d < b.d ? 1 : -1) || (b.id - a.id));
+
+    // les étiquettes en filtres
+    const tags = HQ.noteTags();
+    document.getElementById('chips').innerHTML = tags.length
+      ? '<button class="chip' + (tagFilter ? '' : ' on') + '" onclick="setTag(\'\')">All</button>'
+        + tags.map(t => '<button class="chip' + (tagFilter === t ? ' on' : '') + '" onclick="setTag(\'' + HQ.esc(t).replace(/'/g, "\\'") + '\')">' + HQ.esc(t) + '</button>').join('')
+      : '';
+
+    document.getElementById('list').innerHTML = list.length ? list.map(n => {
+      const p = n.pid ? HQ.state.prospects.find(x => x.id === n.pid) : null;
+      if (editing === n.id) {
+        return '<div class="note">'
+          + '<div class="nhead mono"><span>' + HQ.nice(n.d) + '</span><span>editing</span></div>'
+          + '<textarea class="hq" id="edit' + n.id + '">' + HQ.esc(n.txt) + '</textarea>'
+          + '<div class="acts"><button onclick="saveEdit(' + n.id + ')">✔ Save</button>'
+          + '<button onclick="editing=null; render()">Cancel</button></div>'
+          + '</div>';
+      }
+      return '<div class="note' + (n.pinned ? ' pin' : '') + '">'
+        + '<div class="nhead mono">'
+        +   '<span>' + HQ.nice(n.d) + '</span>'
+        +   (n.tag ? '<span class="tag">' + HQ.esc(n.tag) + '</span>' : '')
+        +   (p ? '<a class="about" href="prospect.html?id=' + p.id + '">' + HQ.esc(p.name) + ' ↗</a>' : '')
+        + '</div>'
+        + '<div class="body">' + HQ.esc(n.txt) + '</div>'
+        + '<div class="acts">'
+        +   '<button class="pinb' + (n.pinned ? ' on' : '') + '" onclick="pin(' + n.id + ')">' + (n.pinned ? '📌 Pinned' : '📌 Pin') + '</button>'
+        +   '<button onclick="copyNote(' + n.id + ', this)">Copy</button>'
+        +   '<button onclick="editing=' + n.id + '; render()">Edit</button>'
+        +   '<button class="del" onclick="del(' + n.id + ', this)">Delete</button>'
+        + '</div></div>';
+    }).join('')
+    : (HQ.state.notes.length
+        ? '<div class="empty">Nothing matches that search.<br>Try another word, or clear the filters.</div>'
+        : '<div class="empty"><b>Your notebook is empty.</b><br>Write your first note above: a detail about a shop, a phrase that worked, anything.<br>Future-you will be grateful ✨</div>');
+  }
+
+  function setTag(t) { tagFilter = t; render(); }
+
+  function saveNote() {
+    const txt = document.getElementById('txt').value;
+    if (!txt.trim()) { HQ.toast('Write something first 🙂'); return; }
+    HQ.noteAdd({ txt, tag: document.getElementById('tag').value, pid: document.getElementById('pid').value });
+    document.getElementById('txt').value = '';
+    HQ.toast('Note saved ✨');
+    render();
+    document.getElementById('txt').focus();
+  }
+  function saveEdit(id) {
+    HQ.noteUpdate(id, { txt: document.getElementById('edit' + id).value });
+    editing = null;
+    HQ.toast('Note updated ✨');
+    render();
+  }
+  function pin(id) {
+    const n = HQ.state.notes.find(x => x.id === id);
+    HQ.noteUpdate(id, { pinned: !n.pinned });
+    render();
+  }
+  function copyNote(id, btn) {
+    const n = HQ.state.notes.find(x => x.id === id);
+    navigator.clipboard && navigator.clipboard.writeText(n.txt);
+    btn.textContent = 'Copied ✅';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  }
+  function del(id, btn) {
+    if (!btn.dataset.arm) {
+      btn.dataset.arm = '1';
+      btn.textContent = 'Sure?';
+      setTimeout(() => { if (btn.dataset.arm) { delete btn.dataset.arm; btn.textContent = 'Delete'; } }, 2600);
+      return;
+    }
+    HQ.noteDelete(id);
+    HQ.toast('Note deleted 🧹');
+    render();
+  }
+
+  // Ctrl + Entrée enregistre, comme dans les vraies apps de notes
+  document.getElementById('txt').addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); saveNote(); }
+  });
+
+  // note pré-rattachée si on arrive depuis une fiche prospect
+  const fromId = new URLSearchParams(location.search).get('pid');
+  render();
+  if (fromId) { document.getElementById('pid').value = fromId; document.getElementById('txt').focus(); }
+</script>
+</body>
+</html>

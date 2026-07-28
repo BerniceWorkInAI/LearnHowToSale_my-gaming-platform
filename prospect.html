@@ -58,6 +58,14 @@
   .facts a { color: var(--gold); }
   #noteIn { width: 100%; margin-top: 14px; border-style: dashed; }
 
+  .pnotes { margin-top: 26px; }
+  .pnote {
+    background: var(--panel); border: 1.5px solid var(--rule); border-radius: 8px;
+    padding: 10px 13px; margin-bottom: 10px; font-size: 13.5px; line-height: 1.55; white-space: pre-wrap;
+  }
+  .pnote .when { color: var(--faint); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; font-family: ui-monospace, Consolas, monospace; display: block; margin-bottom: 4px; }
+  .pnote .tag { color: var(--gold); font-weight: 700; }
+
   .danger { margin-top: 26px; text-align: right; }
   .danger button { background: none; border: none; color: var(--faint); text-decoration: underline; font-size: 12px; }
   .danger button:hover { color: var(--orange); }
@@ -129,6 +137,14 @@
         + '</div>'
       : '';
 
+    const mine = HQ.notesFor(p.id);
+    const notesHtml = mine.length
+      ? mine.map(n => '<div class="pnote"><span class="when">' + HQ.nice(n.d)
+          + (n.tag ? ' · <span class="tag">' + HQ.esc(n.tag) + '</span>' : '')
+          + '</span>' + HQ.esc(n.txt) + '</div>').join('')
+      : '<p class="explain" style="margin:10px 0 0">Nothing written about them yet. '
+        + '<a href="notes.html?pid=' + p.id + '">Write your first note</a> and it will show up here.</p>';
+
     document.getElementById('page').innerHTML =
       '<div class="head">'
       + '<span class="lvlbadge mono' + (p.level === 3 ? ' won' : '') + '">' + LVL[p.level].badge + '</span>'
@@ -155,7 +171,12 @@
       +       '<div class="row"><span class="k mono">LinkedIn</span>' + (p.linkedin ? '<a href="' + HQ.esc(p.linkedin) + '" target="_blank" rel="noopener">' + HQ.esc(p.linkedin.replace(/^https?:\/\//, '')) + ' ↗</a>' : '<span>not filled yet</span>') + '</div>'
       +       '<div class="row"><span class="k mono">Email</span><span>' + (HQ.esc(p.email) || 'not filled yet') + '</span></div>'
       +       '<div class="row"><span class="k mono">Website</span>' + (p.website ? '<a href="' + HQ.esc(p.website) + '" target="_blank" rel="noopener">' + HQ.esc(p.website.replace(/^https?:\/\//, '')) + ' ↗</a>' : '<span>none yet 🎯 your best opening: they need one!</span>') + '</div>'
-      +       '<input class="hq" id="noteIn" placeholder="Add a note, press Enter (e.g. \'closed on Mondays\')" onkeydown="if(event.key===\'Enter\')note(this)">'
+      +       '<input class="hq" id="noteIn" placeholder="Quick timeline note, press Enter (e.g. \'closed on Mondays\')" onkeydown="if(event.key===\'Enter\')note(this)">'
+      +     '</div>'
+      +     '<div class="pnotes">'
+      +       '<div class="shead mono"><span>04 · From your notebook 📓</span>'
+      +       '<a href="notes.html?pid=' + p.id + '" style="text-decoration:none">+ add a note</a></div>'
+      +       notesHtml
       +     '</div>'
       +     '<div class="danger"><button onclick="del(this)">✕ remove from my book (no points lost)</button></div>'
       +   '</div>'

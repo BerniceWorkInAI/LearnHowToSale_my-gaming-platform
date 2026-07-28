@@ -39,12 +39,14 @@
     questDate: null,
     quest: [],               // [{type,pid,done,skipped}]
     trophies: {},            // {key: dateStr}
+    notes: [],               // {id,txt,tag,pid,pinned,d}
     seq: 0,
   });
 
   let st = null;
   try { st = JSON.parse(localStorage.getItem(KEY)); } catch (e) { st = null; }
   if (!st || st.v !== 1) st = fresh();
+  if (!Array.isArray(st.notes)) st.notes = [];   // migration des anciennes sauvegardes
   const save = () => localStorage.setItem(KEY, JSON.stringify(st));
 
   /* ── la série 🔥 et la semaine ── */
@@ -285,6 +287,69 @@
     save();
   }
 
+  /* ══ le carnet de notes 📓 ══
+     Une note peut être libre, étiquetée, et rattachée à un prospect. */
+  function noteAdd(f) {
+    const n = {
+      id: ++st.seq,
+      txt: (f.txt || '').trim(),
+      tag: (f.tag || '').trim(),
+      pid: f.pid ? +f.pid : null,
+      pinned: false,
+      d: today(),
+    };
+    if (!n.txt) return null;
+    st.notes.unshift(n);
+    save();
+    return n;
+  }
+  function noteUpdate(id, patch) {
+    const n = st.notes.find(x => x.id === id);
+    if (!n) return null;
+    Object.assign(n, patch);
+    if (patch.txt !== undefined) n.txt = String(patch.txt).trim();
+    save();
+    return n;
+  }
+  function noteDelete(id) {
+    const k = st.notes.findIndex(x => x.id === id);
+    if (k > -1) { st.notes.splice(k, 1); save(); }
+  }
+  function notesFor(pid) { return st.notes.filter(n => n.pid === pid); }
+  function noteTags() {
+    return [...new Set(st.notes.map(n => n.tag).filter(Boolean))].sort();
+  }
+
+  /* ══ import en masse : coller une liste de prospects ══
+     Un prospect par ligne. Séparateurs acceptés : point-virgule, tabulation,
+     ou virgule. Ordre : nom ; métier ; ville ; site ; linkedin ; email.
+     Les doublons de nom sont ignorés, rien n'écrase l'existant. */
+  function importProspects(text) {
+    const res = { added: 0, skipped: 0, names: [] };
+    String(text || '').split(/\r?\n/).forEach(raw => {
+      const line = raw.trim();
+      if (!line) return;
+      if (/^(name|nom)\s*[;,\t]/i.test(line)) return;             // ligne d'en-tête
+      const sep = line.includes(';') ? ';' : (line.includes('\t') ? '\t' : ',');
+      const c = line.split(sep).map(x => x.trim().replace(/^["']|["']$/g, ''));
+      const name = c[0];
+      if (!name) return;
+      if (st.prospects.some(p => p.name.toLowerCase() === name.toLowerCase())) { res.skipped++; return; }
+      const site = (c[3] || '').toLowerCase();
+      addProspect({
+        name,
+        trade: c[1] || '',
+        city: c[2] || '',
+        website: /^(none|no|aucun|-|n\/a)$/.test(site) ? '' : (c[3] || ''),
+        linkedin: c[4] || '',
+        email: c[5] || '',
+      });
+      res.added++;
+      res.names.push(name);
+    });
+    return res;
+  }
+
   /* ── trophées ── */
   const TROPHY_DEFS = [
     { key: 'firstHello',  name: 'First Hello',  story: 'Your very first brave message. Everything started here.' },
@@ -365,6 +430,12 @@
           'On a bad day, come here first. Then go back to work.',
           'The empty pedestals are appointments, not failures.',
         ],
+        notes: [
+          'Write it down now. You will not remember it on Thursday.',
+          'One true detail beats ten clever arguments.',
+          'This notebook is where your instinct becomes method.',
+          'Read your old notes before you write a message. Always.',
+        ],
         products: [
           'You tested these yourself. That is your unfair advantage.',
           'Know the two objections. The rest is conversation.',
@@ -415,6 +486,12 @@
           'Look what we did. LOOK AT IT.',
           'The locked ones are just trophies that have not surrendered yet.',
           'One day this room will need a bigger room 😈',
+        ],
+        notes: [
+          'Ooooh, secrets. Tell me everything about them 😈',
+          'Every note here is a tiny weapon. Collect them all.',
+          'Their weaknesses, their opening hours, their dreams. WRITE IT.',
+          'I have a photographic memory. It is called this page.',
         ],
         products: [
           'Six weapons. Perfectly legal ones, sadly.',
@@ -520,6 +597,15 @@
       ]));
       lines.push([]);
     });
+    if (st.notes.length) {
+      lines.push(['MY NOTEBOOK 📓 (' + st.notes.length + ')']);
+      lines.push(['Date', 'Tag', 'About', 'Note']);
+      st.notes.forEach(n => {
+        const p = n.pid ? st.prospects.find(x => x.id === n.pid) : null;
+        lines.push([n.d, n.tag, p ? p.name : '', n.txt]);
+      });
+      lines.push([]);
+    }
     const csv = lines
       .map(r => r.map(c => '"' + String(c ?? '').replace(/"/g, '""') + '"').join(','))
       .join('\r\n');
@@ -580,6 +666,7 @@
     get state() { return st; },
     save, ensureDay, genQuest, moveView, completeMove, skipMove,
     addProspect, moveUp, setLevel, braveNo, addNote, removeProspect, resetAll,
+    noteAdd, noteUpdate, noteDelete, notesFor, noteTags, importProspects,
     touchProspect, nextMoveFor,
     TROPHY_DEFS, nextTreat, lessonOfDay,
     CHARACTERS, setCharacter, charLine, charSay, sayBubble,
