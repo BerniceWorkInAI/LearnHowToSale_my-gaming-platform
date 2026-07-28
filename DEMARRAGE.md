@@ -43,30 +43,35 @@ sauvée. Et si tu sautes un jour, le joker 🛡️ te pardonne une fois par sema
 
 Ouvre le terminal dans ton clone (`cd LearnHowToSale_my-gaming-platform` puis
 `claude`). Il lit `CLAUDE.md` automatiquement, donc il connaît ton style, tes
-règles et ton HQ. Voici les 5 demandes qui te feront gagner le plus de temps.
+règles, ton HQ, ET la **règle d'or de prospection** : tu n'as plus jamais besoin
+de lui expliquer le format ni où mettre le fichier.
 
 ### 1. Trouver des prospects · LA boucle, en 3 gestes
 
-**Geste 1 · dans le terminal**, tu colles ça (change le métier et la ville) :
+**Geste 1 · dans le terminal**, une seule phrase suffit :
 ```
-Trouve-moi 10 pizzerias à Leeds qui n'ont pas de site de commande en ligne.
-Réponds UNIQUEMENT par des lignes à ce format exact, une par prospect,
-sans en-tête et sans commentaire :
-nom ; métier ; ville ; site web ou "none" ; lien linkedin ; email
+Prospecte : 10 pizzerias à Leeds pour Botler 360.
 ```
-*(Astuce : si tu as choisi une marque dans les filtres du plateau avant de coller,
-tous les prospects importés lui sont rattachés automatiquement. Sinon tu peux
-ajouter une 7e colonne `; nom de la marque`.)*
+C'est tout. Grâce à `CLAUDE.md`, il sait déjà qu'il doit chercher de VRAIS
+commerces (priorité à ceux sans site web), et te revenir avec tout le paquet.
 
-**Geste 2 · il te répond** quelque chose comme :
-```
-Luigi's Pizzeria; pizzeria; Leeds; none; linkedin.com/company/luigis;
-Nonna Rosa; pizzeria; Leeds; nonnarosa.co.uk; ; hello@nonnarosa.co.uk
-```
+**Geste 2 · il te répond** avec, à chaque fois :
+- un **fichier CSV** rangé dans `private/prospection/` (par exemple
+  `2026-07-28_botler360_leeds.csv`) · ce dossier est invisible pour GitHub,
+  rien n'est jamais publié ;
+- les **mêmes lignes brutes dans le chat**, si tu préfères copier-coller ;
+- **2 emails personnalisés** déjà écrits dans ton style, pour les 2 prospects
+  les plus prometteurs de la liste. Sans que tu le demandes.
 
-**Geste 3 · dans ton HQ**, plateau des prospects, bouton **📋 Paste a list** :
-tu colles le bloc, tu cliques "Add them all ✔", et tout entre d'un coup.
-Les doublons sont ignorés, les trous ne posent aucun problème.
+**Geste 3 · dans ton HQ**, plateau des prospects, deux options :
+- **📂 Import a file** : tu choisis le CSV de `private/prospection/`, tout
+  entre d'un coup. Ça marche aussi avec un CSV téléchargé d'une Google Sheet
+  (Fichier → Télécharger → CSV).
+- **📋 Paste a list** : tu colles les lignes du chat, même résultat.
+
+Les doublons sont ignorés, les trous ne posent aucun problème, et si tu as
+choisi une marque dans les filtres du plateau avant d'importer, tous les
+nouveaux prospects lui sont rattachés automatiquement.
 
 👉 **La structure à retenir : le terminal cherche, le HQ absorbe.**
 Tu ne retapes jamais rien à la main.
