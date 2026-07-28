@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Botler Sales HQ · My prospects</title>
-<link rel="stylesheet" href="assets/hq.css">
+<link rel="stylesheet" href="assets/hq.css?v=20260727">
 <style>
   .stage { max-width: 1180px; margin: 0 auto; padding: 46px 34px 70px; min-height: 100vh; }
   .top { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; flex-wrap: wrap; animation: rise .5s .08s both; }
@@ -152,10 +152,10 @@
 </div>
 
 
-<script src="assets/hq.js"></script>
+<script src="assets/hq.js?v=20260727"></script>
 <script>
   HQ.ensureDay();
-  document.getElementById('say').innerHTML = HQ.sayBubble('prospects');
+  if (HQ.sayBubble) document.getElementById('say').innerHTML = HQ.sayBubble('prospects');
   const LEVELS = [
     { label: '01 · CONTACTED',  desc: 'You said hi. Waiting for a reply.',           up: '↗ They replied! → Interested +20' },
     { label: '02 · INTERESTED', desc: 'They replied. Curious, asking questions.',    up: '↗ Demo booked! → Demo +20' },
@@ -187,8 +187,8 @@
 
   function render() {
     const st = HQ.state;
-    renderBrands();
-    const pool = visible();
+    try { renderBrands(); } catch (e) { /* vieux moteur en cache : pas de filtres, mais le plateau vit */ }
+    const pool = (HQ.brands ? visible() : st.prospects);
     document.getElementById('board').innerHTML = LEVELS.map((L, li) => {
       const cards = pool.filter(p => p.level === li);
       return '<div class="col ' + (li === 3 ? 'trophy' : '') + '" data-lvl="' + li + '"'
@@ -257,7 +257,7 @@
       name,
       trade: document.getElementById('fTrade').value.trim(),
       city: document.getElementById('fCity').value.trim(),
-      brand: document.getElementById('fBrand').value.trim() || HQ.brandFilter(),
+      brand: document.getElementById('fBrand').value.trim() || (HQ.brandFilter && HQ.brandFilter() !== '·none' ? HQ.brandFilter() : ''),
       website: document.getElementById('fSite').value.trim(),
       linkedin: document.getElementById('fLi').value.trim(),
       email: document.getElementById('fEm').value.trim(),
