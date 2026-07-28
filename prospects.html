@@ -69,6 +69,14 @@
   .col.trophy.over .drop { background: rgba(184,134,11,.14); outline-color: var(--gold); }
   .draghint { color: var(--faint); font-size: 12px; margin: 14px 2px 0; }
 
+  /* ── coller une liste (venue de Claude Code) ── */
+  #pasteBox {
+    display: none; border: 1.5px dashed var(--border); border-radius: 8px; background: var(--panel);
+    padding: 16px; margin-top: 22px; animation: rise .4s both;
+  }
+  #pasteBox .lbl { color: var(--grey); margin-bottom: 10px; }
+  #pasteTxt { width: 100%; min-height: 120px; resize: vertical; font-family: ui-monospace, Consolas, monospace; font-size: 13px; line-height: 1.7; background: var(--paper); }
+
 
   .foot { margin-top: 46px; animation: rise .5s .3s both; }
 </style>
@@ -82,7 +90,19 @@
       <h1>Your <em>little world</em></h1>
       <p class="score" id="score"></p>
     </div>
-    <button class="go add" onclick="toggleAdd()">Add a prospect +</button>
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+      <button class="tool" onclick="togglePaste()" title="Paste a list from Claude Code, one prospect per line">📋 Paste a list</button>
+      <button class="go add" onclick="toggleAdd()">Add a prospect +</button>
+    </div>
+  </div>
+
+  <div id="pasteBox">
+    <div class="lbl mono">Paste one prospect per line · name ; trade ; city ; website ; linkedin ; email</div>
+    <textarea class="hq" id="pasteTxt" placeholder="Luigi's Pizzeria; pizzeria; Leeds; none; linkedin.com/company/luigis;&#10;Rosie Bakery; bakery; Bristol; rosiebakery.co.uk; ; rosie@rosiebakery.co.uk"></textarea>
+    <div style="display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap">
+      <span class="mono" style="color:var(--faint)">Missing bits are fine · duplicates are skipped · "none" means no website 🎯</span>
+      <button class="tool" style="margin-left:auto" onclick="doImport()">Add them all ✔</button>
+    </div>
   </div>
 
   <div id="say"></div>
@@ -159,6 +179,21 @@
       '<b>' + total + '</b> friend' + (total > 1 ? 's' : '') + ' in your book'
       + (close ? ' · <span class="hot">' + close + ' getting close 🔥</span>' : '')
       + (st.clients ? ' · <b>' + st.clients + '</b> client' + (st.clients > 1 ? 's' : '') + ' won 🏆' : '');
+  }
+
+  function togglePaste() {
+    const b = document.getElementById('pasteBox');
+    b.style.display = b.style.display === 'block' ? 'none' : 'block';
+    if (b.style.display === 'block') document.getElementById('pasteTxt').focus();
+  }
+  function doImport() {
+    const r = HQ.importProspects(document.getElementById('pasteTxt').value);
+    if (!r.added) { HQ.toast(r.skipped ? 'They are all in your book already 🙂' : 'Nothing to read in there. One prospect per line.'); return; }
+    document.getElementById('pasteTxt').value = '';
+    togglePaste();
+    HQ.toast('+' + r.added + ' in your book ✨ ' + (r.skipped ? '(' + r.skipped + ' already known)' : ''));
+    HQ.confetti(Math.min(30, r.added * 4));
+    render();
   }
 
   function toggleAdd() {

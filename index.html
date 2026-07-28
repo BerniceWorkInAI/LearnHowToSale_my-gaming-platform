@@ -128,6 +128,7 @@
         <div class="links">
           <a href="prospects.html">My prospects <span class="mono" id="pcount"></span></a>
           <a href="trophies.html">Trophy Room 🏆 <span class="mono" id="tcount"></span></a>
+          <a href="notes.html">My notebook 📓 <span class="mono" id="ncount"></span></a>
           <a href="products.html">Products 📦 <span class="mono">anti-panic</span></a>
         </div>
       </section>
@@ -211,6 +212,7 @@
     : st.week.moves + ' brave move' + (st.week.moves > 1 ? 's' : '') + ' this week. Effort counts, answers don\'t.';
 
   document.getElementById('pcount').textContent = st.prospects.length || 'empty';
+  document.getElementById('ncount').textContent = (st.notes || []).length || 'empty';
   document.getElementById('tcount').textContent = Object.keys(st.trophies).length + ' of ' + HQ.TROPHY_DEFS.length;
 
   function startFresh(btn) {
