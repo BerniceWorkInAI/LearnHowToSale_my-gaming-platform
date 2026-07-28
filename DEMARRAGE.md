@@ -69,6 +69,9 @@ commerces (priorité à ceux sans site web), et te revenir avec tout le paquet.
   (Fichier → Télécharger → CSV).
 - **📋 Paste a list** : tu colles les lignes du chat, même résultat.
 
+*(Envie d'une trace en ligne ? Glisse le CSV dans ton dossier Google Drive :
+le bouton **☁️ My Drive folder**, en bas du Home et du plateau, l'ouvre en un clic.)*
+
 Les doublons sont ignorés, les trous ne posent aucun problème, et si tu as
 choisi une marque dans les filtres du plateau avant d'importer, tous les
 nouveaux prospects lui sont rattachés automatiquement.
