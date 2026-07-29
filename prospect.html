@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Botler Sales HQ · Prospect</title>
-<link rel="stylesheet" href="assets/hq.css?v=20260727">
+<link rel="stylesheet" href="assets/hq.css?v=20260729">
 <style>
   .stage { max-width: 980px; margin: 0 auto; padding: 46px 34px 70px; min-height: 100vh; }
   .head { animation: rise .5s .08s both; }
@@ -80,7 +80,8 @@
   <p class="foot mono">Sell with heart · every name here is a future story</p>
 </div>
 
-<script src="assets/hq.js?v=20260727"></script>
+<script src="assets/hq.js?v=20260729"></script>
+<script src="assets/products.js?v=20260729"></script>
 <script>
   HQ.ensureDay();
   document.getElementById('dateLine').textContent = HQ.dateLine();
@@ -168,11 +169,11 @@
       +     '</ul>'
       +     '<div class="facts">'
       +       '<div class="shead mono" style="border-top:0; padding-top:24px;"><span>03 · Details</span></div>'
-      +       '<div class="row"><span class="k mono">Brand</span>'
+      +       '<div class="row"><span class="k mono">Product</span>'
       +         '<input class="hq" id="brandIn" value="' + HQ.esc(p.brand || '') + '" list="brandList"'
-      +         ' placeholder="none yet" style="flex:1; padding:7px 10px; font-size:13px"'
+      +         ' placeholder="pick one, your script depends on it" style="flex:1; padding:7px 10px; font-size:13px"'
       +         ' onchange="setBrand(this)" onkeydown="if(event.key===\'Enter\')setBrand(this)">'
-      +         '<datalist id="brandList">' + HQ.brands().map(b => '<option value="' + HQ.esc(b) + '">').join('') + '</datalist>'
+      +         '<datalist id="brandList">' + productChoices().map(b => '<option value="' + HQ.esc(b) + '">').join('') + '</datalist>'
       +       '</div>'
       +       '<div class="row"><span class="k mono">LinkedIn</span>' + (p.linkedin ? '<a href="' + HQ.esc(p.linkedin) + '" target="_blank" rel="noopener">' + HQ.esc(p.linkedin.replace(/^https?:\/\//, '')) + ' ↗</a>' : '<span>not filled yet</span>') + '</div>'
       +       '<div class="row"><span class="k mono">Email</span><span>' + (HQ.esc(p.email) || 'not filled yet') + '</span></div>'
@@ -220,9 +221,14 @@
     HQ.toast('+15 courage points 🦁 A no beats silence.');
     setTimeout(() => location.href = 'prospects.html', 900);
   }
+  /* les produits vendables d'abord, puis les campagnes déjà créées à la main */
+  function productChoices() {
+    const sellable = (window.PRODUCTS || []).filter(x => x.ready).sort((a, b) => a.order - b.order).map(x => x.key);
+    return [...new Set([...sellable, ...HQ.brands()])];
+  }
   function setBrand(inp) {
     HQ.setBrand(pid, inp.value);
-    HQ.toast(inp.value.trim() ? 'Brand set: ' + inp.value.trim() + ' ✨' : 'Brand cleared');
+    HQ.toast(inp.value.trim() ? 'Product set: ' + inp.value.trim() + ' ✨ your script just changed' : 'Product cleared');
   }
   function note(inp) {
     const t = inp.value.trim();
