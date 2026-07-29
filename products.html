@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Botler Sales HQ · Products</title>
-<link rel="stylesheet" href="assets/hq.css?v=20260727">
+<link rel="stylesheet" href="assets/hq.css?v=20260729">
 <style>
   .stage { max-width: 1100px; margin: 0 auto; padding: 46px 34px 70px; min-height: 100vh; }
   .head { animation: rise .5s .08s both; }
@@ -12,16 +12,33 @@
   .lede { color: var(--grey); font-size: 15.5px; margin: 0 0 18px; max-width: 62ch; line-height: 1.55; }
   .lede b { color: var(--ink-strong); font-weight: 650; }
 
-  .waiting {
-    display: flex; gap: 12px; align-items: center;
+  .privacy {
+    display: flex; gap: 12px; align-items: flex-start;
     border: 1.5px dashed var(--border); border-radius: 8px; background: var(--panel);
-    padding: 13px 16px; margin: 0 0 36px; color: var(--grey); font-size: 13.5px; line-height: 1.55;
-    animation: rise .5s .14s both; max-width: 720px;
+    padding: 13px 16px; margin: 0 0 20px; color: var(--grey); font-size: 13.5px; line-height: 1.55;
+    animation: rise .5s .14s both; max-width: 760px;
   }
-  .waiting .em { font-size: 22px; flex: none; }
-  .waiting b { color: var(--ink-strong); }
+  .privacy .em { font-size: 22px; flex: none; }
+  .privacy b { color: var(--ink-strong); }
 
-  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; animation: rise .5s .2s both; }
+  .barz { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 0 0 30px; animation: rise .5s .18s both; }
+
+  /* ── le coffre privé : prix et liens, jamais dans le repo ── */
+  #vault {
+    display: none; border: 1.5px solid var(--border); border-radius: 8px; background: var(--panel);
+    position: relative; padding: 20px; margin: 0 0 34px; animation: rise .4s both;
+  }
+  #vault .corner { position: absolute; width: 8px; height: 8px; background: var(--signal); border: 1.5px solid var(--border); top: -5px; left: -5px; }
+  #vault .vtitle { font-size: 17px; font-weight: 750; color: var(--ink-strong); margin-bottom: 4px; }
+  #vault .vsub { color: var(--grey); font-size: 13px; line-height: 1.55; margin-bottom: 18px; max-width: 70ch; }
+  .vrow { border-top: 1px solid var(--rule); padding: 14px 0 4px; }
+  .vrow .vname { font-size: 14.5px; font-weight: 700; color: var(--ink-strong); margin-bottom: 8px; }
+  .vgrid { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 10px; }
+  @media (max-width: 760px) { .vgrid { grid-template-columns: 1fr; } }
+  .vgrid input { background: var(--paper); font-size: 13px; padding: 9px 11px; }
+  .vsave { display: flex; gap: 12px; align-items: center; margin-top: 20px; flex-wrap: wrap; }
+
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; animation: rise .5s .22s both; }
   @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
 
   .prod {
@@ -29,33 +46,50 @@
     position: relative; padding: 0 0 18px;
   }
   .prod .corner { position: absolute; width: 8px; height: 8px; background: var(--signal); border: 1.5px solid var(--border); top: -5px; left: -5px; }
+  .prod.soon { opacity: .74; }
+  .prod.soon .corner { background: var(--faint); }
+  .prod.first { box-shadow: 4px 4px 0 var(--shadow); }
   .prod .phead {
-    display: flex; justify-content: space-between; align-items: center;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
     color: var(--grey); border-bottom: 1px dashed var(--rule); padding: 11px 18px;
   }
+  .badge { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; border-radius: 999px; padding: 4px 10px; border: 1px solid var(--rule); white-space: nowrap; }
+  .badge.go { background: #e7f4f0; color: var(--green); border-color: var(--green); }
+  .badge.soon { background: var(--bar-bg); color: var(--faint); }
+  .badge.start { background: var(--signal); color: var(--ink-strong); border-color: var(--border); }
   .prod .pbody { padding: 18px 20px 0; }
   .prod h2 { margin: 0 0 6px; font-size: 21px; font-weight: 800; letter-spacing: -.02em; color: var(--ink-strong); }
-  .prod .what { font-size: 14px; color: var(--ink); line-height: 1.6; margin: 0 0 4px; }
-  .prod .who { font-size: 13px; color: var(--grey); line-height: 1.55; margin: 0 0 14px; }
+  .prod .what { font-size: 14px; color: var(--ink); line-height: 1.6; margin: 0 0 10px; }
+  .prod .who { font-size: 13px; color: var(--grey); line-height: 1.6; margin: 0 0 14px; }
   .prod .who b { color: var(--ink-strong); font-weight: 650; }
 
   .lbl { color: var(--grey); border-top: 1px solid var(--rule); padding: 10px 0 8px; margin-top: 4px; }
-  .args { margin: 0; padding: 0 0 6px 2px; list-style: none; }
-  .args li { font-size: 13.5px; line-height: 1.55; padding: 4px 0 4px 22px; position: relative; }
+  .args, .tgts { margin: 0; padding: 0 0 6px 2px; list-style: none; }
+  .args li, .tgts li { font-size: 13.5px; line-height: 1.55; padding: 4px 0 4px 22px; position: relative; }
   .args li::before { content: "✓"; position: absolute; left: 2px; color: var(--green); font-weight: 800; }
+  .tgts li::before { content: "→"; position: absolute; left: 2px; color: var(--gold); font-weight: 800; }
 
+  .proof { font-size: 13px; line-height: 1.55; background: var(--bar-bg); border-left: 3px solid var(--gold); padding: 9px 12px; margin: 4px 0 6px; color: var(--ink); }
   .obj { padding: 6px 0 8px; }
   .obj .they { font-size: 13.5px; color: var(--grey); font-style: italic; font-family: Georgia, serif; }
   .obj .you { font-size: 13.5px; line-height: 1.55; margin-top: 3px; }
   .obj .you b { color: var(--green); font-weight: 800; font-style: normal; }
   .obj + .obj { border-top: 1px dashed var(--rule); margin-top: 8px; padding-top: 12px; }
+  .qs { margin: 0; padding: 0 0 6px 2px; list-style: none; }
+  .qs li { font-size: 13.5px; line-height: 1.55; padding: 5px 0 5px 22px; position: relative; font-family: Georgia, serif; font-style: italic; color: var(--ink); }
+  .qs li::before { content: "?"; position: absolute; left: 4px; color: var(--gold); font-weight: 800; font-style: normal; font-family: ui-monospace, Consolas, monospace; }
 
-  .price {
-    display: flex; justify-content: space-between; align-items: center; gap: 10px;
-    border-top: 1px solid var(--rule); margin-top: 10px; padding: 12px 0 0;
-  }
-  .price .p { font-size: 12px; color: var(--faint); font-style: italic; }
+  .mine { border-top: 1px solid var(--rule); margin-top: 8px; padding-top: 12px; font-size: 13px; line-height: 1.7; }
+  .mine .k { color: var(--faint); font-family: ui-monospace, Consolas, monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+  .mine .v { color: var(--ink-strong); font-weight: 650; }
+  .mine .v a { color: var(--gold); }
+  .mine .empty { color: var(--faint); font-style: italic; }
+
+  .pfoot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--rule); margin-top: 10px; padding: 12px 0 0; }
   .copy { font-size: 12.5px; padding: 8px 13px; box-shadow: 2px 2px 0 var(--shadow); }
+  .show { font-size: 12.5px; padding: 8px 13px; text-decoration: none; box-shadow: 2px 2px 0 var(--shadow); }
+  .nolink { font-size: 12px; color: var(--faint); font-style: italic; max-width: 30ch; line-height: 1.45; }
+  .notready { font-size: 13px; line-height: 1.6; color: var(--grey); background: var(--bar-bg); border-radius: 6px; padding: 11px 13px; margin-top: 6px; }
 
   .foot { margin-top: 50px; animation: rise .5s .3s both; }
 </style>
@@ -66,56 +100,139 @@
 
   <div class="head">
     <h1>Your <em>anti-panic</em> cards</h1>
-    <p class="lede">Everything you need to <b>never freeze</b>: what each product is, who it helps,
-    what to say, and what to answer. You tested these products yourself, remember. You know them better than anyone.</p>
+    <p class="lede">One card per product you can really sell. What it is, <b>who to write to</b>,
+    what to say, what to answer, and the link you are allowed to show. Email first, LinkedIn second, <b>never a phone call.</b></p>
   </div>
 
   <div id="say"></div>
 
-  <div class="waiting">
-    <span class="em">📦</span>
-    <div><b>The official catalogue is on its way.</b> Exact prices and offers will land here as soon as
-    Maëva's catalogue is ready. Until then, these cards are your training wheels: everything on them is true and safe to say.</div>
+  <div class="privacy">
+    <span class="em">🔒</span>
+    <div>These cards live in your public HQ, so on purpose they carry <b>no prices and no internal notes</b>.
+    Your prices, your private links and your own reminders go in the vault below: they stay <b>in this browser only</b>
+    and travel inside your 💾 Backup. Nothing you type there is ever published.</div>
+  </div>
+
+  <div class="barz">
+    <button class="tool" onclick="toggleVault()">✏️ My prices &amp; links</button>
+    <span class="mono" style="color:var(--faint)" id="vaultState"></span>
+  </div>
+
+  <div id="vault">
+    <span class="corner"></span>
+    <div class="vtitle">Your private vault 🔒</div>
+    <div class="vsub">Type what you want at hand while prospecting: the price you can quote, a private link,
+    and anything to remember (what is negotiable, which country it is ready for). Saved in this browser only.</div>
+    <div id="vaultRows"></div>
+    <div class="vsave">
+      <button class="tool" onclick="saveVault()">Save my notes ✔</button>
+      <span class="mono" style="color:var(--faint)">Stays on this computer · included in your 💾 Backup</span>
+    </div>
   </div>
 
   <div class="grid" id="grid"></div>
 
   <div class="foot">
     <div class="mono">Sell with heart · you are not selling, you are helping</div>
+    <div class="footlinks mono">
+      <button onclick="HQ.exportData()" title="Full backup file · your vault travels inside it">💾 Backup (for Restore)</button>
+      <button onclick="window.open('https://drive.google.com/drive/folders/1QptJUWXTMH9g2fasdTge3tId0c_DRE8q','_blank')" title="Your Google Drive folder">☁️ My Drive folder</button>
+    </div>
   </div>
 </div>
 
-<script src="assets/hq.js?v=20260727"></script>
-<script src="assets/products.js?v=20260727"></script>
+<script src="assets/hq.js?v=20260729"></script>
+<script src="assets/products.js?v=20260729"></script>
 <script>
-  document.getElementById('say').innerHTML = HQ.sayBubble('products');
-  document.getElementById('grid').innerHTML = PRODUCTS.map((p, i) => {
-    const pitch = p.em + ' ' + p.name + ': ' + p.what + ' Perfect for: ' + p.who;
-    return '<div class="prod"><span class="corner"></span>'
-      + '<div class="phead mono"><span>0' + (i + 1) + ' · ' + HQ.esc(p.name) + '</span><span>' + p.em + '</span></div>'
-      + '<div class="pbody">'
-      + '<h2>' + p.em + ' ' + HQ.esc(p.name) + '</h2>'
-      + '<p class="what">' + HQ.esc(p.what) + '</p>'
-      + '<p class="who">Perfect for: <b>' + HQ.esc(p.who) + '</b></p>'
-      + '<div class="lbl mono">Why they will love it</div>'
-      + '<ul class="args">' + p.args.map(a => '<li>' + HQ.esc(a) + '</li>').join('') + '</ul>'
-      + '<div class="lbl mono">If they say… you say…</div>'
-      + p.objections.map(o =>
-          '<div class="obj"><div class="they">“' + HQ.esc(o.they) + '”</div>'
-          + '<div class="you"><b>→</b> ' + HQ.esc(o.you) + '</div></div>').join('')
-      + '<div class="price">'
-      + '<span class="p mono">Price · coming with the catalogue 📦</span>'
-      + '<button class="tool copy" onclick="copyPitch(this, ' + i + ')">Copy pitch 📋</button>'
-      + '</div>'
-      + '</div></div>';
-  }).join('');
+  if (HQ.sayBubble) document.getElementById('say').innerHTML = HQ.sayBubble('products');
+  const LIST = PRODUCTS.slice().sort((a, b) => a.order - b.order);
 
-  function copyPitch(btn, i) {
-    const p = PRODUCTS[i];
-    navigator.clipboard && navigator.clipboard.writeText(p.name + ' · ' + p.what + ' Perfect for: ' + p.who);
-    btn.textContent = 'Copied ✅';
-    setTimeout(() => btn.textContent = 'Copy pitch 📋', 1600);
+  function paint() {
+    document.getElementById('grid').innerHTML = LIST.map((p, i) => {
+      const mine = HQ.productInfo(p.key);
+      const badge = !p.ready ? '<span class="badge soon">Not yet</span>'
+        : p.start ? '<span class="badge start">Start here</span>'
+        : '<span class="badge go">Ready to sell</span>';
+      return '<div class="prod' + (p.ready ? '' : ' soon') + (p.start ? ' first' : '') + '"><span class="corner"></span>'
+        + '<div class="phead mono"><span>0' + (i + 1) + ' · ' + HQ.esc(p.key) + '</span>' + badge + '</div>'
+        + '<div class="pbody">'
+        + '<h2>' + p.em + ' ' + HQ.esc(p.name) + '</h2>'
+        + '<p class="what">' + HQ.esc(p.what) + '</p>'
+        + '<p class="who">' + HQ.esc(p.who) + '</p>'
+        + (p.proof ? '<div class="proof">🏅 ' + HQ.esc(p.proof) + '</div>' : '')
+        + (p.notReadyWhy ? '<div class="notready">🌱 ' + HQ.esc(p.notReadyWhy) + '</div>' : '')
+        + (p.targets && p.targets.length ? '<div class="lbl mono">Who you write to</div>'
+            + '<ul class="tgts">' + p.targets.map(t => '<li>' + HQ.esc(t) + '</li>').join('') + '</ul>' : '')
+        + (p.args && p.args.length ? '<div class="lbl mono">Why they will listen</div>'
+            + '<ul class="args">' + p.args.map(a => '<li>' + HQ.esc(a) + '</li>').join('') + '</ul>' : '')
+        + (p.discoveryQ && p.discoveryQ.length ? '<div class="lbl mono">Ask this instead of pitching</div>'
+            + '<ul class="qs">' + p.discoveryQ.map(q => '<li>' + HQ.esc(q) + '</li>').join('') + '</ul>' : '')
+        + (p.objections && p.objections.length ? '<div class="lbl mono">If they say… you say…</div>'
+            + p.objections.map(o =>
+                '<div class="obj"><div class="they">“' + HQ.esc(o.they) + '”</div>'
+                + '<div class="you"><b>→</b> ' + HQ.esc(o.you) + '</div></div>').join('') : '')
+        + '<div class="mine">'
+        + '<div><span class="k">My price</span> · ' + (mine.price ? '<span class="v">' + HQ.esc(mine.price) + '</span>' : '<span class="empty">not filled in yet</span>') + '</div>'
+        + (mine.link ? '<div><span class="k">My private link</span> · <span class="v"><a href="' + HQ.esc(mine.link) + '" target="_blank" rel="noopener">open ↗</a></span></div>' : '')
+        + (mine.note ? '<div><span class="k">My note</span> · ' + HQ.esc(mine.note) + '</div>' : '')
+        + '</div>'
+        + '<div class="pfoot">'
+        + (p.link
+            ? '<a class="tool show" href="' + HQ.esc(p.link) + '" target="_blank" rel="noopener">' + HQ.esc(p.linkLabel || 'Open the link') + ' ↗</a>'
+            : '<span class="nolink">No public link yet · show this one live on your screen</span>')
+        + (p.script ? '<button class="tool copy" onclick="copyPitch(' + i + ', this)">Copy my pitch 📋</button>' : '')
+        + '</div>'
+        + '</div></div>';
+    }).join('');
   }
+
+  function copyPitch(i, btn) {
+    const p = LIST[i];
+    navigator.clipboard && navigator.clipboard.writeText(p.script.lines.join('\n'));
+    btn.textContent = 'Copied ✅';
+    setTimeout(() => btn.textContent = 'Copy my pitch 📋', 1600);
+  }
+
+  /* ── le coffre privé ── */
+  function toggleVault() {
+    const v = document.getElementById('vault');
+    const open = v.style.display === 'block';
+    v.style.display = open ? 'none' : 'block';
+    if (!open) buildVault();
+  }
+  function buildVault() {
+    document.getElementById('vaultRows').innerHTML = LIST.map(p => {
+      const m = HQ.productInfo(p.key);
+      return '<div class="vrow"><div class="vname">' + p.em + ' ' + HQ.esc(p.name) + '</div>'
+        + '<div class="vgrid">'
+        + '<input class="hq" id="vp_' + p.order + '" placeholder="Price I can quote" value="' + HQ.esc(m.price) + '">'
+        + '<input class="hq" id="vl_' + p.order + '" placeholder="Private link (optional)" value="' + HQ.esc(m.link) + '">'
+        + '<input class="hq" id="vn_' + p.order + '" placeholder="My note: what is negotiable, which country…" value="' + HQ.esc(m.note) + '">'
+        + '</div></div>';
+    }).join('');
+  }
+  function saveVault() {
+    LIST.forEach(p => HQ.setProductInfo(p.key, {
+      price: document.getElementById('vp_' + p.order).value,
+      link: document.getElementById('vl_' + p.order).value,
+      note: document.getElementById('vn_' + p.order).value,
+    }));
+    HQ.toast('Saved in this browser only 🔒');
+    paint();
+    vaultState();
+  }
+  function vaultState() {
+    const filled = LIST.filter(p => {
+      const m = HQ.productInfo(p.key);
+      return m.price || m.link || m.note;
+    }).length;
+    document.getElementById('vaultState').textContent = filled
+      ? filled + ' of ' + LIST.length + ' products filled in 🔒'
+      : 'nothing saved yet · takes 5 minutes, once';
+  }
+
+  paint();
+  vaultState();
 </script>
 </body>
 </html>

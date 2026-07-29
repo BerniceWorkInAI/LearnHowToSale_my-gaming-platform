@@ -40,6 +40,7 @@
     quest: [],               // [{type,pid,done,skipped}]
     trophies: {},            // {key: dateStr}
     notes: [],               // {id,txt,tag,pid,pinned,d}
+    productInfo: {},         // COUCHE PRIVÉE : {cléProduit: {price, link, note}} · jamais dans le repo
     seq: 0,
   });
 
@@ -88,28 +89,27 @@
     return moves.slice(0, 3).map((m, i) => ({ ...m, id: i, done: false, skipped: false }));
   }
 
-  /* ── les scripts : courts, chaleureux, une question à la fin, jamais d'em dash ── */
-  const TRADE = t => {
-    t = (t || '').toLowerCase();
-    if (/pizz|resto|restaurant/.test(t)) return { em: '🍕', pitch: 'we build simple ordering sites for restaurants' };
-    if (/boulang|bak|pâtiss|patiss/.test(t)) return { em: '🥐', pitch: 'we build simple sites with click and collect for bakeries' };
-    if (/bouch|butch|traiteur/.test(t)) return { em: '🥩', pitch: 'we build simple order-ahead sites for butchers' };
-    if (/club|asso|pta|school/.test(t)) return { em: '🏛️', pitch: 'we build simple sites for clubs and associations' };
-    if (/coiff|barb|salon|hair/.test(t)) return { em: '💈', pitch: 'we build simple booking sites for salons' };
-    if (/dent|cabinet|avocat|solicitor|practice|libr/.test(t)) return { em: '☎️', pitch: 'we set up an AI phone receptionist for practices' };
-    return { em: '📇', pitch: 'we build simple websites with an AI assistant for local businesses' };
-  };
+  /* ── les scripts : courts, chaleureux, une question à la fin, jamais d'em dash ──
+     Le script dépend du PRODUIT (champ "Brand" du prospect), pas du métier.
+     Sans produit choisi, on ne promet RIEN : on pose une question. ── */
+  function prodOf(p) {
+    return (p && window.productByKey) ? window.productByKey(p.brand) : null;
+  }
 
   function getScript(p, type) {
-    const tr = TRADE(p && p.trade);
+    const pr = prodOf(p);
     if (type === 'hello') {
-      const hook = p && !p.website
-        ? 'I noticed you do not seem to have a website yet'
-        : 'I had a look at your online presence';
-      return 'Hi [first name] 👋 I came across ' + (p ? p.name : 'your business') + ' while browsing ' + (p ? p.city : 'your city') + ' businesses, [something you liked]!\n'
-        + 'Quick question: ' + hook + '. When a customer wants to find or order from you, how do they do it today?\n'
-        + 'I work at Botler, ' + tr.pitch + '. One-off price, no monthly fees.\n'
-        + 'Worth a 10-minute look?';
+      const intro = 'Hi [first name] 👋 I came across ' + (p ? p.name : 'your business')
+        + ' while looking at ' + (p ? (p.city || 'your area') : 'your city') + ', and [something you liked]!';
+      if (pr && pr.script) {
+        return intro + '\n' + pr.script.lines.join('\n')
+          + '\nAnd if it is a no, that is completely fine, just say so.';
+      }
+      // aucun produit choisi : on ne vend rien, on ouvre la conversation
+      return intro + '\n'
+        + 'I work at Botler, we build websites and AI assistants for businesses like yours.\n'
+        + 'Quick question before I say anything else: when a customer wants to find you or order from you, how do they do it today?\n'
+        + 'And if this is not for you, just say so, that is completely fine.';
     }
     if (type === 'nudge') {
       return 'Hi [first name], just a gentle nudge on my last message 🙂\n'
@@ -122,21 +122,24 @@
   /* ── vue d'une action (pour le Home et le mode quête) ── */
   function moveView(m) {
     const p = m.pid !== undefined ? st.prospects.find(x => x.id === m.pid) : null;
-    const tr = p ? TRADE(p.trade) : null;
+    const pr = prodOf(p);
     if (m.type === 'hello') return {
       icon: '✉️', pts: 10,
       title: 'Say hi to ' + p.name,
-      desc: 'First message · ' + p.trade + ' · ' + p.city + ' · script ready to copy',
-      channel: p.linkedin ? '💼 Send this on LINKEDIN · direct message' : '✉️ Send this by EMAIL',
-      btn: p.linkedin ? 'I sent it on LinkedIn ✔ +10' : 'I sent it by email ✔ +10',
-      why: (p.website ? 'They have a site, but no AI assistant. ' : 'No website found. That is your best opening. ') + tr.em + ' Exactly what Botler fixes.',
+      desc: 'First message · ' + [p.trade, p.city, pr ? pr.em + ' ' + pr.key : ''].filter(Boolean).join(' · ') + ' · script ready to copy',
+      channel: p.email ? '✉️ Send this by EMAIL · your main channel'
+        : p.linkedin ? '💼 Send this on LINKEDIN · direct message'
+        : '✉️ Send this by EMAIL, or LinkedIn if that is all you have',
+      btn: p.email ? 'I sent it by email ✔ +10' : p.linkedin ? 'I sent it on LinkedIn ✔ +10' : 'I sent it ✔ +10',
+      why: pr && pr.script ? pr.script.hookWhy
+        : 'No product picked for this one yet. Open their card and choose one, and your script becomes a real pitch instead of a polite hello.',
       script: getScript(p, 'hello'), p
     };
     if (m.type === 'nudge') return {
       icon: '🔁', pts: 10,
       title: 'Follow up with ' + p.name,
       desc: 'Quiet for ' + daysBetween(p.lastTouch, today()) + ' days · one gentle nudge · script ready',
-      channel: p.email ? '✉️ Send this by EMAIL · reply to your last thread' : '💼 Send this on LINKEDIN · same conversation',
+      channel: p.email ? '✉️ Send this by EMAIL · reply in your last thread' : '💼 Send this on LINKEDIN · same conversation',
       btn: 'I sent the nudge ✔ +10',
       why: 'A gentle nudge doubles your chances. Nudging is caring.',
       script: getScript(p, 'nudge'), p
@@ -306,6 +309,25 @@
     const p = st.prospects.find(x => x.id === id);
     if (p) { p.brand = (b || '').trim(); save(); }
     return p;
+  }
+
+  /* ══ la couche PRIVÉE des produits ══
+     Prix, conditions, liens privés : ça vit ici, dans le navigateur de Berni,
+     et ça voyage dans sa sauvegarde 💾. Jamais dans le repo, qui est public. */
+  function productInfo(key) {
+    if (!st.productInfo) st.productInfo = {};
+    return st.productInfo[key] || { price: '', link: '', note: '' };
+  }
+  function setProductInfo(key, f) {
+    if (!st.productInfo) st.productInfo = {};
+    const cur = productInfo(key);
+    st.productInfo[key] = {
+      price: (f.price !== undefined ? f.price : cur.price || '').trim(),
+      link: (f.link !== undefined ? f.link : cur.link || '').trim(),
+      note: (f.note !== undefined ? f.note : cur.note || '').trim(),
+    };
+    save();
+    return st.productInfo[key];
   }
 
   /* ══ le carnet de notes 📓 ══
@@ -704,6 +726,7 @@
     addProspect, moveUp, setLevel, braveNo, addNote, removeProspect, resetAll,
     noteAdd, noteUpdate, noteDelete, notesFor, noteTags, importProspects,
     brands, brandFilter, setBrandFilter, setBrand, dayMoves,
+    productInfo, setProductInfo,
     touchProspect, nextMoveFor,
     TROPHY_DEFS, nextTreat, lessonOfDay,
     CHARACTERS, setCharacter, charLine, charSay, sayBubble,
