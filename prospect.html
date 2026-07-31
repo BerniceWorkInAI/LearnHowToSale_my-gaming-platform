@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Botler Sales HQ · Prospect</title>
-<link rel="stylesheet" href="assets/hq.css?v=20260729">
+<link rel="stylesheet" href="assets/hq.css?v=20260731">
 <style>
   .stage { max-width: 980px; margin: 0 auto; padding: 46px 34px 70px; min-height: 100vh; }
   .head { animation: rise .5s .08s both; }
@@ -80,8 +80,9 @@
   <p class="foot mono">Sell with heart · every name here is a future story</p>
 </div>
 
-<script src="assets/hq.js?v=20260729"></script>
-<script src="assets/products.js?v=20260729"></script>
+<script src="assets/hq.js?v=20260731"></script>
+<script src="assets/products.js?v=20260731"></script>
+<script src="assets/templates.js?v=20260731"></script>
 <script>
   HQ.ensureDay();
   document.getElementById('dateLine').textContent = HQ.dateLine();
@@ -138,6 +139,20 @@
         + '</div>'
       : '';
 
+    /* les réponses anti-panique 🧯 : quand ILS répondent, ton script est prêt */
+    const replies = window.TemplateBank ? window.TemplateBank.replies(p) : [];
+    const repliesHtml = replies.length
+      ? '<details style="margin-top:26px">'
+        + '<summary class="mono" style="cursor:pointer; color:var(--grey); letter-spacing:.14em; text-transform:uppercase; font-size:10.5px">🧯 They replied? Your anti-panic scripts</summary>'
+        + '<p class="explain" style="margin:10px 0 12px">The scariest moment is not sending, it is when someone answers. Pick the situation, copy, breathe.</p>'
+        + replies.map((r, k) =>
+            '<div class="script" style="margin-bottom:10px"><div class="head mono"><span>' + HQ.esc(r.label) + '</span>'
+            + '<button class="tool" style="font-size:11px; padding:5px 10px" onclick="copyReply(this,' + k + ')">Copy 📋</button></div>'
+            + '<div class="txt" id="reply' + k + '" style="font-size:13px">'
+            + HQ.esc(r.text).replace(/\[(.+?)\]/g, '<span class="hole">[$1]</span>') + '</div></div>').join('')
+        + '</details>'
+      : '';
+
     const mine = HQ.notesFor(p.id);
     const notesHtml = mine.length
       ? mine.map(n => '<div class="pnote"><span class="when">' + HQ.nice(n.d)
@@ -157,7 +172,7 @@
       +   '<div class="next">'
       +     '<div class="shead mono"><span>01 · Next move · picked for you</span></div>'
       +     '<p class="explain">One move at a time. It also appears in your daily mission when it is due.</p>'
-      +     nextHtml + acts
+      +     nextHtml + acts + repliesHtml
       +   '</div>'
       +   '<div class="story">'
       +     '<div class="shead mono"><span>02 · Your story so far</span></div>'
@@ -178,6 +193,17 @@
       +       '<div class="row"><span class="k mono">LinkedIn</span>' + (p.linkedin ? '<a href="' + HQ.esc(p.linkedin) + '" target="_blank" rel="noopener">' + HQ.esc(p.linkedin.replace(/^https?:\/\//, '')) + ' ↗</a>' : '<span>not filled yet</span>') + '</div>'
       +       '<div class="row"><span class="k mono">Email</span><span>' + (HQ.esc(p.email) || 'not filled yet') + '</span></div>'
       +       '<div class="row"><span class="k mono">Website</span>' + (p.website ? '<a href="' + HQ.esc(p.website) + '" target="_blank" rel="noopener">' + HQ.esc(p.website.replace(/^https?:\/\//, '')) + ' ↗</a>' : '<span>none yet 🎯 your best opening: they need one!</span>') + '</div>'
+      +       '<div class="row"><span class="k mono">Contact</span>'
+      +         '<input class="hq" value="' + HQ.esc(p.contact || '') + '" placeholder="first name · fills the greeting by itself"'
+      +         ' style="flex:1; padding:7px 10px; font-size:13px" onchange="setField(\'contact\', this)"></div>'
+      +       '<div class="row"><span class="k mono">Hook</span>'
+      +         '<input class="hq" value="' + HQ.esc(p.hook || '') + '" placeholder="the true detail you loved · fills your script"'
+      +         ' style="flex:1; padding:7px 10px; font-size:13px" onchange="setField(\'hook\', this)"></div>'
+      +       '<div class="row"><span class="k mono">Language</span>'
+      +         '<select class="hq" style="padding:7px 10px; font-size:13px" onchange="setField(\'lang\', this)">'
+      +           '<option value=""' + (!p.lang ? ' selected' : '') + '>English (default)</option>'
+      +           '<option value="fr"' + (p.lang === 'fr' ? ' selected' : '') + '>Français</option>'
+      +         '</select></div>'
       +       '<input class="hq" id="noteIn" placeholder="Quick timeline note, press Enter (e.g. \'closed on Mondays\')" onkeydown="if(event.key===\'Enter\')note(this)">'
       +     '</div>'
       +     '<div class="pnotes">'
@@ -229,6 +255,18 @@
   function setBrand(inp) {
     HQ.setBrand(pid, inp.value);
     HQ.toast(inp.value.trim() ? 'Product set: ' + inp.value.trim() + ' ✨ your script just changed' : 'Product cleared');
+    render();
+  }
+  function setField(k, inp) {
+    HQ.updateProspect(pid, { [k]: inp.value });
+    HQ.toast('Saved ✨ your script just updated itself');
+    render();
+  }
+  function copyReply(btn, k) {
+    const raw = document.getElementById('reply' + k).innerText;
+    navigator.clipboard && navigator.clipboard.writeText(raw);
+    btn.textContent = 'Copied ✅';
+    setTimeout(() => btn.textContent = 'Copy 📋', 1600);
   }
   function note(inp) {
     const t = inp.value.trim();

@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Botler Sales HQ · The Courage Machine</title>
+<link rel="stylesheet" href="assets/hq.css?v=20260731">
+<style>
+  /* ═══ La machine à sous du courage 🎰 ═══
+     Un levier = ta quête du jour ENTIÈRE : la machine décide, tu exécutes.
+     Le re-roll est gratuit, toujours : tu gardes un droit de veto sans
+     jamais avoir à choisir face à la liste entière. */
+  .stage { max-width: 860px; margin: 0 auto; padding: 46px 30px 70px; min-height: 100vh; }
+  h1 { font-size: clamp(34px, 7vw, 50px); font-weight: 800; letter-spacing: -.04em; line-height: 1.02; margin: 18px 0 10px; text-wrap: balance; color: var(--ink-strong); }
+  .lede { color: var(--grey); font-size: 15px; line-height: 1.6; margin: 0 0 20px; max-width: 60ch; animation: rise .5s .08s both; }
+  .lede b { color: var(--ink-strong); font-weight: 650; }
+
+  @keyframes thunk { 0% { transform: none; } 35% { transform: translateY(3px); } 100% { transform: none; } }
+  @keyframes dealIn { from { opacity: 0; transform: translateY(26px) rotate(var(--tilt, 0deg)) scale(.96); } to { opacity: 1; transform: rotate(var(--tilt, 0deg)); } }
+
+  /* ── le meuble ── */
+  .cabinet { background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px; position: relative; padding: 20px 20px 24px; box-shadow: 4px 4px 0 var(--shadow); animation: rise .5s .14s both; }
+  .cabinet > .corner { position: absolute; width: 9px; height: 9px; background: var(--signal); border: 1.5px solid var(--border); top: -6px; left: -6px; }
+  .chead { display: flex; justify-content: space-between; gap: 10px; color: var(--grey); border-bottom: 1px dashed var(--rule); padding-bottom: 12px; margin-bottom: 18px; }
+  .reels { display: grid; gap: 10px; }
+  .reel { background: var(--paper); border: 1.5px solid var(--border); border-radius: 3px; overflow: hidden; height: 96px; position: relative; }
+  .reel.landed { animation: thunk .22s ease; }
+  .reel::before, .reel::after { content: ""; position: absolute; left: 0; right: 0; height: 24px; z-index: 2; pointer-events: none; }
+  .reel::before { top: 0; background: linear-gradient(#fff, rgba(255,255,255,0)); }
+  .reel::after { bottom: 0; background: linear-gradient(rgba(255,255,255,0), #fff); }
+  .reel .rlbl { position: absolute; top: 0; left: 0; right: 0; z-index: 3; text-align: center; color: var(--faint); font-family: ui-monospace, Consolas, monospace; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; padding: 4px 0; }
+  .strip { display: flex; flex-direction: column; will-change: transform; }
+  .cell { height: 96px; flex: none; display: flex; flex-direction: column; justify-content: center; padding: 0 12px; text-align: center; }
+  .cell .big { font-size: 14.5px; font-weight: 750; letter-spacing: -.01em; color: var(--ink-strong); line-height: 1.25; }
+  .cell .sub { font-size: 11px; color: var(--grey); margin-top: 3px; line-height: 1.35; }
+  .winline { border-top: 1.5px dashed var(--gold); margin: 14px 2px 0; }
+  .pullbox { display: flex; gap: 14px; align-items: center; margin-top: 20px; flex-wrap: wrap; }
+  .pull { flex: 1; min-width: 230px; }
+  .snd { background: none; border: 1.5px solid var(--rule); border-radius: 999px; padding: 9px 14px; font-size: 13px; color: var(--grey); cursor: pointer; }
+  .snd:hover { border-color: var(--border); color: var(--ink); }
+  .pullnote { color: var(--faint); font-family: ui-monospace, Consolas, monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; margin: 10px 0 0; }
+
+  /* ── le plateau des cartes du jour ── */
+  #tray { display: none; margin-top: 26px; }
+  .trayhead { display: flex; justify-content: space-between; gap: 10px; color: var(--grey); border-bottom: 1px solid var(--ink); padding-bottom: 10px; margin-bottom: 18px; }
+  .trayhead .prog { color: var(--gold); font-weight: 700; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; align-items: start; }
+  .card { background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px; position: relative; box-shadow: 3px 3px 0 var(--shadow); animation: dealIn .5s both; transform: rotate(var(--tilt, 0deg)); }
+  .card.done { border-color: var(--green); }
+  .card.skipped { opacity: .55; }
+  .card > .corner { position: absolute; width: 9px; height: 9px; background: var(--gold); border: 1.5px solid var(--border); top: -6px; left: -6px; }
+  .card.done > .corner { background: var(--green); }
+  .chd { display: flex; justify-content: space-between; gap: 8px; color: var(--grey); border-bottom: 1px dashed var(--rule); padding: 10px 14px; }
+  .cbody { padding: 14px 15px 16px; }
+  .cbody h3 { margin: 0 0 3px; font-size: 17px; font-weight: 800; letter-spacing: -.02em; color: var(--ink-strong); line-height: 1.25; }
+  .cbody .sub { font-size: 12px; color: var(--grey); margin-bottom: 9px; line-height: 1.45; }
+  .chanx { display: inline-flex; align-items: center; gap: 6px; background: var(--bar-bg); border: 1.5px solid var(--rule); border-radius: 999px; padding: 4px 11px; margin-bottom: 10px; font-size: 11.5px; color: var(--ink); }
+  .luck { font-size: 12px; line-height: 1.5; background: #fdf8e6; border-left: 3px solid var(--gold); padding: 7px 10px; margin-bottom: 11px; }
+  .scriptbox { background: var(--paper); border: 1.5px solid var(--rule); border-radius: 3px; margin-bottom: 11px; }
+  .scriptbox .txt { padding: 11px 12px; font-size: 12.5px; line-height: 1.6; white-space: pre-line; max-height: 210px; overflow-y: auto; }
+  .hole { background: var(--bar-bg); border-bottom: 1.5px dashed var(--gold); padding: 0 3px; border-radius: 3px; font-weight: 650; }
+  .cacts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .cacts .tool { font-size: 12.5px; padding: 8px 12px; }
+  .cacts .tool.ok { border-color: var(--green); color: var(--green); }
+  .reroll1 { background: none; border: none; color: var(--faint); text-decoration: underline; font-size: 12px; padding: 8px 0; cursor: pointer; }
+  .reroll1:hover { color: var(--grey); }
+  .sentline { display: none; border-top: 1px dashed var(--rule); margin-top: 11px; padding-top: 10px; font-size: 12.5px; line-height: 1.55; }
+  .sentline .big { color: var(--green); font-weight: 800; font-size: 14px; }
+  .sentline .treat { margin-top: 8px; background: var(--bar-bg); border-radius: 6px; padding: 8px 10px; }
+  .sentline .treat b { color: var(--ink-strong); }
+  .mini { display: grid; gap: 9px; margin-bottom: 11px; }
+  .mini input { font-size: 12.5px; padding: 8px 10px; }
+
+  #daydone { display: none; margin-top: 22px; background: var(--panel); border: 1.5px solid var(--gold); border-radius: 4px; padding: 18px 20px; text-align: center; animation: rise .45s both; }
+  #daydone .big { font-size: 21px; font-weight: 800; color: var(--ink-strong); }
+  #daydone .big em { font-family: Georgia, serif; font-style: italic; font-weight: 400; color: var(--gold); }
+  #daydone .d { color: var(--grey); font-size: 13.5px; margin-top: 5px; line-height: 1.6; }
+  #empty { display: none; border: 1.5px dashed var(--faint); border-radius: 8px; color: var(--grey); font-size: 14px; text-align: center; padding: 30px 18px; line-height: 1.7; margin-top: 22px; }
+  .foot { margin-top: 50px; animation: rise .5s .3s both; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="meta mono"><span><a href="index.html">← Back home</a></span><span id="dateLine"></span></div>
+
+  <h1>The <em>courage</em> machine 🎰</h1>
+  <p class="lede">You do not choose who to write to today. <b>The machine chooses your whole day</b>: one pull,
+  your moves land, scripts already written from your book. If one scares you,
+  <b>re-roll just that card</b>, free, forever.</p>
+
+  <div id="say"></div>
+
+  <div class="cabinet">
+    <span class="corner"></span>
+    <div class="chead mono"><span>One pull = your whole day</span><span id="cstate">Ready</span></div>
+    <div class="reels" id="reels"></div>
+    <div class="winline"></div>
+    <div class="pullbox">
+      <button class="go pull" id="lever" onclick="pullDay()">PULL · DEAL MY DAY 🎰</button>
+      <button class="snd" id="sndBtn" onclick="toggleSound()">🔊 Sound on</button>
+    </div>
+    <p class="pullnote">Nothing is ever sent by the machine · you always send it yourself</p>
+  </div>
+
+  <div id="empty"></div>
+
+  <div id="tray">
+    <div class="trayhead mono"><span>Today's hand</span><span class="prog" id="prog"></span></div>
+    <div class="cards" id="cards"></div>
+    <div id="daydone">
+      <div class="big">Day <em>complete</em> 🏆</div>
+      <div class="d">Your streak is safe 🔥 You showed up, and that is the whole secret.</div>
+    </div>
+  </div>
+
+  <p class="foot mono">Sell with heart · the machine decides, you shine</p>
+</div>
+
+<script src="assets/hq.js?v=20260731"></script>
+<script src="assets/products.js?v=20260731"></script>
+<script src="assets/templates.js?v=20260731"></script>
+<script>
+  HQ.ensureDay();
+  document.getElementById('dateLine').textContent = HQ.dateLine();
+  document.getElementById('say').innerHTML = HQ.sayBubble('home');
+
+  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = id => document.getElementById(id);
+  let sound = true, spinning = false, pulled = false, ac = null;
+
+  /* ── le son : fabriqué à la volée, aucun fichier ── */
+  function beep(freq, dur, type, vol) {
+    if (!sound) return;
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type || 'triangle'; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol || .06, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + dur);
+      o.connect(g); g.connect(ac.destination);
+      o.start(); o.stop(ac.currentTime + dur);
+    } catch (e) {}
+  }
+  const tick = () => beep(1150, .03, 'square', .022);
+  const clack = () => beep(190, .11, 'triangle', .1);
+  const ding = () => { beep(660, .12); setTimeout(() => beep(880, .16), 90); setTimeout(() => beep(1320, .22), 190); };
+  function toggleSound() { sound = !sound; $('sndBtn').textContent = sound ? '🔊 Sound on' : '🔇 Sound off'; if (sound) clack(); }
+
+  /* ── la chance 🍀 : toujours un cadeau, jamais une punition.
+     Mémorisée pour la journée : recharger la page ne re-tire pas les dés. ── */
+  const LUCK = [
+    { em: '✨', t: '+5 bonus', d: 'Five extra points on this one, just because the machine likes you today.', extra: 5 },
+    { em: '🎁', t: 'brain treat', d: 'A brain treat unlocks once you have sent it.', extra: 0, treat: true },
+    { em: '🍀', t: 'double', d: 'Double points on this one. Rare, and yours.', extra: 10 },
+    { em: '🔥', t: 'streak boost', d: 'This one move locks your streak for the whole day.', extra: 0 },
+    { em: '💛', t: 'gentle one', d: 'Take this one slow. Warm up, no pressure.', extra: 0 },
+  ];
+  function luckFor(m) {
+    const st = HQ.state;
+    if (!st.machineLuck || st.machineLuck.d !== HQ.today()) st.machineLuck = { d: HQ.today(), byId: {} };
+    if (st.machineLuck.byId[m.id] === undefined) {
+      st.machineLuck.byId[m.id] = Math.floor(Math.random() * LUCK.length);
+      HQ.save();
+    }
+    return LUCK[st.machineLuck.byId[m.id]];
+  }
+
+  /* ── les rouleaux : un par action du jour ── */
+  const H = 96, CYCLES = 4;
+  function cellFor(m) {
+    if (m.type === 'add') return { big: '📇 Your book', sub: 'add one prospect · +5' };
+    const p = HQ.state.prospects.find(x => x.id === m.pid);
+    if (!p) return { big: '?', sub: '' };
+    return { big: p.name, sub: (p.trade || '') + (p.city ? ' · ' + p.city : '') };
+  }
+  function stripCells() {
+    /* la bande qui défile : tout le carnet actif, l'air vivant */
+    const pool = HQ.state.prospects.filter(p => p.level < 3 && !p.resting);
+    const cells = pool.length ? pool.map(p => ({ big: p.name, sub: (p.trade || '') + (p.city ? ' · ' + p.city : '') }))
+      : [{ big: '📇 Your book', sub: 'is waiting for names' }];
+    cells.push({ big: '📇 Your book', sub: 'add one prospect · +5' });
+    return cells;
+  }
+  function buildReels() {
+    const quest = HQ.state.quest;
+    const box = $('reels');
+    box.style.gridTemplateColumns = 'repeat(' + Math.max(1, quest.length) + ', 1fr)';
+    box.innerHTML = quest.map((m, i) =>
+      '<div class="reel" id="r' + i + '"><span class="rlbl">move ' + (i + 1) + '</span><div class="strip" id="s' + i + '"></div></div>'
+    ).join('');
+    quest.forEach((m, i) => fillStrip(i, m));
+  }
+  /* la bande d'UN rouleau, avec la cellule gagnante à la fin */
+  function fillStrip(i, m) {
+    const base = stripCells();
+    const cells = [];
+    for (let c = 0; c < CYCLES; c++) cells.push(...base);
+    cells.push(cellFor(m));
+    $('s' + i).innerHTML = cells.map(c =>
+      '<div class="cell"><div class="big">' + HQ.esc(c.big) + '</div><div class="sub">' + HQ.esc(c.sub) + '</div></div>'
+    ).join('');
+    return cells.length - 1;   // l'index de la cellule gagnante
+  }
+  function spinReel(i, m, dur, done) {
+    const target = fillStrip(i, m);
+    const strip = $('s' + i);
+    strip.style.transition = 'none';
+    strip.style.transform = 'translateY(0px)';
+    void strip.offsetHeight;
+    const y = -(target * H);
+    if (REDUCED) { strip.style.transform = 'translateY(' + y + 'px)'; done && done(); return; }
+    strip.style.transition = 'transform ' + dur + 'ms cubic-bezier(.16,.86,.16,1)';
+    strip.style.transform = 'translateY(' + y + 'px)';
+    setTimeout(() => {
+      const r = $('r' + i);
+      if (r) { r.classList.add('landed'); setTimeout(() => r.classList.remove('landed'), 240); }
+      clack();
+      done && done();
+    }, dur);
+  }
+
+  /* ── le levier ── */
+  function pullDay() {
+    if (spinning) return;
+    const quest = HQ.state.quest;
+    if (!quest.length) return;
+    spinning = true;
+    pulled = true;
+    $('lever').disabled = true;
+    $('lever').textContent = 'SPINNING…';
+    $('cstate').textContent = 'Spinning';
+    $('tray').style.display = 'none';
+    clack();
+    let landed = 0;
+    const durs = [1500, 2100, 2700];
+    quest.forEach((m, i) => spinReel(i, m, durs[i] || 2700, () => {
+      landed++;
+      if (landed === quest.length) allLanded();
+    }));
+    if (!REDUCED) {
+      let t = 0, gap = 55;
+      const total = durs[Math.min(quest.length, durs.length) - 1] || 1500;
+      while (t < total - 120) { setTimeout(tick, t); t += gap; gap *= 1.09; }
+    }
+  }
+  function allLanded() {
+    spinning = false;
+    $('lever').disabled = false;
+    $('lever').textContent = 'RE-SPIN THE DRUMS 🎰';
+    $('cstate').textContent = 'Landed';
+    ding();
+    renderTray();
+    $('tray').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'nearest' });
+  }
+
+  /* ── les cartes du jour ── */
+  const TILTS = ['-0.5deg', '0.4deg', '-0.3deg'];
+  function renderTray() {
+    const quest = HQ.state.quest;
+    const wrap = $('cards');
+    wrap.innerHTML = quest.map((m, i) => cardHtml(m, i)).join('');
+    $('tray').style.display = 'block';
+    paintProg();
+  }
+  function cardHtml(m, i) {
+    const v = HQ.moveView(m);
+    const luck = m.type === 'add' ? null : luckFor(m);
+    const status = m.done ? (m.skipped ? ' skipped' : ' done') : '';
+    let inner;
+    if (m.type === 'add') {
+      inner = '<h3>' + HQ.esc(v.title) + '</h3>'
+        + '<div class="sub">' + HQ.esc(v.desc) + '</div>'
+        + (m.done ? '' :
+          '<div class="mini">'
+          + '<input class="hq" id="aName' + i + '" placeholder="Business name">'
+          + '<input class="hq" id="aTrade' + i + '" placeholder="Trade: pizzeria, bakery…">'
+          + '<input class="hq" id="aCity' + i + '" placeholder="City">'
+          + '</div>'
+          + '<div class="cacts"><button class="tool" onclick="addOne(' + m.id + ',' + i + ')">Added to my book ✔ +5</button></div>')
+        + '<div class="sentline" id="sline' + i + '"></div>';
+    } else {
+      const scriptHtml = HQ.esc(v.script).replace(/\[(.+?)\]/g, '<span class="hole">[$1]</span>');
+      inner = '<h3>' + HQ.esc(v.title) + ' ' + v.icon + '</h3>'
+        + '<div class="sub">' + HQ.esc(v.desc) + '</div>'
+        + '<div class="chanx mono">' + v.channel + '</div>'
+        + (luck ? '<div class="luck">' + luck.em + ' <b>' + HQ.esc(luck.t) + '</b> · ' + HQ.esc(luck.d) + '</div>' : '')
+        + '<div class="scriptbox"><div class="txt" id="txt' + i + '">' + scriptHtml + '</div></div>'
+        + (m.done ? '' :
+          '<div class="cacts">'
+          + '<button class="tool" onclick="copyIt(this,' + i + ')">Copy 📋</button>'
+          + '<button class="tool" id="sent' + i + '" onclick="sendIt(' + m.id + ',' + i + ')">I sent it ✔</button>'
+          + '<button class="reroll1" onclick="reroll(' + m.id + ',' + i + ')">not this one today, re-roll →</button>'
+          + '</div>')
+        + '<div class="sentline" id="sline' + i + '"' + (m.done && !m.skipped ? ' style="display:block"><span class="big">Sent ✅</span>' : '>') + '</div>';
+    }
+    return '<div class="card' + status + '" id="card' + i + '" style="--tilt:' + TILTS[i % 3] + '; animation-delay:' + (i * .13) + 's">'
+      + '<span class="corner"></span>'
+      + '<div class="chd mono"><span>Move ' + (i + 1) + ' of ' + HQ.state.quest.length + '</span><span>'
+      + (m.done ? (m.skipped ? 'skipped' : 'done ✔') : 'to play') + '</span></div>'
+      + '<div class="cbody">' + inner + '</div></div>';
+  }
+
+  function copyIt(btn, i) {
+    const raw = $('txt' + i).innerText;
+    navigator.clipboard && navigator.clipboard.writeText(raw);
+    btn.textContent = 'Copied ✅'; beep(880, .09);
+    setTimeout(() => { btn.textContent = 'Copy 📋'; }, 1600);
+  }
+  function sendIt(qid, i) {
+    const m = HQ.state.quest.find(x => x.id === qid);
+    if (!m || m.done) return;
+    const luck = luckFor(m);
+    const v = HQ.completeMove(qid);
+    if (!v) return;
+    let gained = v.pts;
+    if (luck && luck.extra) {                     // le petit cadeau de la machine
+      HQ.state.points += luck.extra;
+      HQ.save();
+      gained += luck.extra;
+    }
+    HQ.toast('+' + gained + ' points ✨');
+    HQ.confetti(16);
+    ding();
+    renderTray();
+    const sl = $('sline' + i);
+    if (sl) {
+      let html = '<span class="big">+' + gained + ' points ✨</span><br>You showed up. That is the whole secret.';
+      if (luck && luck.treat) {
+        const t = HQ.nextTreat();
+        html += '<div class="treat">' + t.em + ' <b>' + HQ.esc(t.p) + '</b><br>' + HQ.esc(t.h) + '</div>';
+      }
+      sl.innerHTML = html;
+      sl.style.display = 'block';
+    }
+    checkDayDone();
+  }
+  function addOne(qid, i) {
+    const name = $('aName' + i).value.trim();
+    if (!name) { HQ.toast('A name is all I need 🙂'); return; }
+    HQ.addProspect({ name, trade: $('aTrade' + i).value.trim(), city: $('aCity' + i).value.trim() });
+    HQ.toast('+5 points ✨ Welcome, ' + name + '!');
+    HQ.confetti(12);
+    renderTray();
+    checkDayDone();
+  }
+  function reroll(qid, i) {
+    if (spinning) return;
+    const m = HQ.rerollMove(qid);
+    if (!m) { HQ.toast('Nobody left to swap with today 🌿'); return; }
+    spinning = true;
+    $('cstate').textContent = 'Re-rolling move ' + (i + 1);
+    clack();
+    if (!REDUCED) {
+      let t = 0, gap = 60;
+      while (t < 1500) { setTimeout(tick, t); t += gap; gap *= 1.12; }
+    }
+    spinReel(i, m, 1650, () => {
+      spinning = false;
+      $('cstate').textContent = 'Landed';
+      renderTray();
+      HQ.toast('Swapped, for free 🎰');
+    });
+  }
+  function paintProg() {
+    const q = HQ.state.quest;
+    $('prog').textContent = q.filter(m => m.done && !m.skipped).length + ' / ' + q.length + ' played';
+  }
+  function checkDayDone() {
+    if (HQ.state.quest.every(m => m.done)) {
+      $('daydone').style.display = 'block';
+      HQ.confetti(50);
+      setTimeout(() => beep(523, .18), 250);
+      setTimeout(() => beep(659, .18), 420);
+      setTimeout(() => beep(784, .3), 590);
+    }
+  }
+
+  /* ── au départ ── */
+  function boot() {
+    const quest = HQ.state.quest;
+    if (!HQ.state.prospects.length && quest.every(m => m.type === 'add')) {
+      $('empty').style.display = 'block';
+      $('empty').innerHTML = 'Your book is empty, so the machine has nothing to draw 🎰<br>'
+        + 'Ask Claude to prospect for you, then load the list on '
+        + '<a href="prospects.html">your board</a>. Come back and pull!';
+    }
+    buildReels();
+    /* si la journée est déjà entamée, les cartes sont déjà sur la table */
+    if (HQ.state.quest.some(m => m.done)) { pulled = true; renderTray(); checkDayDone(); }
+  }
+  boot();
+</script>
+</body>
+</html>
