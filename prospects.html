@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Botler Sales HQ · My prospects</title>
-<link rel="stylesheet" href="assets/hq.css?v=20260729">
+<link rel="stylesheet" href="assets/hq.css?v=20260731">
 <style>
   .stage { max-width: 1180px; margin: 0 auto; padding: 46px 34px 70px; min-height: 100vh; }
   .top { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; flex-wrap: wrap; animation: rise .5s .08s both; }
@@ -117,7 +117,7 @@
 
   <div id="pasteBox">
     <div class="lbl mono">Paste one prospect per line · name ; trade ; city ; website ; linkedin ; email ; product</div>
-    <textarea class="hq" id="pasteTxt" placeholder="Luigi's Pizzeria; pizzeria; Avignon; none; ; luigi@example.com; Botler Pizza&#10;Chateau des Roses; wedding venue; Carpentras; none; ; hello@example.com; Yousic"></textarea>
+    <textarea class="hq" id="pasteTxt" placeholder="Luigi's Pizzeria; pizzeria; Avignon; none; ; luigi@example.com; Botler Pizza; Luigi; the 4.9 stars and the wood oven photos; fr&#10;Chateau des Roses; wedding venue; Carpentras; none; ; hello@example.com; Yousic; ; ; fr&#10;(last 3 columns are optional: contact first name; the detail you loved; language fr or en)"></textarea>
     <div style="display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap">
       <span class="mono" style="color:var(--faint)">Missing bits are fine · duplicates are skipped · "none" means no website 🎯</span>
       <button class="tool" style="margin-left:auto" onclick="doImport()">Add them all ✔</button>
@@ -155,8 +155,8 @@
 </div>
 
 
-<script src="assets/hq.js?v=20260729"></script>
-<script src="assets/products.js?v=20260729"></script>
+<script src="assets/hq.js?v=20260731"></script>
+<script src="assets/products.js?v=20260731"></script>
 <script>
   HQ.ensureDay();
   if (HQ.sayBubble) document.getElementById('say').innerHTML = HQ.sayBubble('prospects');

@@ -48,6 +48,16 @@
   try { st = JSON.parse(localStorage.getItem(KEY)); } catch (e) { st = null; }
   if (!st || st.v !== 1) st = fresh();
   if (!Array.isArray(st.notes)) st.notes = [];   // migration des anciennes sauvegardes
+  /* migration : les fiches d'avant l'échelle de relance apprennent à compter
+     leurs envois (bonjour + relances lus dans leur propre histoire) */
+  st.prospects.forEach(p => {
+    if (p.sends === undefined) {
+      p.sends = (p.helloSent ? 1 : 0) + p.history.filter(h => /gentle nudge/.test(h.txt)).length;
+    }
+    if (p.contact === undefined) p.contact = '';
+    if (p.hook === undefined) p.hook = '';
+    if (p.lang === undefined) p.lang = '';
+  });
   const save = () => localStorage.setItem(KEY, JSON.stringify(st));
 
   /* ── la série 🔥 et la semaine ── */
@@ -68,12 +78,31 @@
     save();
   }
 
+  /* ── l'échelle de relance : hello → nudge (3j+) → value (8j+) → door (15j+),
+     puis repos DÉFINITIF : personne ne reçoit jamais un 5e message. ── */
+  function rungOf(p) {
+    const s = p.sends || 0;
+    if (!p.helloSent || s === 0) return 'hello';
+    if (s === 1) return 'nudge';
+    if (s === 2) return 'value';
+    if (s === 3) return 'door';
+    return 'rest';
+  }
+  const RUNG_QUIET = { nudge: 3, value: 8, door: 15 };   // jours de silence requis
+  function nudgeDue(p) {
+    if (p.resting) return false;
+    const r = rungOf(p);
+    if (r === 'hello' || r === 'rest') return false;
+    const quiet = p.lastTouch ? daysBetween(p.lastTouch, today()) : 99;
+    return quiet >= RUNG_QUIET[r];
+  }
+
   /* ── la quête du jour : relances d'abord, puis un bonjour, puis le carnet ── */
   function genQuest() {
     const moves = [];
-    const active = st.prospects.filter(p => p.level < 3);
+    const active = st.prospects.filter(p => p.level < 3 && !p.resting);
     const quiet = active
-      .filter(p => p.lastTouch && daysBetween(p.lastTouch, today()) >= 3)
+      .filter(p => p.lastTouch && nudgeDue(p))
       .sort((a, b) => a.lastTouch < b.lastTouch ? -1 : 1);
     quiet.slice(0, 2).forEach(p => moves.push({ type: 'nudge', pid: p.id }));
     if (moves.length < 2) {
@@ -97,26 +126,9 @@
   }
 
   function getScript(p, type) {
-    const pr = prodOf(p);
-    if (type === 'hello') {
-      const intro = 'Hi [first name] 👋 I came across ' + (p ? p.name : 'your business')
-        + ' while looking at ' + (p ? (p.city || 'your area') : 'your city') + ', and [something you liked]!';
-      if (pr && pr.script) {
-        return intro + '\n' + pr.script.lines.join('\n')
-          + '\nAnd if it is a no, that is completely fine, just say so.';
-      }
-      // aucun produit choisi : on ne vend rien, on ouvre la conversation
-      return intro + '\n'
-        + 'I work at Botler, we build websites and AI assistants for businesses like yours.\n'
-        + 'Quick question before I say anything else: when a customer wants to find you or order from you, how do they do it today?\n'
-        + 'And if this is not for you, just say so, that is completely fine.';
-    }
-    if (type === 'nudge') {
-      return 'Hi [first name], just a gentle nudge on my last message 🙂\n'
-        + 'No rush at all. Happy to answer any question, or show you a quick 10-minute demo whenever suits.\n'
-        + 'And if it is a no for now, that is completely fine too. Just say so and I will stop nudging.';
-    }
-    return '';
+    if (!window.TemplateBank) return '';   // templates.js pas encore chargé
+    const rung = type === 'hello' ? 'hello' : rungOf(p || {});
+    return window.TemplateBank.compose(p, rung === 'hello' && type === 'nudge' ? 'nudge' : rung);
   }
 
   /* ── vue d'une action (pour le Home et le mode quête) ── */
@@ -135,15 +147,27 @@
         : 'No product picked for this one yet. Open their card and choose one, and your script becomes a real pitch instead of a polite hello.',
       script: getScript(p, 'hello'), p
     };
-    if (m.type === 'nudge') return {
-      icon: '🔁', pts: 10,
-      title: 'Follow up with ' + p.name,
-      desc: 'Quiet for ' + daysBetween(p.lastTouch, today()) + ' days · one gentle nudge · script ready',
-      channel: p.email ? '✉️ Send this by EMAIL · reply in your last thread' : '💼 Send this on LINKEDIN · same conversation',
-      btn: 'I sent the nudge ✔ +10',
-      why: 'A gentle nudge doubles your chances. Nudging is caring.',
-      script: getScript(p, 'nudge'), p
-    };
+    if (m.type === 'nudge') {
+      const rung = rungOf(p);
+      const RUNG_VIEW = {
+        nudge: { icon: '🔁', kind: 'one gentle nudge', btn: 'I sent the nudge ✔ +10',
+          why: 'A gentle nudge doubles your chances. Nudging is caring.' },
+        value: { icon: '🎁', kind: 'a value nudge · you bring something NEW', btn: 'I sent the value nudge ✔ +10',
+          why: 'Never "did you see my message". This one brings a link, an example, a fresh reason to answer.' },
+        door: { icon: '🌟', kind: 'the open door · your LAST message to them', btn: 'I sent the open door ✔ +10',
+          why: 'The perfect last impression. After this one they rest forever: you are never a pest.' },
+      };
+      const rv = RUNG_VIEW[rung] || RUNG_VIEW.nudge;
+      return {
+        icon: rv.icon, pts: 10,
+        title: 'Follow up with ' + p.name,
+        desc: 'Quiet for ' + daysBetween(p.lastTouch, today()) + ' days · ' + rv.kind + ' · script ready',
+        channel: p.email ? '✉️ Send this by EMAIL · reply in your last thread' : '💼 Send this on LINKEDIN · same conversation',
+        btn: rv.btn,
+        why: rv.why,
+        script: getScript(p, 'nudge'), rung, p
+      };
+    }
     return {
       icon: '📇', pts: 5,
       title: 'Add one prospect to your book',
@@ -175,18 +199,45 @@
     if (!m || m.done) return null;
     m.done = true;
     const v = moveView(m);
-    if (v.p) {
-      v.p.lastTouch = today();
-      if (m.type === 'hello') v.p.helloSent = true;
-      v.p.history.push({ d: today(), txt: m.type === 'hello' ? 'You said hi ✉️ First brave move.' : 'You sent a gentle nudge 🔁' });
-      if (!st.trophies.firstHello) st.trophies.firstHello = today();
-    }
+    if (v.p) recordSend(v.p, m.type);
     award(v.pts);
     return v;
   }
   function skipMove(qid) {
     const m = st.quest.find(x => x.id === qid);
     if (m) { m.skipped = true; m.done = true; save(); }
+  }
+
+  /* ── le re-roll de la machine à sous 🎰 : échanger UN prospect du jour
+     contre un autre éligible, gratuitement, sans perdre de points ── */
+  function rerollMove(qid) {
+    const m = st.quest.find(x => x.id === qid && !x.done);
+    if (!m || m.type === 'add') return null;
+    const used = st.quest.map(x => x.pid).filter(x => x !== undefined);
+    const active = st.prospects.filter(p => p.level < 3 && !p.resting && !used.includes(p.id));
+    /* même type d'action d'abord, sinon l'autre : la journée reste une journée */
+    let cand = m.type === 'nudge'
+      ? active.filter(p => p.lastTouch && nudgeDue(p))
+      : active.filter(p => !p.helloSent);
+    if (!cand.length) cand = active.filter(p => !p.helloSent || nudgeDue(p));
+    if (!cand.length) return null;
+    const p = cand[Math.floor(Math.random() * cand.length)];
+    m.pid = p.id;
+    m.type = p.helloSent ? 'nudge' : 'hello';
+    save();
+    return m;
+  }
+
+  /* corriger la personnalisation d'une fiche (contact, hook, lang) */
+  function updateProspect(id, patch) {
+    const p = st.prospects.find(x => x.id === id);
+    if (!p) return null;
+    ['contact', 'hook', 'lang'].forEach(k => {
+      if (patch[k] !== undefined) p[k] = String(patch[k]).trim();
+    });
+    if (patch.lang !== undefined) p.lang = p.lang.toLowerCase();
+    save();
+    return p;
   }
 
   /* ── agir directement depuis la fiche prospect ──
@@ -197,24 +248,36 @@
     if (m) return completeMove(m.id);
     const p = st.prospects.find(x => x.id === pid);
     if (!p) return null;
+    recordSend(p, type);
+    award(10);
+    return { pts: 10 };
+  }
+
+  /* un envoi = un barreau gravi sur l'échelle ; après la porte ouverte,
+     le prospect se repose pour toujours (jamais un 5e message) */
+  function recordSend(p, type) {
+    const rung = type === 'hello' ? 'hello' : rungOf(p);
     p.lastTouch = today();
     if (type === 'hello') {
       p.helloSent = true;
       p.history.push({ d: today(), txt: 'You said hi ✉️ First brave move.' });
       if (!st.trophies.firstHello) st.trophies.firstHello = today();
+    } else if (rung === 'value') {
+      p.history.push({ d: today(), txt: 'You sent a value nudge 🎁 Something new to look at.' });
+    } else if (rung === 'door') {
+      p.history.push({ d: today(), txt: 'You left the door open 🌟 They rest now, and you were never a pest.' });
+      p.resting = true;
     } else {
       p.history.push({ d: today(), txt: 'You sent a gentle nudge 🔁' });
     }
-    award(10);
-    return { pts: 10 };
+    p.sends = (p.sends || 0) + 1;
   }
 
   /* la prochaine action suggérée pour UN prospect */
   function nextMoveFor(p) {
-    if (!p || p.level === 3) return null;
+    if (!p || p.level === 3 || p.resting) return null;
     if (!p.helloSent) return { type: 'hello', pid: p.id };
-    const quiet = p.lastTouch ? daysBetween(p.lastTouch, today()) : 99;
-    if (quiet >= 3) return { type: 'nudge', pid: p.id };
+    if (nudgeDue(p)) return { type: 'nudge', pid: p.id };
     return null;
   }
 
@@ -225,7 +288,11 @@
       name: f.name, trade: f.trade || 'local business', city: f.city || '',
       brand: (f.brand || '').trim(),
       website: f.website || '', linkedin: f.linkedin || '', email: f.email || '',
-      level: 0, maxLevel: 0, helloSent: false, lastTouch: null,
+      /* la personnalisation trouvée par Claude à la prospection :
+         contact = prénom, hook = le détail vrai qui remplit le message,
+         lang = fr ou en (la machine choisit la langue toute seule) */
+      contact: (f.contact || '').trim(), hook: (f.hook || '').trim(), lang: (f.lang || '').trim().toLowerCase(),
+      level: 0, maxLevel: 0, helloSent: false, lastTouch: null, sends: 0,
       history: [{ d: today(), txt: 'Added to your book 📇' }],
       createdAt: today(),
     };
@@ -401,6 +468,9 @@
         linkedin: c[4] || '',
         email: c[5] || '',
         brand: c[6] || defBrand || '',
+        contact: c[7] || '',
+        hook: c[8] || '',
+        lang: c[9] || '',
       });
       res.added++;
       res.names.push(name);
@@ -637,7 +707,7 @@
      (Clients d'abord). S'ouvre proprement dans Excel ou Google Sheets. */
   function exportCSV() {
     const lvl = ['CONTACTED · you said hi', 'INTERESTED · they replied', 'DEMO · booked or done', 'CLIENTS 🏆 · they said yes'];
-    const head = ['Name', 'Brand', 'Trade', 'City', 'Website', 'LinkedIn', 'Email', 'Added', 'Last touch', 'Days quiet', 'Story so far'];
+    const head = ['Name', 'Brand', 'Trade', 'City', 'Website', 'LinkedIn', 'Email', 'Contact', 'Hook', 'Lang', 'Added', 'Last touch', 'Days quiet', 'Messages sent', 'Story so far'];
     const lines = [];
     lines.push(['BOTLER SALES HQ · MY PROSPECTS']);
     lines.push(['Exported', today()]);
@@ -649,8 +719,10 @@
       lines.push(head);
       rows.forEach(p => lines.push([
         p.name, p.brand || '', p.trade, p.city, p.website || 'no site yet 🎯', p.linkedin, p.email,
+        p.contact || '', p.hook || '', p.lang || '',
         p.createdAt, p.lastTouch || '',
         p.lastTouch ? daysBetween(p.lastTouch, today()) : '',
+        (p.sends || 0) + (p.resting ? ' · resting 🌿' : ''),
         p.history.map(h => h.d + ' · ' + h.txt).join('  |  '),
       ]));
       lines.push([]);
@@ -722,8 +794,8 @@
 
   window.HQ = {
     get state() { return st; },
-    save, ensureDay, genQuest, moveView, completeMove, skipMove,
-    addProspect, moveUp, setLevel, braveNo, addNote, removeProspect, resetAll,
+    save, ensureDay, genQuest, moveView, completeMove, skipMove, rerollMove, rungOf,
+    addProspect, updateProspect, moveUp, setLevel, braveNo, addNote, removeProspect, resetAll,
     noteAdd, noteUpdate, noteDelete, notesFor, noteTags, importProspects,
     brands, brandFilter, setBrandFilter, setBrand, dayMoves,
     productInfo, setProductInfo,

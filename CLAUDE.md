@@ -32,11 +32,21 @@ COURAGE et l'EFFORT, pas seulement les ventes.
   Mots-clés des titres en Georgia italique dorée. Fond blanc quadrillé + grain.
 
 ## Architecture (100% statique, zéro API, zéro coût)
-- `index.html` Home · `quest.html` mode quête · `prospects.html` plateau ·
-  `prospect.html` fiche (à venir) · `trophies.html` Trophy Room 3D (à venir).
+- `index.html` Home · `quest.html` mode quête · `machine.html` la machine à
+  sous du courage 🎰 (un levier = la quête du jour entière, re-roll gratuit) ·
+  `prospects.html` plateau · `prospect.html` fiche · `trophies.html` Trophy
+  Room 3D (à venir).
 - `assets/hq.js` : LE moteur (état localStorage clé `botler-sales-hq-v1`,
   série 🔥 avec joker hebdo, génération de quête, points, trophées, scripts,
-  brain treats, leçons, export/import JSON).
+  brain treats, leçons, export/import JSON). Échelle de relance à 4 barreaux :
+  hello → nudge (3j+) → value (8j+) → door (15j+), puis repos DÉFINITIF
+  (`p.resting`, jamais de 5e message). `p.sends` compte les envois.
+- `assets/templates.js` : la banque de messages validée par Berni (FR + EN,
+  signature Bernice incluse, variantes en rotation, pack Yousic par métier,
+  réponses anti-panique). Règles NON négociables dedans : vouvoiement,
+  jamais de coucou, jamais de promesse de démo ou de rendez-vous tenus par
+  Berni, jamais de prix (repo public). Toute nouvelle formulation de message
+  passe par la validation de Berni avant d'entrer dans ce fichier.
 - Prospects : champ `brand` libre (campagnes séparées, filtres sur le plateau,
   mémorisés dans `state.brandFilter`).
 - `notes.html` : carnet de notes (capture rapide, tags, recherche, épinglage,
@@ -56,11 +66,20 @@ question sur le format ou la destination :
 2. **Écris un fichier CSV** dans `private/prospection/` (crée le dossier si
    besoin) nommé `AAAA-MM-JJ_<marque>_<ville>.csv`, avec cette première ligne
    d'en-tête exactement :
-   `name;trade;city;website;linkedin;email;brand`
+   `name;trade;city;website;linkedin;email;brand;contact;hook;lang`
    puis une ligne par prospect, séparateur `;`, `none` quand pas de site web,
-   champ vide quand l'info manque. Ce fichier ne sera JAMAIS commité
-   (`private/` est dans .gitignore) : Berni le charge sur le plateau via le
-   bouton "📂 Import a file" (il accepte aussi les CSV exportés de Google Sheets).
+   champ vide quand l'info manque. Les 3 dernières colonnes sont la
+   PERSONNALISATION qui remplit les templates toute seule :
+   - `contact` : le prénom de la personne à contacter (gérant, adjoint com...),
+     vide si introuvable (le message marchera sans).
+   - `hook` : le détail personnel VRAI trouvé pendant la recherche, écrit en
+     fin de phrase minuscule qui complète "and I loved ..." / "et j'ai adoré ..."
+     (ex : `the 4.9 stars and the wood oven photos` ou `la façade années 30`).
+     C'est LE champ qui rend chaque message unique : cherche-le sérieusement.
+   - `lang` : `fr` ou `en` (la langue du message que la plateforme génèrera).
+   Ce fichier ne sera JAMAIS commité (`private/` est dans .gitignore) : Berni
+   le charge sur le plateau via le bouton "📂 Import a file" (il accepte aussi
+   les CSV exportés de Google Sheets, et les anciens fichiers à 7 colonnes).
 3. **Affiche AUSSI les lignes brutes dans le chat** (sans en-tête, sans
    commentaire autour) : elle peut les coller via "📋 Paste a list" si elle
    préfère.
