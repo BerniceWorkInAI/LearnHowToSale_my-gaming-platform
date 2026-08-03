@@ -94,6 +94,19 @@
   #pasteBox .lbl { color: var(--grey); margin-bottom: 10px; }
   #pasteTxt { width: 100%; min-height: 120px; resize: vertical; font-family: ui-monospace, Consolas, monospace; font-size: 13px; line-height: 1.7; background: var(--paper); }
 
+  /* ── le coffre privé 🔒 : jamais publié, il vit dans ce navigateur ── */
+  #vaultBox {
+    display: none; border: 1.5px dashed var(--gold); border-radius: 8px; background: #fdfaf0;
+    padding: 18px; margin-top: 22px; animation: rise .4s both;
+  }
+  #vaultBox .vtitle { font-size: 17px; font-weight: 800; letter-spacing: -.02em; color: var(--ink-strong); }
+  #vaultBox .vsub { color: var(--grey); font-size: 13px; line-height: 1.6; margin: 6px 0 16px; max-width: 70ch; }
+  #vaultBox .vsub b { color: var(--ink-strong); }
+  .vrow { border-top: 1px dashed var(--rule); padding: 12px 0 2px; }
+  .vrow .vname { font-size: 14px; font-weight: 700; color: var(--ink-strong); margin-bottom: 8px; }
+  .vrow .vgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 9px; }
+  .vrow .vgrid input { background: var(--paper); font-size: 13px; padding: 9px 11px; }
+
 
   .foot { margin-top: 46px; animation: rise .5s .3s both; }
 </style>
@@ -111,6 +124,7 @@
       <button class="tool" onclick="document.getElementById('fileIn').click()" title="Load a CSV from Claude Code or a Google Sheet download">📂 Import a file</button>
       <input type="file" id="fileIn" accept=".csv,.tsv,.txt" style="display:none" onchange="importFile(this)">
       <button class="tool" onclick="togglePaste()" title="Paste a list from Claude Code, one prospect per line">📋 Paste a list</button>
+      <button class="tool" onclick="toggleVault()" title="Your prices and private notes · this browser only, never published">🔒 My prices</button>
       <button class="go add" onclick="toggleAdd()">Add a prospect +</button>
     </div>
   </div>
@@ -121,6 +135,19 @@
     <div style="display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap">
       <span class="mono" style="color:var(--faint)">Missing bits are fine · duplicates are skipped · "none" means no website 🎯</span>
       <button class="tool" style="margin-left:auto" onclick="doImport()">Add them all ✔</button>
+    </div>
+  </div>
+
+  <!-- le coffre privé 🔒 : prix et notes internes, jamais dans le dépôt -->
+  <div id="vaultBox">
+    <div class="vtitle">Your private vault 🔒</div>
+    <div class="vsub">The price you can quote, a private link, anything to remember while prospecting.
+    Saved <b>in this browser only</b> and carried inside your 💾 Backup. Nothing here is ever published,
+    and it shows up on a prospect card when they ask "how much is it?".</div>
+    <div id="vaultRows"></div>
+    <div style="display:flex; gap:12px; align-items:center; margin-top:14px; flex-wrap:wrap">
+      <span class="mono" style="color:var(--faint)" id="vaultState"></span>
+      <button class="tool" style="margin-left:auto" onclick="saveVault()">Save my notes ✔</button>
     </div>
   </div>
 
@@ -235,6 +262,50 @@
       + (f ? ' in <b>' + HQ.esc(f === '·none' ? 'no brand' : f) + '</b>' : ' in your book')
       + (close ? ' · <span class="hot">' + close + ' getting close 🔥</span>' : '')
       + (won ? ' · <b>' + won + '</b> client' + (won > 1 ? 's' : '') + ' won 🏆' : '');
+  }
+
+  /* ── le coffre privé 🔒 · prix et notes internes ──
+     Ça vit dans le localStorage de Berni, ça voyage dans sa sauvegarde 💾,
+     et ça n'entre JAMAIS dans le dépôt, qui est public. */
+  function vaultList() {
+    return (window.PRODUCTS || []).filter(p => p.ready).sort((a, b) => a.order - b.order);
+  }
+  function toggleVault() {
+    const v = document.getElementById('vaultBox');
+    const open = v.style.display === 'block';
+    v.style.display = open ? 'none' : 'block';
+    if (!open) { buildVault(); v.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+  }
+  function buildVault() {
+    document.getElementById('vaultRows').innerHTML = vaultList().map(p => {
+      const m = HQ.productInfo(p.key);
+      return '<div class="vrow"><div class="vname">' + p.em + ' ' + HQ.esc(p.name) + '</div>'
+        + '<div class="vgrid">'
+        + '<input class="hq" id="vp_' + p.order + '" placeholder="Price I can quote" value="' + HQ.esc(m.price) + '">'
+        + '<input class="hq" id="vl_' + p.order + '" placeholder="Private link (optional)" value="' + HQ.esc(m.link) + '">'
+        + '<input class="hq" id="vn_' + p.order + '" placeholder="My note: what is negotiable, which country…" value="' + HQ.esc(m.note) + '">'
+        + '</div></div>';
+    }).join('');
+    vaultState();
+  }
+  function saveVault() {
+    vaultList().forEach(p => HQ.setProductInfo(p.key, {
+      price: document.getElementById('vp_' + p.order).value,
+      link: document.getElementById('vl_' + p.order).value,
+      note: document.getElementById('vn_' + p.order).value,
+    }));
+    HQ.toast('Saved in this browser only 🔒');
+    vaultState();
+  }
+  function vaultState() {
+    const list = vaultList();
+    const filled = list.filter(p => {
+      const m = HQ.productInfo(p.key);
+      return m.price || m.link || m.note;
+    }).length;
+    document.getElementById('vaultState').textContent = filled
+      ? filled + ' of ' + list.length + ' products filled in 🔒'
+      : 'nothing saved yet · takes 5 minutes, once';
   }
 
   function togglePaste() {

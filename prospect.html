@@ -66,6 +66,14 @@
   .pnote .when { color: var(--faint); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; font-family: ui-monospace, Consolas, monospace; display: block; margin-bottom: 4px; }
   .pnote .tag { color: var(--gold); font-weight: 700; }
 
+  /* ── le coffre privé sur la fiche : le prix sous les yeux, jamais publié ── */
+  .vault { border: 1.5px dashed var(--gold); border-radius: 8px; background: #fdfaf0; padding: 12px 14px; margin-bottom: 14px; font-size: 13.5px; line-height: 1.6; }
+  .vault .vk { color: var(--gold); margin-bottom: 6px; }
+  .vault .vv b { color: var(--ink-strong); }
+  .vault .vn { color: var(--faint); font-size: 11.5px; margin-top: 7px; }
+  .vault.empty { border-color: var(--rule); background: var(--panel); color: var(--grey); font-size: 13px; }
+  .vault.empty b { color: var(--ink-strong); }
+
   .danger { margin-top: 26px; text-align: right; }
   .danger button { background: none; border: none; color: var(--faint); text-decoration: underline; font-size: 12px; }
   .danger button:hover { color: var(--orange); }
@@ -139,12 +147,26 @@
         + '</div>'
       : '';
 
+    /* le prix, au moment exact où on te le demande 🔒
+       Il vient de ton coffre privé (ce navigateur), jamais du dépôt. */
+    const vault = p.brand ? HQ.productInfo(p.brand) : null;
+    const vaultHtml = vault && (vault.price || vault.link || vault.note)
+      ? '<div class="vault"><div class="vk mono">🔒 From your private vault · ' + HQ.esc(p.brand) + '</div>'
+        + (vault.price ? '<div class="vv"><b>Price you can quote:</b> ' + HQ.esc(vault.price) + '</div>' : '')
+        + (vault.note ? '<div class="vv"><b>Your note:</b> ' + HQ.esc(vault.note) + '</div>' : '')
+        + (vault.link ? '<div class="vv"><b>Private link:</b> <a href="' + HQ.esc(vault.link) + '" target="_blank" rel="noopener">open ↗</a></div>' : '')
+        + '<div class="vn">Never published · only in this browser</div></div>'
+      : '<div class="vault empty">🔒 No price saved for '
+        + (p.brand ? '<b>' + HQ.esc(p.brand) + '</b>' : 'this product')
+        + ' yet. Fill your vault once on <a href="prospects.html">your board</a> (button 🔒 My prices) and it will appear right here.</div>';
+
     /* les réponses anti-panique 🧯 : quand ILS répondent, ton script est prêt */
     const replies = window.TemplateBank ? window.TemplateBank.replies(p) : [];
     const repliesHtml = replies.length
       ? '<details style="margin-top:26px">'
         + '<summary class="mono" style="cursor:pointer; color:var(--grey); letter-spacing:.14em; text-transform:uppercase; font-size:10.5px">🧯 They replied? Your anti-panic scripts</summary>'
         + '<p class="explain" style="margin:10px 0 12px">The scariest moment is not sending, it is when someone answers. Pick the situation, copy, breathe.</p>'
+        + vaultHtml
         + replies.map((r, k) =>
             '<div class="script" style="margin-bottom:10px"><div class="head mono"><span>' + HQ.esc(r.label) + '</span>'
             + '<button class="tool" style="font-size:11px; padding:5px 10px" onclick="copyReply(this,' + k + ')">Copy 📋</button></div>'
