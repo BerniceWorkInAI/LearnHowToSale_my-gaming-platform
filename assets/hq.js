@@ -41,6 +41,9 @@
     trophies: {},            // {key: dateStr}
     notes: [],               // {id,txt,tag,pid,pinned,d}
     productInfo: {},         // COUCHE PRIVÉE : {cléProduit: {price, link, note}} · jamais dans le repo
+    /* le journal d'événements 📊 : une ligne datée par action, la source
+       du rapport mensuel. Tous les chiffres se recalculent à partir de là. */
+    events: [],              // {d, k:'lead|send|reply|demo|client|no', rung, pid, name, brand}
     seq: 0,
   });
 
@@ -58,6 +61,26 @@
     if (p.hook === undefined) p.hook = '';
     if (p.lang === undefined) p.lang = '';
   });
+  /* migration : le journal d'événements se reconstruit une fois depuis les
+     histoires existantes (les non déjà supprimés sont perdus, on le sait) */
+  if (!Array.isArray(st.events)) {
+    st.events = [];
+    st.prospects.forEach(p => {
+      (p.history || []).forEach(h => {
+        const k =
+          h.txt.indexOf('Added to your book') > -1 ? ['lead', ''] :
+          h.txt.indexOf('You said hi') > -1 ? ['send', 'hello'] :
+          h.txt.indexOf('gentle nudge') > -1 ? ['send', 'nudge'] :
+          h.txt.indexOf('value nudge') > -1 ? ['send', 'value'] :
+          h.txt.indexOf('door open') > -1 ? ['send', 'door'] :
+          h.txt.indexOf('They replied') > -1 ? ['reply', ''] :
+          h.txt.indexOf('Demo booked') > -1 ? ['demo', ''] :
+          h.txt.indexOf('They said YES') > -1 ? ['client', ''] : null;
+        if (k) st.events.push({ d: h.d, k: k[0], rung: k[1], pid: p.id, name: p.name, brand: p.brand || '' });
+      });
+    });
+    st.events.sort((a, b) => a.d < b.d ? -1 : 1);
+  }
   const save = () => localStorage.setItem(KEY, JSON.stringify(st));
 
   /* ── la série 🔥 et la semaine ── */
@@ -253,10 +276,17 @@
     return { pts: 10 };
   }
 
+  /* une ligne datée dans le journal : la matière première du rapport 📊 */
+  function logEvent(k, p, rung) {
+    if (!Array.isArray(st.events)) st.events = [];
+    st.events.push({ d: today(), k, rung: rung || '', pid: p ? p.id : 0, name: p ? p.name : '', brand: p ? (p.brand || '') : '' });
+  }
+
   /* un envoi = un barreau gravi sur l'échelle ; après la porte ouverte,
      le prospect se repose pour toujours (jamais un 5e message) */
   function recordSend(p, type) {
     const rung = type === 'hello' ? 'hello' : rungOf(p);
+    logEvent('send', p, rung);
     p.lastTouch = today();
     if (type === 'hello') {
       p.helloSent = true;
@@ -297,6 +327,7 @@
       createdAt: today(),
     };
     st.prospects.unshift(p);
+    logEvent('lead', p);
     const addMove = st.quest.find(m => m.type === 'add' && !m.done);
     if (addMove) addMove.done = true;
     award(5);
@@ -329,6 +360,7 @@
       if (lvl === 1 && !st.trophies.firstReply) st.trophies.firstReply = today();
       if (lvl === 2 && !st.trophies.firstDemo) st.trophies.firstDemo = today();
       if (lvl === 3 && !st.trophies.firstClient) st.trophies.firstClient = today();
+      if (fresh_) logEvent(['', 'reply', 'demo', 'client'][lvl], p);
     } else {
       p.history.push({ d: today(), txt: 'Moved back to ' + ['Contacted', 'Interested', 'Demo', 'Client'][lvl] + ' 🔧' });
     }
@@ -341,6 +373,9 @@
   function braveNo(id) {
     const k = st.prospects.findIndex(x => x.id === id);
     if (k < 0) return;
+    /* le journal retient le refus (qui, quand, quelle marque) AVANT que la
+       carte quitte le plateau : le rapport n'oublie plus jamais un non */
+    logEvent('no', st.prospects[k]);
     st.prospects[k].history.push({ d: today(), txt: 'They said no. You dared to ask 🦁' });
     st.prospects.splice(k, 1);
     st.braveNos++;

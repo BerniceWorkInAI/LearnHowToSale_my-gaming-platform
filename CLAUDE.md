@@ -51,6 +51,12 @@ COURAGE et l'EFFORT, pas seulement les ventes.
   mémorisés dans `state.brandFilter`).
 - `notes.html` : carnet de notes (capture rapide, tags, recherche, épinglage,
   rattachement à un prospect). Notes dans `state.notes`.
+- `report.html` : le rapport d'activité mensuel 📊 (effort d'abord, résultat
+  ensuite : messages par barreau, tableau par marque, entonnoir, résultats
+  nommés, comparaison au mois précédent, résumé à coller, impression PDF,
+  export CSV). Il LIT le journal `state.events` (une ligne datée par action :
+  lead, send, reply, demo, client, no) écrit par hq.js ; le non courageux est
+  journalisé AVANT le retrait de la carte, plus aucune perte pour le rapport.
 - `assets/hq.css` : styles communs charte.
 - `vendor/three-0.147.0.min.js` : three.js local (jamais de CDN).
 - Déploiement : GitHub Pages depuis `main`. Pas de build, pas de dépendances.
