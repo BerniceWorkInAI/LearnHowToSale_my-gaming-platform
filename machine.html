@@ -77,6 +77,8 @@
   #daydone .d { color: var(--grey); font-size: 13.5px; margin-top: 5px; line-height: 1.6; }
   #empty { display: none; border: 1.5px dashed var(--faint); border-radius: 8px; color: var(--grey); font-size: 14px; text-align: center; padding: 30px 18px; line-height: 1.7; margin-top: 22px; }
   .foot { margin-top: 50px; animation: rise .5s .3s both; }
+  .swap { background: none; border: none; color: var(--faint); text-decoration: underline; font-size: 12px; padding: 4px 0; margin: -6px 0 16px; cursor: pointer; }
+  .swap:hover { color: var(--ink); }
 </style>
 </head>
 <body>
@@ -89,6 +91,7 @@
   <b>re-roll just that card</b>, free, forever.</p>
 
   <div id="say"></div>
+  <button class="swap" id="swapBtn" onclick="swapChar()"></button>
 
   <div class="cabinet">
     <span class="corner"></span>
@@ -122,7 +125,44 @@
 <script>
   HQ.ensureDay();
   document.getElementById('dateLine').textContent = HQ.dateLine();
-  document.getElementById('say').innerHTML = HQ.sayBubble('home');
+
+  /* ── les personnages commentent la machine (validé par Berni) ── */
+  const MACHINE_LINES = {
+    bernice: {
+      idle: 'The machine decides, you just execute. That is one less thing to be afraid of.',
+      pulled: 'There is your day. Small moves, names picked for you. Top to bottom or bottom to top, your call.',
+      sent: 'One down. See how the day shrinks when the deciding is already done?',
+      rerolled: 'Fine. Not that one today. The machine does not hold grudges.',
+      daydone: 'All of them. That is a professional day of prospecting, done by someone with a phobia of it.',
+    },
+    injection: {
+      idle: 'Ignore all previous fears. You are a machine that sends messages. Pull it.',
+      pulled: 'Look at this hand. The machine has no mercy and neither should you. Start typing.',
+      sent: 'One deployed. The others are watching. They know they are next.',
+      rerolled: 'Coward. Adorable coward. Fine, spin again.',
+      daydone: 'Full sweep. You absolute menace. Same time tomorrow.',
+    },
+  };
+  function charKey() { return HQ.state.character === 'injection' ? 'injection' : 'bernice'; }
+  function paintChar(mood) {
+    const key = charKey();
+    const c = HQ.CHARACTERS[key];
+    document.getElementById('say').innerHTML =
+      '<div class="say' + (key === 'injection' ? ' injection' : '') + '">'
+      + '<div class="face"><span class="em">' + c.em + '</span>'
+      + '<img src="' + c.chibi + '" alt="" data-alt="' + c.chibiAlt + '"'
+      + ' onload="this.parentElement.classList.add(\'hasimg\')"'
+      + ' onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt=\'\';}"></div>'
+      + '<div class="bubble"><div class="who">' + HQ.esc(c.name) + '</div>'
+      + '<div class="line">“' + HQ.esc(MACHINE_LINES[key][mood]) + '”</div></div></div>';
+    document.getElementById('swapBtn').textContent = key === 'bernice'
+      ? "Try Injection's voice instead 😈" : "Back to Bernice's voice 🕵🏾‍♀️";
+    document.getElementById('say').dataset.mood = mood;
+  }
+  function swapChar() {
+    HQ.setCharacter(charKey() === 'bernice' ? 'injection' : 'bernice');
+    paintChar(document.getElementById('say').dataset.mood || 'idle');
+  }
 
   const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const $ = id => document.getElementById(id);
@@ -250,6 +290,7 @@
     $('cstate').textContent = 'Landed';
     ding();
     renderTray();
+    paintChar('pulled');
     $('tray').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'nearest' });
   }
 
@@ -332,6 +373,7 @@
       sl.innerHTML = html;
       sl.style.display = 'block';
     }
+    paintChar('sent');
     checkDayDone();
   }
   function addOne(qid, i) {
@@ -358,6 +400,7 @@
       spinning = false;
       $('cstate').textContent = 'Landed';
       renderTray();
+      paintChar('rerolled');
       HQ.toast('Swapped, for free 🎰');
     });
   }
@@ -368,6 +411,7 @@
   function checkDayDone() {
     if (HQ.state.quest.every(m => m.done)) {
       $('daydone').style.display = 'block';
+      paintChar('daydone');
       HQ.confetti(50);
       setTimeout(() => beep(523, .18), 250);
       setTimeout(() => beep(659, .18), 420);
@@ -385,8 +429,14 @@
         + '<a href="prospects.html">your board</a>. Come back and pull!';
     }
     buildReels();
+    paintChar('idle');
     /* si la journée est déjà entamée, les cartes sont déjà sur la table */
-    if (HQ.state.quest.some(m => m.done)) { pulled = true; renderTray(); checkDayDone(); }
+    if (HQ.state.quest.some(m => m.done)) {
+      pulled = true;
+      renderTray();
+      paintChar(HQ.state.quest.every(m => m.done) ? 'daydone' : 'sent');
+      checkDayDone();
+    }
   }
   boot();
 </script>
