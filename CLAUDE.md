@@ -122,5 +122,9 @@ copié dans le code ni commité : le repo est PUBLIC. Reformule toujours de
 façon "publique-safe" (arguments génériques, pas de conditions internes).
 
 ## En attente
-- Doc produits de Maëva → écran Produits (fiches anti-panique).
+- L'écran Produits a été RETIRÉ du menu à la demande de Berni (dépôt public) :
+  `products.html` n'existe plus, mais `assets/products.js` reste tel quel, le
+  moteur en a besoin pour les scripts. Ne pas remettre le lien sans son accord.
+  Le coffre à prix (`state.productInfo`) est à relocaliser si elle le redemande.
+- Doc produits de Maëva → à ranger dans `private/`.
 - Médias de Berni : `media/music/`, `media/art/`, `media/victory/` (à la toute fin).
