@@ -35,8 +35,9 @@ et l'effort**, pas seulement les ventes.
    avec son script. C'est de là que naissent les quêtes du jour.
 5. **Trophy Room 🏆 (three.js)** : salle des trophées en 3D, un trophée par
    victoire, manipulable à la souris. Habillage charte (papier, blueprint, or).
-6. **Produits** *(en attente de la doc de Maëva)* : fiches anti-panique · c'est
-   quoi, pour qui, prix, 3 arguments, 2 objections + réponses.
+6. **Rapport d'activité 📊** : `report.html` · l'activité du mois choisi, lue dans
+   le journal d'événements. Effort d'abord, résultat ensuite.
+   *(L'écran Produits a été retiré du menu à la demande de Berni.)*
 
 ## Le moteur de points (transversal)
 - Points sur l'**effort** : message envoyé, relance, prospect ajouté…
