@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Botler Sales HQ · My activity report</title>
+<link rel="stylesheet" href="assets/hq.css?v=20260803">
+<style>
+  /* ═══ Le rapport d'activité mensuel 📊 ═══
+     Il ne stocke rien : il LIT le journal d'événements (state.events)
+     et recalcule tout pour le mois choisi. L'effort d'abord, le
+     résultat ensuite : l'effort est la partie que Berni contrôle.
+     Une seule teinte dorée porte les longueurs ; les statuts ont
+     toujours un mot + une icône, jamais la couleur seule.
+     Maquette validée par Berni (rapport-activite-v1). */
+  .stage { max-width: 800px; margin: 0 auto; padding: 46px 30px 90px; min-height: 100vh; }
+  h1 { font-size: clamp(32px, 6.5vw, 46px); font-weight: 800; letter-spacing: -.04em; line-height: 1.04; margin: 18px 0 8px; text-wrap: balance; color: var(--ink-strong); }
+  .lede { color: var(--grey); font-size: 15px; line-height: 1.65; margin: 0 0 20px; max-width: 62ch; animation: rise .5s .08s both; }
+  .lede b { color: var(--ink-strong); font-weight: 650; }
+  h2 { font-size: 13px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-strong); margin: 42px 0 4px; border-bottom: 1px solid var(--ink); padding-bottom: 9px; display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  h2 .n { color: var(--faint); font-family: ui-monospace, Consolas, monospace; font-weight: 400; letter-spacing: .16em; font-size: 10.5px; }
+  .note { color: var(--grey); font-size: 13px; line-height: 1.6; margin: 12px 0 16px; max-width: 62ch; }
+  .note b { color: var(--ink-strong); }
+
+  .picker { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px; box-shadow: 3px 3px 0 var(--shadow); position: relative; padding: 13px 16px; margin: 0 0 10px; animation: rise .5s .12s both; }
+  .picker .corner { position: absolute; width: 9px; height: 9px; background: var(--signal); border: 1.5px solid var(--border); top: -6px; left: -6px; }
+  .picker label { color: var(--grey); }
+  .picker select { border: 1.5px solid var(--border); border-radius: 4px; padding: 8px 11px; background: var(--paper); color: var(--ink); font-size: 14px; font-weight: 650; font-family: inherit; cursor: pointer; }
+  .picker select:focus-visible { outline: 2.5px solid var(--gold); outline-offset: 3px; }
+  .picker .spacer { flex: 1; min-width: 10px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-top: 18px; }
+  .tile { background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px; box-shadow: 3px 3px 0 var(--shadow); position: relative; padding: 15px 16px 16px; }
+  .tile .corner { position: absolute; width: 9px; height: 9px; background: var(--gold); border: 1.5px solid var(--border); top: -6px; left: -6px; }
+  .tile .k { color: var(--grey); font-family: ui-monospace, Consolas, monospace; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; line-height: 1.4; }
+  .tile .v { font-size: 34px; font-weight: 800; letter-spacing: -.03em; color: var(--ink-strong); line-height: 1; margin: 9px 0 3px; font-variant-numeric: tabular-nums; }
+  .tile .d { color: var(--grey); font-size: 12.5px; line-height: 1.45; }
+  .tile.hero { grid-column: span 2; }
+  .tile.hero .v { font-size: 46px; color: var(--gold); }
+  @media (max-width: 520px) { .tile.hero { grid-column: span 1; } }
+
+  .bars { display: grid; gap: 11px; margin-top: 16px; }
+  .brow { display: grid; grid-template-columns: 168px 1fr auto; gap: 12px; align-items: center; }
+  @media (max-width: 560px) { .brow { grid-template-columns: 118px 1fr auto; gap: 9px; } }
+  .brow .lbl { font-size: 13px; color: var(--ink); line-height: 1.35; }
+  .brow .lbl b { color: var(--ink-strong); }
+  .brow .lbl small { display: block; color: var(--faint); font-size: 11px; }
+  .track { background: var(--bar-bg); border-radius: 3px; height: 16px; overflow: hidden; }
+  .fill { height: 100%; background: var(--gold); border-radius: 0 4px 4px 0; }
+  .fill.soft { background: var(--faint); }
+  .brow .val { font-size: 14px; font-weight: 800; color: var(--ink-strong); min-width: 5.4em; text-align: right; font-variant-numeric: tabular-nums; }
+  .brow .val span { font-size: 11px; color: var(--grey); font-weight: 600; margin-left: 5px; }
+  .brow.open { padding-top: 11px; border-top: 1px dashed var(--rule); margin-top: 4px; }
+
+  .tablewrap { overflow-x: auto; margin-top: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--panel); border: 1.5px solid var(--border); box-shadow: 3px 3px 0 var(--shadow); }
+  th { text-align: left; font-family: ui-monospace, Consolas, monospace; font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--grey); border-bottom: 1.5px solid var(--border); padding: 10px 12px; white-space: nowrap; }
+  th.r, td.r { text-align: right; font-variant-numeric: tabular-nums; }
+  td { border-bottom: 1px dashed var(--rule); padding: 10px 12px; line-height: 1.4; }
+  tr:last-child td { border-bottom: none; }
+  tfoot td { border-top: 1.5px solid var(--border); font-weight: 800; color: var(--ink-strong); background: var(--bar-bg); }
+  td .minibar { display: block; height: 5px; background: var(--gold); border-radius: 0 3px 3px 0; margin-top: 5px; }
+  .brandname { font-weight: 700; color: var(--ink-strong); white-space: nowrap; }
+
+  .outs { display: grid; gap: 10px; margin-top: 16px; }
+  .out { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; background: var(--panel); border: 1.5px solid var(--rule); border-left-width: 4px; border-radius: 3px; padding: 11px 14px; }
+  .out.win { border-left-color: var(--green); }
+  .out.demo { border-left-color: var(--gold); }
+  .out.no { border-left-color: var(--orange); }
+  .out.reply { border-left-color: var(--faint); }
+  .out .em { font-size: 20px; }
+  .out .who { font-size: 14px; line-height: 1.4; }
+  .out .who b { color: var(--ink-strong); }
+  .out .who small { display: block; color: var(--grey); font-size: 11.5px; }
+  .out .st { font-family: ui-monospace, Consolas, monospace; font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; white-space: nowrap; }
+  .out.win .st { color: var(--green); }
+  .out.demo .st { color: var(--gold); }
+  .out.no .st { color: var(--orange); }
+  .out.reply .st { color: var(--grey); }
+
+  .compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 16px; }
+  .cmp { border: 1.5px dashed var(--rule); border-radius: 6px; padding: 12px 13px; }
+  .cmp .k { color: var(--grey); font-family: ui-monospace, Consolas, monospace; font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; }
+  .cmp .v { font-size: 20px; font-weight: 800; color: var(--ink-strong); margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+  .cmp .d { font-size: 12px; color: var(--grey); }
+  .cmp .up { color: var(--green); font-weight: 700; }
+
+  .summary { background: var(--panel); border: 1.5px solid var(--border); border-radius: 4px; box-shadow: 3px 3px 0 var(--shadow); position: relative; margin-top: 16px; }
+  .summary .corner { position: absolute; width: 9px; height: 9px; background: var(--signal); border: 1.5px solid var(--border); top: -6px; left: -6px; }
+  .summary .shd { display: flex; justify-content: space-between; gap: 8px; color: var(--grey); border-bottom: 1px dashed var(--rule); padding: 10px 15px; }
+  .summary .txt { padding: 15px 16px; font-size: 13.5px; line-height: 1.75; white-space: pre-line; }
+  .acts { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+  .go.big { max-width: 320px; }
+
+  .honest { border: 1.5px dashed var(--rule); border-radius: 8px; padding: 14px 16px; font-size: 13px; line-height: 1.65; color: var(--grey); margin-top: 18px; }
+  .honest b { color: var(--ink-strong); }
+  #emptyState { display: none; border: 1.5px dashed var(--faint); border-radius: 8px; color: var(--grey); font-size: 14px; text-align: center; padding: 34px 18px; line-height: 1.75; margin-top: 26px; }
+  .foot { margin-top: 50px; animation: rise .5s .3s both; }
+
+  /* ── impression PDF : le rapport nu, sans décor ni boutons ── */
+  @media print {
+    body { background: #fff !important; }
+    body::after { display: none !important; }
+    .stage { max-width: none; padding: 0; }
+    .picker, .acts, .foot, .meta a { display: none !important; }
+    .tile, table, .summary { box-shadow: none !important; }
+    h2 { break-after: avoid; }
+    .tile, .out, .brow, table { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="meta mono"><span><a href="index.html">← Back home</a></span><span id="dateLine"></span></div>
+
+  <h1>My <em>activity</em> report 📊</h1>
+  <p class="lede">What you did this month, brand by brand, and what it produced.
+  <b>Effort first, results second</b>, because the effort is the part you control.
+  Pick a month, copy the summary into an email, or print it as a PDF.</p>
+
+  <div class="picker">
+    <span class="corner"></span>
+    <label class="mono" for="m">Month</label>
+    <select id="m" onchange="render(this.value)"></select>
+    <span class="spacer"></span>
+    <span class="mono" id="period"></span>
+  </div>
+
+  <div id="emptyState"></div>
+
+  <div id="report">
+    <h2><span>What I did</span><span class="n">01</span></h2>
+    <p class="note">The numbers that describe your month. <b>Messages sent</b> is the headline:
+    it is the only one that depends entirely on you.</p>
+    <div class="tiles">
+      <div class="tile hero"><span class="corner"></span>
+        <div class="k">Messages sent</div><div class="v" id="tMsg">0</div><div class="d" id="tMsgD"></div></div>
+      <div class="tile"><span class="corner"></span>
+        <div class="k">New leads added</div><div class="v" id="tLeads">0</div><div class="d">Real businesses researched and added to the book</div></div>
+      <div class="tile"><span class="corner"></span>
+        <div class="k">Brands worked</div><div class="v" id="tBrands">0</div><div class="d" id="tBrandsD"></div></div>
+    </div>
+
+    <h2><span>What kind of messages</span><span class="n">02</span></h2>
+    <p class="note">Your follow-up ladder in one look. A month with many follow-ups is a
+    <b>disciplined</b> month: most answers arrive after the second or third touch, never the first.</p>
+    <div class="bars" id="mixBars"></div>
+
+    <h2><span>Brand by brand</span><span class="n">03</span></h2>
+    <p class="note">The table you will most likely be asked for. Bars show the share of your
+    messages, exact numbers are always printed beside them.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Brand</th><th class="r">New leads</th><th class="r">Messages</th><th class="r">Answers</th><th class="r">Demos</th><th class="r">Clients</th><th class="r">Refusals</th></tr></thead>
+        <tbody id="brandRows"></tbody>
+        <tfoot id="brandFoot"></tfoot>
+      </table>
+    </div>
+
+    <h2><span>What it produced</span><span class="n">04</span></h2>
+    <p class="note">The funnel of the month. Silence is listed too, because it is information,
+    not a failure: those conversations are still open.</p>
+    <div class="bars" id="funnel"></div>
+
+    <h2><span>Named outcomes</span><span class="n">05</span></h2>
+    <p class="note">Who moved, and when. This is the part people ask about in a meeting.</p>
+    <div class="outs" id="outs"></div>
+
+    <h2><span>Compared to last month</span><span class="n">06</span></h2>
+    <p class="note">One month alone means little. Progress only shows next to the month before.</p>
+    <div class="compare" id="compare"></div>
+
+    <h2><span>The summary to send</span><span class="n">07</span></h2>
+    <p class="note">Six lines, ready to paste into an email. This is what you will use most.</p>
+    <div class="summary">
+      <span class="corner"></span>
+      <div class="shd mono"><span>Ready to paste</span><span id="sumMonth"></span></div>
+      <div class="txt" id="sumTxt"></div>
+    </div>
+    <div class="acts">
+      <button class="go big" onclick="copySummary(this)">Copy the summary 📋</button>
+      <button class="tool" onclick="window.print()">Print as PDF 🖨️</button>
+      <button class="tool" onclick="exportMonth()">Export the month as CSV ⬇</button>
+    </div>
+
+    <div class="honest">
+      <b>Honest note:</b> this report only knows what you logged in the HQ. A message sent straight
+      from LinkedIn without tapping "I sent it" does not exist here. So these numbers are a floor,
+      never an exaggeration, which is exactly what you want in front of someone.
+    </div>
+  </div>
+
+  <p class="foot mono">Sell with heart · the effort is the part you control</p>
+</div>
+
+<script src="assets/hq.js?v=20260803"></script>
+<script src="assets/products.js?v=20260803"></script>
+<script>
+  HQ.ensureDay();
+  document.getElementById('dateLine').textContent = HQ.dateLine();
+  const $ = id => document.getElementById(id);
+  const esc = HQ.esc;
+  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const monthLabel = m => MONTH_NAMES[+m.slice(5, 7) - 1] + ' ' + m.slice(0, 4);
+  const NOBRAND = 'No product yet';
+
+  function events() { return HQ.state.events || []; }
+
+  /* ── tous les chiffres d'un mois, recalculés depuis le journal ── */
+  function agg(month) {
+    const E = events().filter(e => e.d.slice(0, 7) === month);
+    const sends = E.filter(e => e.k === 'send');
+    const hellos = sends.filter(e => e.rung === 'hello');
+    const by = k => E.filter(e => e.k === k);
+    const answered = new Set([...by('reply'), ...by('demo'), ...by('client')].map(e => e.pid));
+    const stillSilent = hellos.filter(h =>
+      !events().some(e => e.pid === h.pid && e.d >= h.d && (e.k === 'reply' || e.k === 'demo' || e.k === 'client' || e.k === 'no'))).length;
+
+    const brands = {};
+    E.forEach(e => {
+      const b = e.brand || NOBRAND;
+      brands[b] = brands[b] || { n: b, leads: 0, msgs: 0, ans: 0, demos: 0, clients: 0, no: 0 };
+      if (e.k === 'lead') brands[b].leads++;
+      if (e.k === 'send') brands[b].msgs++;
+      if (e.k === 'reply') brands[b].ans++;
+      if (e.k === 'demo') brands[b].demos++;
+      if (e.k === 'client') brands[b].clients++;
+      if (e.k === 'no') brands[b].no++;
+    });
+
+    return {
+      month, E, sends, hellos,
+      days: new Set(E.map(e => e.d)).size,
+      leads: by('lead').length,
+      mix: ['hello', 'nudge', 'value', 'door'].map(r => sends.filter(s => s.rung === r).length),
+      brands: Object.values(brands).sort((a, b) => b.msgs - a.msgs),
+      ans: by('reply').length, demos: by('demo').length, clients: by('client').length, nos: by('no').length,
+      answeredN: answered.size, stillSilent,
+      resting: sends.filter(s => s.rung === 'door').length,
+    };
+  }
+
+  const prevMonth = m => {
+    const y = +m.slice(0, 4), mo = +m.slice(5, 7);
+    return mo === 1 ? (y - 1) + '-12' : y + '-' + String(mo - 1).padStart(2, '0');
+  };
+  const pct = (n, top) => top ? Math.round(n / top * 100) + '%' : '';
+
+  function barRow(lbl, small, v, top, extra, open) {
+    return '<div class="brow' + (open ? ' open' : '') + '"><div class="lbl"><b>' + esc(lbl) + '</b><small>' + esc(small) + '</small></div>'
+      + '<div class="track"><div class="fill' + (open ? ' soft' : '') + '" style="width:' + Math.max(top ? v / top * 100 : 0, v ? 2 : 0) + '%"></div></div>'
+      + '<div class="val">' + v + (extra ? '<span>' + esc(extra) + '</span>' : '') + '</div></div>';
+  }
+
+  function render(month) {
+    const a = agg(month);
+    const first = events()[0];
+    $('period').textContent = monthLabel(month) + ' · ' + a.days + ' active day' + (a.days === 1 ? '' : 's');
+
+    $('tMsg').textContent = a.sends.length;
+    $('tMsgD').textContent = a.sends.length
+      ? 'Across ' + a.days + ' active day' + (a.days === 1 ? '' : 's') + '. ' + a.mix[0] + ' first hello' + (a.mix[0] === 1 ? '' : 's')
+        + ' and ' + (a.sends.length - a.mix[0]) + ' follow-up' + (a.sends.length - a.mix[0] === 1 ? '' : 's') + '.'
+      : 'No message logged this month yet.';
+    $('tLeads').textContent = a.leads;
+    $('tBrands').textContent = a.brands.filter(b => b.n !== NOBRAND).length;
+    $('tBrandsD').textContent = a.brands.length ? a.brands.map(b => b.n).slice(0, 4).join(', ') : 'Pick a product on each card';
+
+    /* 02 · le mix */
+    const MIXL = [
+      ['First hellos', 'a brand new conversation'],
+      ['Gentle nudges', 'after 3 quiet days'],
+      ['Value nudges', 'with something new to look at'],
+      ['Open doors', 'the last message, then they rest'],
+    ];
+    const maxMix = Math.max(...a.mix, 1);
+    $('mixBars').innerHTML = a.mix.map((v, i) => barRow(MIXL[i][0], MIXL[i][1], v, maxMix)).join('');
+
+    /* 03 · par marque */
+    const maxMsgs = Math.max(...a.brands.map(b => b.msgs), 1);
+    $('brandRows').innerHTML = a.brands.length ? a.brands.map(b =>
+      '<tr><td><span class="brandname">' + esc(b.n) + '</span>'
+      + '<span class="minibar" style="width:' + (b.msgs / maxMsgs * 100) + '%"></span></td>'
+      + '<td class="r">' + b.leads + '</td><td class="r">' + b.msgs + '</td><td class="r">' + b.ans + '</td>'
+      + '<td class="r">' + b.demos + '</td><td class="r">' + b.clients + '</td><td class="r">' + b.no + '</td></tr>').join('')
+      : '<tr><td colspan="7" style="color:var(--grey)">Nothing logged this month yet.</td></tr>';
+    $('brandFoot').innerHTML = '<tr><td>All brands</td><td class="r">' + a.leads + '</td><td class="r">' + a.sends.length
+      + '</td><td class="r">' + a.ans + '</td><td class="r">' + a.demos + '</td><td class="r">' + a.clients
+      + '</td><td class="r">' + a.nos + '</td></tr>';
+
+    /* 04 · l'entonnoir */
+    const top = a.hellos.length;
+    $('funnel').innerHTML =
+      barRow('Contacted', 'received a first hello from you', a.hellos.length, top)
+      + barRow('Answered', 'wrote back and moved up', a.ans, top, pct(a.ans, top))
+      + barRow('Demo', 'a walkthrough was set up', a.demos, top, pct(a.demos, top))
+      + barRow('Client', 'they said yes 🏆', a.clients, top, pct(a.clients, top))
+      + barRow('Clear nos', 'brave nos, collected with grace 🦁', a.nos, top, pct(a.nos, top))
+      + barRow('Still silent', 'no answer yet, still open', a.stillSilent, top, pct(a.stillSilent, top), true)
+      + barRow('Resting', 'ladder finished, never contacted again', a.resting, top, pct(a.resting, top), true);
+
+    /* 05 · les résultats nommés */
+    const OUT = { client: ['win', '🏆', 'Client'], demo: ['demo', '📅', 'Demo'], reply: ['reply', '💬', 'Answered'], no: ['no', '🦁', 'Refusal'] };
+    const outs = a.E.filter(e => OUT[e.k]).sort((x, y) => (x.d < y.d ? -1 : 1));
+    $('outs').innerHTML = outs.length ? outs.map(o => {
+      const c = OUT[o.k];
+      return '<div class="out ' + c[0] + '"><span class="em">' + c[1] + '</span>'
+        + '<div class="who"><b>' + esc(o.name) + '</b><small>' + esc(o.brand || NOBRAND) + ' · ' + HQ.nice(o.d) + '</small></div>'
+        + '<span class="st">' + c[2] + '</span></div>';
+    }).join('') : '<p class="note">Nobody moved level this month. That happens, and the messages you sent still count.</p>';
+
+    /* 06 · la comparaison */
+    const pm = prevMonth(month);
+    const hasPrev = events().some(e => e.d.slice(0, 7) === pm);
+    if (hasPrev) {
+      const p = agg(pm);
+      const rows = [
+        ['Messages', a.sends.length, p.sends.length],
+        ['New leads', a.leads, p.leads],
+        ['Answers', a.ans, p.ans],
+        ['Clients', a.clients, p.clients],
+      ];
+      $('compare').innerHTML = rows.map(r => {
+        const diff = r[1] - r[2];
+        const txt = diff > 0 ? '<span class="up">+' + diff + '</span> vs ' + monthLabel(pm)
+          : diff === 0 ? 'same as ' + monthLabel(pm) : diff + ' vs ' + monthLabel(pm);
+        return '<div class="cmp"><div class="k">' + r[0] + '</div><div class="v">' + r[1] + '</div><div class="d">' + txt + '</div></div>';
+      }).join('');
+    } else {
+      $('compare').innerHTML = '<p class="note">No earlier month to compare with yet. Next month this section fills itself.</p>';
+    }
+
+    /* 07 · le résumé à coller */
+    $('sumMonth').textContent = monthLabel(month);
+    const busiest = a.brands.filter(b => b.n !== NOBRAND)[0];
+    const s = 'Prospecting activity, ' + monthLabel(month) + '\n'
+      + '· ' + a.sends.length + ' message' + (a.sends.length === 1 ? '' : 's') + ' sent over ' + a.days
+      + ' active day' + (a.days === 1 ? '' : 's') + ' (' + a.mix[0] + ' first contact' + (a.mix[0] === 1 ? '' : 's')
+      + ', ' + (a.sends.length - a.mix[0]) + ' follow-up' + (a.sends.length - a.mix[0] === 1 ? '' : 's') + ')\n'
+      + '· ' + a.leads + ' new lead' + (a.leads === 1 ? '' : 's') + ' researched and added'
+      + (a.brands.length ? ', across ' + a.brands.filter(b => b.n !== NOBRAND).length + ' brand' + (a.brands.length === 1 ? '' : 's') : '') + '\n'
+      + '· ' + a.ans + ' answer' + (a.ans === 1 ? '' : 's') + ' received, ' + a.demos + ' demo' + (a.demos === 1 ? '' : 's')
+      + ', ' + a.clients + ' new client' + (a.clients === 1 ? '' : 's') + ', ' + a.nos + ' clear refusal' + (a.nos === 1 ? '' : 's') + '\n'
+      + (busiest ? '· Busiest brand: ' + busiest.n + ' (' + busiest.msgs + ' messages, ' + busiest.leads + ' new leads)\n' : '')
+      + '· ' + a.stillSilent + ' conversation' + (a.stillSilent === 1 ? '' : 's') + ' still open and waiting for an answer\n'
+      + 'Bernice';
+    $('sumTxt').textContent = s;
+    $('sumTxt').dataset.raw = s;
+    $('sumTxt').dataset.month = month;
+  }
+
+  function copySummary(btn) {
+    navigator.clipboard && navigator.clipboard.writeText($('sumTxt').dataset.raw || '');
+    btn.textContent = 'Copied ✅';
+    setTimeout(() => { btn.textContent = 'Copy the summary 📋'; }, 1700);
+  }
+  function exportMonth() {
+    const month = $('sumTxt').dataset.month;
+    const rows = [['Date', 'Event', 'Step', 'Prospect', 'Brand']];
+    events().filter(e => e.d.slice(0, 7) === month)
+      .forEach(e => rows.push([e.d, e.k, e.rung || '', e.name, e.brand || '']));
+    const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'botler-activity-' + month + '.csv';
+    a.click();
+    HQ.toast('Month exported ⬇');
+  }
+
+  /* ── départ : les mois disponibles viennent du journal ── */
+  (function boot() {
+    const now = HQ.today().slice(0, 7);
+    const months = [...new Set(events().map(e => e.d.slice(0, 7)).concat([now]))].sort().reverse();
+    $('m').innerHTML = months.map(m => '<option value="' + m + '">' + monthLabel(m) + '</option>').join('');
+    if (!events().length) {
+      $('emptyState').style.display = 'block';
+      $('emptyState').innerHTML = 'No activity logged yet, so there is nothing to report 📊<br>'
+        + 'Send your first message from <a href="machine.html">the machine</a> or <a href="quest.html">the quest</a>, '
+        + 'and this page starts writing itself.';
+    }
+    render(months[0]);
+  })();
+</script>
+</body>
+</html>
